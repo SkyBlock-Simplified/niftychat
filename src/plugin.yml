@@ -1,0 +1,103 @@
+name: NiftyChat
+version: 0.9.5
+website: http://netcoding.net/
+author: Brian Graham
+
+main: net.netcoding.niftychat.NiftyChat
+depend: [NiftyBukkit]
+softdepend: [Vault]
+
+commands:
+  censor:
+    description: Manage chat censoring
+    permission: niftychat.censor
+    usage: /<command> <add|edit|remove|list> <badword> [replace]
+    aliases: cl
+  format:
+    description: Manage chat formatting
+    permission: niftychat.format
+    usage: /<command> <rank> <prefix|suffix|format> [value]
+  nick:
+    description: Sets player nickname
+    permission: niftychat.nick
+    usage: /<command> <<nick|clear>|<player> <nick|clear|revoke|grant>>
+    aliases: nickname
+  rank:
+    description: Manage player rank
+    permission: niftychat.rank
+    usage: /<command> [create|edit|check|player]
+  realname:
+    description: Find a players realname by nickname
+    permission: niftychat.realname
+    usage: /<command> <nick>
+    aliases: rn
+
+permissions:
+  niftychat.*:
+    description: Gives access to all plugin features and commands
+    children:
+      niftychat.censor.*:
+        description: Allows you to run all censor commands
+        children:
+          niftychat.censor.list:
+            description: Allows you to list censored words
+          niftychat.censor.manage:
+            description: Allows you to add, edit and remove censored words
+      niftychat.chat.*:
+        description: Allows you to bypass all chat restrictions
+        children:
+          niftychat.chat.bypass.*:
+            description: Allows you to bypass all chat filtering
+            children:
+              niftychat.chat.bypass.advertise:
+                description: Allows you to put IP addresses and websites with ports in chat
+              niftychat.chat.bypass.caps:
+                description: Allows you to use CAPS in chat
+              niftychat.chat.bypass.censor:
+                description: Allows you to bypass the badword censor in chat
+              niftychat.chat.bypass.move:
+                description: Allows you to talk without moving on first join
+              niftychat.chat.bypass.repeat:
+                description: Allows you to submit the same message in chat
+              niftychat.chat.bypass.url:
+                description: Allows you to put websites without ports in chat
+          niftychat.chat.color:
+            description: Allows you to use colors in chat
+          niftychat.chat.format:
+            description: Allows you to use formatting in chat
+          niftychat.chat.magic:
+            description: Allows you to use magic in chat
+      niftychat.format.*:
+        description: Allows you to run all format commands
+        children:
+          niftychat.format.manage:
+            description: Allows you to edit rank format, prefix and suffix
+          niftychat.format.view:
+            description: Allows you to view rank format, prefix and suffix
+      niftychat.join.fullserver:
+        description: Allows you to join the server even when it is full
+      niftychat.nick.*:
+        description: Allows you to access all nicknames features and commands
+        children:
+          niftychat.nick.clear:
+            description: Allows you to clear player nicknames
+          niftychat.nick.revoke:
+            description: Allows you to revoke or grant player access to the nick command
+          niftychat.nick.other:
+            description: Allows you to set the nicknames of other players
+          niftychat.nick.color:
+            description: Allows you to set nicknames with colors
+          niftychat.nick.magic:
+            description: Allows you to set nicknames with magic
+          niftychat.nick.format:
+            description: Allows you to set nicknames with formatting
+      niftychat.rank.*:
+        description: Allows you to access all rank commands
+        children:
+          niftychat.rank: true
+          niftychat.rank.check:
+            description: Allows you to check the rank of a player
+          niftychat.rank.manage:
+            description: Allows you to create, edit and remove ranks
+      niftychat.realname:
+        description: Allows you to find a players realname by nickname

@@ -16,7 +16,6 @@ public class NiftyChat extends JavaPlugin implements DatabaseListener {
 
 	@Override
 	public void onEnable() {
-		// commit test
 		this.saveDefaultConfig();
 		this.saveConfig();
 		new Cache(this);

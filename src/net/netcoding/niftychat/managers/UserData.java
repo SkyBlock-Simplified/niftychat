@@ -60,8 +60,6 @@ public class UserData extends BukkitHelper {
 	}
 
 	private static String _getDisplayName(final String playerName, final String primaryRank) throws SQLException, Exception {
-		//final String matchedName = matchPlayerName(playerName);
-
 		return String.valueOf(Cache.MySQL.query("SELECT * FROM `nc_users` WHERE `user` = ? LIMIT 1;", new ResultSetCallback() {
 			@Override
 			public Object handleResult(ResultSet result) throws SQLException, Exception {
@@ -146,7 +144,6 @@ public class UserData extends BukkitHelper {
 	}
 
 	public boolean hasPermissions(String... permissions) {
-		super.getLog().console(Bukkit.getPlayer(this.getName()));
 		return super.hasPermissions(Bukkit.getPlayer(this.getName()), permissions);
 	}
 

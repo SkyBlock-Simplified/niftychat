@@ -5,10 +5,24 @@ import static net.netcoding.niftychat.managers.Cache.Log;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 
-import net.netcoding.niftybukkit.database.*;
-import net.netcoding.niftychat.commands.*;
-import net.netcoding.niftychat.listeners.*;
-import net.netcoding.niftychat.managers.*;
+import net.netcoding.niftybukkit.database.DatabaseListener;
+import net.netcoding.niftybukkit.database.DatabaseNotification;
+import net.netcoding.niftybukkit.database.ResultSetCallback;
+import net.netcoding.niftybukkit.database.ResultSetCallbackNR;
+import net.netcoding.niftybukkit.database.TriggerEvent;
+import net.netcoding.niftychat.commands.Censor;
+import net.netcoding.niftychat.commands.Format;
+import net.netcoding.niftychat.commands.Nick;
+import net.netcoding.niftychat.commands.Rank;
+import net.netcoding.niftychat.commands.Realname;
+import net.netcoding.niftychat.listeners.Chat;
+import net.netcoding.niftychat.listeners.Disconnect;
+import net.netcoding.niftychat.listeners.Login;
+import net.netcoding.niftychat.listeners.Move;
+import net.netcoding.niftychat.managers.Cache;
+import net.netcoding.niftychat.managers.CompiledCensor;
+import net.netcoding.niftychat.managers.RankData;
+import net.netcoding.niftychat.managers.UserData;
 
 import org.bukkit.plugin.java.JavaPlugin;
 

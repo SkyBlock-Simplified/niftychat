@@ -7,9 +7,9 @@ import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.plugin.java.JavaPlugin;
 
 import net.milkbowl.vault.permission.Permission;
-import net.netcoding.niftybukkit.GhostBusters;
 import net.netcoding.niftybukkit.NiftyBukkit;
 import net.netcoding.niftybukkit.database.MySQL;
+import net.netcoding.niftybukkit.ghosts.GhostBusters;
 import net.netcoding.niftybukkit.minecraft.Log;
 import net.netcoding.niftybukkit.utilities.CIHashMap;
 

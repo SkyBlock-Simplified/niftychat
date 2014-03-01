@@ -23,9 +23,9 @@ public class Vanish extends BukkitCommand {
 
 	@Override
 	public void command(CommandSender sender, String[] args) throws SQLException, Exception {
-		if (super.hasPermissions(sender, "vanish")) {
+		if (this.hasPermissions(sender, "vanish")) {
 			if (BukkitHelper.isConsole(sender) && args.length < 2)
-				super.getLog().error(sender, "The vanish command requires a player name when used by the console!");
+				this.getLog().error(sender, "The vanish command requires a player name when used by the console!");
 			else if (args.length >= 0 && args.length <= 2) {
 				String playerName   = sender.getName();
 				boolean toggleValue = true;
@@ -44,7 +44,7 @@ public class Vanish extends BukkitCommand {
 				}
 
 				if (playerName.equalsIgnoreCase("CONSOLE")) {
-					super.getLog().error(sender, "You cannot modify the visibility of the console!");
+					this.getLog().error(sender, "You cannot modify the visibility of the console!");
 					return;
 				}
 
@@ -61,10 +61,10 @@ public class Vanish extends BukkitCommand {
 							Cache.ghosts.remove(player);
 					}
 
-					super.getLog().message(sender, "{$1$s} %2$s vanished", (matchedName.equalsIgnoreCase(sender.getName()) ? "You are" : matchedName + " is"), (userData.isVanished() ? "now" : "no longer"));
+					this.getLog().message(sender, "{$1$s} %2$s vanished", (matchedName.equalsIgnoreCase(sender.getName()) ? "You are" : matchedName + " is"), (userData.isVanished() ? "now" : "no longer"));
 				}
 			} else
-				super.showUsage(sender);
+				this.showUsage(sender);
 		}
 	}
 

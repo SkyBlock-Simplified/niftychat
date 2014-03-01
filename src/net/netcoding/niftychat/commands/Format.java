@@ -1,7 +1,5 @@
 package net.netcoding.niftychat.commands;
 
-import static net.netcoding.niftychat.managers.Cache.Log;
-
 import java.sql.ResultSet;
 import java.sql.SQLException;
 
@@ -23,7 +21,7 @@ public class Format extends BukkitCommand {
 
 	@Override
 	public void command(final CommandSender sender, final String[] args) {
-		if (super.hasPermissions(sender,  "format")) {
+		if (this.hasPermissions(sender,  "format")) {
 			if (args.length >= 2) {
 				final String rank   = args[0].toLowerCase();
 				final String action = args[1].toLowerCase();
@@ -70,17 +68,17 @@ public class Format extends BukkitCommand {
 												else if (action.equalsIgnoreCase("format"))
 													rankInfo.setFormat(format);
 											} else {
-												Log.error(sender, "Unable to set format for {%1$s}!", rank);
+												getLog().error(sender, "Unable to set format for {%1$s}!", rank);
 												return false;
 											}
 										}
 									}
 
 									String proper = Character.toUpperCase(action.charAt(0)) + action.substring(1);
-									Log.message(sender, "{%1$s} of {%2$s} %3$s {%4$s}", proper, rank, now, _format);
+									getLog().message(sender, "{%1$s} of {%2$s} %3$s {%4$s}", proper, rank, now, _format);
 									return true;
 								} else
-									Log.error(sender, "{%1$s} is not a valid rank!", rank);
+									getLog().error(sender, "{%1$s} is not a valid rank!", rank);
 
 								return false;
 							}
@@ -89,9 +87,9 @@ public class Format extends BukkitCommand {
 						ex.printStackTrace();
 					}
 				} else
-					super.showUsage(sender);
+					this.showUsage(sender);
 			} else
-				super.showUsage(sender);
+				this.showUsage(sender);
 		}
 	}
 

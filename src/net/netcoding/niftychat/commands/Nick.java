@@ -1,7 +1,5 @@
 package net.netcoding.niftychat.commands;
 
-import static net.netcoding.niftychat.managers.Cache.Log;
-
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.List;
@@ -29,9 +27,9 @@ public class Nick extends BukkitTabCommand {
 
 	@Override
 	public void command(CommandSender sender, String args[]) throws SQLException, Exception {
-		if (super.hasPermissions(sender, "nick")) {
+		if (this.hasPermissions(sender, "nick")) {
 			if ((BukkitHelper.isConsole(sender)) && args.length < 2)
-				Log.error(sender, "The nickname command requires a player name when used by the console!");
+				this.getLog().error(sender, "The nickname command requires a player name when used by the console!");
 			else if (args.length >= 1 && args.length <= 2) {
 				String playerName  = (args.length == 2 ? args[0] : sender.getName());
 				String nick  = (args.length == 2 ? args[1] : args[0]);
@@ -44,22 +42,22 @@ public class Nick extends BukkitTabCommand {
 
 				if (off) {
 					if (!playerName.equalsIgnoreCase(sender.getName())) {
-						if (!super.hasPermissions(sender, "nick", "clear")) {
-							Log.error(sender, "You do not have access to clear other players nicknames!");
+						if (!this.hasPermissions(sender, "nick", "clear")) {
+							this.getLog().error(sender, "You do not have access to clear other players nicknames!");
 							return;
 						}
 					}
 
 					nick = null;
 				} else if (rev || ena) {
-					if (!super.hasPermissions(sender, "nick", "revoke")) {
-						Log.error(sender, "You do not have access to grant/revoke players nicknames!");
+					if (!this.hasPermissions(sender, "nick", "revoke")) {
+						this.getLog().error(sender, "You do not have access to grant/revoke players nicknames!");
 						return;
 					}
 				} else {
 					if (!playerName.equalsIgnoreCase(sender.getName())) {
-						if (!super.hasPermissions(sender, "nick", "other")) {
-							Log.error(sender, "You do not have access to change other players nicknames!");
+						if (!this.hasPermissions(sender, "nick", "other")) {
+							this.getLog().error(sender, "You do not have access to change other players nicknames!");
 							return;
 						}
 					}
@@ -68,42 +66,42 @@ public class Nick extends BukkitTabCommand {
 					String strippedNick = RegexUtil.strip(noColorNick, RegexUtil.INVALID_NICKNAME_CHARZ);
 
 					if (strippedNick != noColorNick) {
-						Log.error(sender, "Nicknames can only contain letters, numbers and underscores!");
+						this.getLog().error(sender, "Nicknames can only contain letters, numbers and underscores!");
 						return;
 					}
 
-					if (!super.hasPermissions(sender, "nick", "length")) {
+					if (!this.hasPermissions(sender, "nick", "length")) {
 						int minChars = 3;
 						int maxChars = 16;
 
 						if (strippedNick.length() < minChars) {
-							Log.error(sender, "Nicknames must contain at least {%1$s} letters!", minChars);
+							this.getLog().error(sender, "Nicknames must contain at least {%1$s} letters!", minChars);
 							return;
 						}
 
 						if (strippedNick.length() > maxChars) {
-							Log.error(sender, "Nicknames can only be 16 characters long!", minChars);
+							this.getLog().error(sender, "Nicknames can only be 16 characters long!", minChars);
 							return;
 						}
 					}
 
 					if (RegexUtil.replaceColor(nick, RegexUtil.REPLACE_COLOR_PATTERN) != nick) {
-						if (!super.hasPermissions(sender, "nick", "color")) {
-							Log.error(sender, "You do not have access to use color in nicknames!");
+						if (!this.hasPermissions(sender, "nick", "color")) {
+							this.getLog().error(sender, "You do not have access to use color in nicknames!");
 							return;
 						}
 					}
 
 					if (RegexUtil.replaceColor(nick, RegexUtil.REPLACE_MAGIC_PATTERN) != nick) {
-						if (!super.hasPermissions(sender, "nick", "magic")) {
-							Log.error(sender, "You do not have access to use magic nicknames!");
+						if (!this.hasPermissions(sender, "nick", "magic")) {
+							this.getLog().error(sender, "You do not have access to use magic nicknames!");
 							return;
 						}
 					}
 
 					if (RegexUtil.replaceColor(nick, RegexUtil.REPLACE_FORMAT_PATTERN) != nick) {
-						if (!super.hasPermissions(sender, "nick", "format")) {
-							Log.error(sender, "You do not have access to use formatting in nicknames!");
+						if (!this.hasPermissions(sender, "nick", "format")) {
+							this.getLog().error(sender, "You do not have access to use formatting in nicknames!");
 							return;
 						}
 					}
@@ -122,7 +120,7 @@ public class Nick extends BukkitTabCommand {
 					}, strippedNick, sender.getName());
 
 					if (taken) {
-						Log.error(sender, "The nickname {%1$s} is already taken!", nick);
+						this.getLog().error(sender, "The nickname {%1$s} is already taken!", nick);
 						return;
 					}
 				}
@@ -139,18 +137,18 @@ public class Nick extends BukkitTabCommand {
 
 						if (Cache.MySQL.update("UPDATE `nc_users` SET `nick` = ?, `ufnick` = ? WHERE `user` = ?;", nick, _ufnick, matchedName)) {
 							if (off)
-								Log.message(sender, "{%1$s} now %2$s no nickname.", your, has);
+								this.getLog().message(sender, "{%1$s} now %2$s no nickname.", your, has);
 							else
-								Log.message(sender, "{%1$s} now %2$s the nickname {%3$s}.", your, has, RegexUtil.replaceColor(nick, RegexUtil.REPLACE_COLOR_PATTERN));
+								this.getLog().message(sender, "{%1$s} now %2$s the nickname {%3$s}.", your, has, RegexUtil.replaceColor(nick, RegexUtil.REPLACE_COLOR_PATTERN));
 						} else
-							Log.error(sender, "Player {%1$s} not found!", playerName);
+							this.getLog().error(sender, "Player {%1$s} not found!", playerName);
 					} catch (Exception ex) {
-						Log.error(sender, "Unable to set nickname {%1$s} for {%2$s}.", nick, playerName);
+						this.getLog().error(sender, "Unable to set nickname {%1$s} for {%2$s}.", nick, playerName);
 						ex.printStackTrace();
 					}
 				}
 			} else
-				super.showUsage(sender);
+				this.showUsage(sender);
 		}
 	}
 

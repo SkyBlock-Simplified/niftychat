@@ -13,11 +13,11 @@ public class Mute extends BukkitCommand {
 
 	@Override
 	public void command(CommandSender sender, String[] args) {
-		if (super.hasPermissions(sender, "chat", "mute")) {
+		if (this.hasPermissions(sender, "chat", "mute")) {
 			if (args.length >= 1 && args.length <= 2) {
 				// TODO
 			} else
-				super.showUsage(sender);
+				this.showUsage(sender);
 		}
 	}
 

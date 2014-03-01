@@ -44,13 +44,13 @@ public class Login extends BukkitListener {
 	public void onPlayerLogin(PlayerLoginEvent event) {
 		Player player = event.getPlayer();
 		String playerName = player.getName();
-		UserData userData = new UserData(super.getPlugin(), playerName);
+		UserData userData = new UserData(this.getPlugin(), playerName);
 		Cache.userData.put(playerName, userData);
 
-		if (super.hasPermissions(player, "vanish", "see"))
+		if (this.hasPermissions(player, "vanish", "see"))
 			Cache.ghosts.add(player);
 
-		if (event.getResult() == Result.KICK_FULL && super.hasPermissions(player, "join", "fullserver"))
+		if (event.getResult() == Result.KICK_FULL && this.hasPermissions(player, "join", "fullserver"))
 			event.setResult(Result.ALLOWED);
 	}
 

@@ -78,17 +78,17 @@ public class Chat extends BukkitListener {
 	}
 
 	private String formatMessage(Player player, String message) {
-		if (super.hasPermissions(player, "chat", "color"))
+		if (this.hasPermissions(player, "chat", "color"))
 			message = RegexUtil.replaceColor(message, RegexUtil.REPLACE_COLOR_PATTERN);
 		else
 			message = RegexUtil.strip(message, RegexUtil.VANILLA_COLOR_PATTERN);
 
-		if (super.hasPermissions(player, "chat", "magic"))
+		if (this.hasPermissions(player, "chat", "magic"))
 			message = RegexUtil.replaceColor(message, RegexUtil.REPLACE_MAGIC_PATTERN);
 		else
 			message = RegexUtil.strip(message, RegexUtil.VANILLA_MAGIC_PATTERN);
 
-		if (super.hasPermissions(player, "chat", "format"))
+		if (this.hasPermissions(player, "chat", "format"))
 			message = RegexUtil.replaceColor(message, RegexUtil.REPLACE_FORMAT_PATTERN);
 		else
 			message = RegexUtil.strip(message, RegexUtil.VANILLA_FORMAT_PATTERN);
@@ -97,19 +97,19 @@ public class Chat extends BukkitListener {
 	}
 
 	private String filterMessage(Player player, String message) {
-		if (!super.hasPermissions(player, "chat", "bypass", "advertise")) {
+		if (!this.hasPermissions(player, "chat", "bypass", "advertise")) {
 			message = RegexUtil.IP_FILTER_PATTERN.matcher(message).replaceAll("*.*.*.*");
 
 			while (RegexUtil.URL_FILTER_PATTERN.matcher(message).find())
 				message = RegexUtil.URL_FILTER_PATTERN.matcher(message).replaceAll("$1 $2");
 		}
 
-		if (!super.hasPermissions(player, "chat", "bypass", "url")) {
+		if (!this.hasPermissions(player, "chat", "bypass", "url")) {
 			while (RegexUtil.URL_PATTERN.matcher(message).find())
 				message = RegexUtil.URL_PATTERN.matcher(message).replaceAll("$1 $2");
 		}
 
-		if (!super.hasPermissions(player, "chat", "bypass", "censor")) {
+		if (!this.hasPermissions(player, "chat", "bypass", "censor")) {
 			for (String badword : Cache.censorList.keySet()) {
 				CompiledCensor censor = Cache.censorList.get(badword);
 				Pattern pattern = censor.getPattern();
@@ -119,7 +119,7 @@ public class Chat extends BukkitListener {
 			}
 		}
 
-		if (!super.hasPermissions(player, "chat", "bypass", "caps")) {
+		if (!this.hasPermissions(player, "chat", "bypass", "caps")) {
 			String[] words = message.split("\\s");
 
 			for (int i = 0; i < words.length; i++)

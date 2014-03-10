@@ -11,7 +11,7 @@ import net.netcoding.niftybukkit.NiftyBukkit;
 import net.netcoding.niftybukkit.database.MySQL;
 import net.netcoding.niftybukkit.ghosts.GhostBusters;
 import net.netcoding.niftybukkit.minecraft.Log;
-import net.netcoding.niftybukkit.utilities.CIHashMap;
+import net.netcoding.niftybukkit.util.concurrent.ConcurrentIHashMap;
 
 public class Cache {
 
@@ -19,8 +19,8 @@ public class Cache {
 	public static transient MySQL MySQL;
 	public static transient Permission permissions;
 	public static transient Log Log;
-	public static final CIHashMap<RankData>   rankData = new CIHashMap<>();
-	public static final CIHashMap<UserData>   userData = new CIHashMap<>();
+	public static final ConcurrentIHashMap<RankData>   rankData = new ConcurrentIHashMap<>();
+	public static final ConcurrentIHashMap<UserData>   userData = new ConcurrentIHashMap<>();
 	public static final Map<String, CompiledCensor> censorList = new HashMap<>();
 
 	public Cache(JavaPlugin plugin) {

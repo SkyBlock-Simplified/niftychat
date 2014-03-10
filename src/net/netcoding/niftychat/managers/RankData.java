@@ -1,6 +1,6 @@
 package net.netcoding.niftychat.managers;
 
-import net.netcoding.niftybukkit.utilities.RegexUtil;
+import net.netcoding.niftybukkit.util.RegexUtil;
 
 public class RankData {
 

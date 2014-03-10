@@ -5,8 +5,8 @@ import static net.netcoding.niftychat.managers.Cache.Log;
 import java.util.regex.Pattern;
 
 import net.netcoding.niftybukkit.minecraft.BukkitListener;
-import net.netcoding.niftybukkit.utilities.RegexUtil;
-import net.netcoding.niftybukkit.utilities.StringUtil;
+import net.netcoding.niftybukkit.util.RegexUtil;
+import net.netcoding.niftybukkit.util.StringUtil;
 import net.netcoding.niftychat.NiftyChat;
 import net.netcoding.niftychat.managers.Cache;
 import net.netcoding.niftychat.managers.CompiledCensor;

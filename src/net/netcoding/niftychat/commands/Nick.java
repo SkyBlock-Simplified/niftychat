@@ -7,7 +7,7 @@ import java.util.List;
 import net.netcoding.niftybukkit.database.ResultSetCallback;
 import net.netcoding.niftybukkit.minecraft.BukkitHelper;
 import net.netcoding.niftybukkit.minecraft.BukkitTabCommand;
-import net.netcoding.niftybukkit.utilities.RegexUtil;
+import net.netcoding.niftybukkit.util.RegexUtil;
 import net.netcoding.niftychat.NiftyChat;
 import net.netcoding.niftychat.managers.Cache;
 import net.netcoding.niftychat.managers.UserData;

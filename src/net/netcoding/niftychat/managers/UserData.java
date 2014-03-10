@@ -10,7 +10,7 @@ import java.util.List;
 import net.netcoding.niftybukkit.database.ResultSetCallback;
 import net.netcoding.niftybukkit.database.ResultSetCallbackNR;
 import net.netcoding.niftybukkit.minecraft.BukkitHelper;
-import net.netcoding.niftybukkit.utilities.RegexUtil;
+import net.netcoding.niftybukkit.util.RegexUtil;
 
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;

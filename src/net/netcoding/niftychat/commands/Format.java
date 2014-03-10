@@ -5,8 +5,8 @@ import java.sql.SQLException;
 
 import net.netcoding.niftybukkit.database.ResultSetCallback;
 import net.netcoding.niftybukkit.minecraft.BukkitCommand;
-import net.netcoding.niftybukkit.utilities.RegexUtil;
-import net.netcoding.niftybukkit.utilities.StringUtil;
+import net.netcoding.niftybukkit.util.RegexUtil;
+import net.netcoding.niftybukkit.util.StringUtil;
 import net.netcoding.niftychat.NiftyChat;
 import net.netcoding.niftychat.managers.Cache;
 import net.netcoding.niftychat.managers.RankData;

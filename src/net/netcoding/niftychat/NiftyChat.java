@@ -109,14 +109,14 @@ public class NiftyChat extends JavaPlugin implements DatabaseListener {
 						public Void handle(ResultSet result) throws SQLException {
 							if (result.next()) {
 								String rank = result.getString("rank");
-								RankData rankData = Cache.rankData.get(rank);
+								RankData rankData = RankData.getCache(rank);
 								rankData.setGroup(result.getString("group"));
 								rankData.setPrefix(result.getString("prefix"));
 								rankData.setSuffix(result.getString("suffix"));
 								rankData.setFormat(result.getString("format"));
 
-								for (String playerName : Cache.userData.keySet()) {
-									UserData userData = Cache.userData.get(playerName);
+								for (String playerName : UserData.getCachedPlayers()) {
+									UserData userData = UserData.getCache(playerName);
 
 									if (userData.getPrimaryRank() == rank) {
 										userData.updateDisplayName();
@@ -148,7 +148,7 @@ public class NiftyChat extends JavaPlugin implements DatabaseListener {
 									@Override
 									public Void handle(ResultSet result) throws SQLException {
 										if (result.next()) {
-											UserData userData = Cache.userData.get(result.getString("user"));
+											UserData userData = UserData.getCache(result.getString("user"));
 											
 											if (userData != null) { // Online
 												userData.updateRanks();
@@ -177,7 +177,7 @@ public class NiftyChat extends JavaPlugin implements DatabaseListener {
 					@Override
 					public Void handle(ResultSet result) throws SQLException {
 						if (result.next()) {
-							UserData userData = Cache.userData.get(result.getString("user"));
+							UserData userData = UserData.getCache(result.getString("user"));
 
 							if (userData != null) {
 								userData.updateDisplayName();
@@ -219,7 +219,7 @@ public class NiftyChat extends JavaPlugin implements DatabaseListener {
 
 	private void loadFormats() {
 		try {
-			Cache.rankData.clear();
+			RankData.clearCache();
 
 			Cache.MySQL.query("SELECT * FROM `nc_ranks`;", new ResultCallback<Void>() {
 				@Override
@@ -234,8 +234,7 @@ public class NiftyChat extends JavaPlugin implements DatabaseListener {
 						String format = result.getString("format");
 						if (result.wasNull()) format = null;
 
-						RankData rankInfo = new RankData(group, format, prefix, suffix);
-						Cache.rankData.put(rank, rankInfo);
+						new RankData(rank, group, format, prefix, suffix);
 					}
 
 					return null;

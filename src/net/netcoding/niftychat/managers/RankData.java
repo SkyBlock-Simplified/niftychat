@@ -1,23 +1,37 @@
 package net.netcoding.niftychat.managers;
 
+import java.util.concurrent.ConcurrentHashMap;
+
 import net.netcoding.niftybukkit.util.RegexUtil;
 
 public class RankData {
 
+	private static final ConcurrentHashMap<String, RankData> cache = new ConcurrentHashMap<>();
+	private String rank;
 	private String group;
 	private String format;
 	private String prefix;
 	private String suffix;
 
-	public RankData(String group, String format) {
-		this(group, format, "", "");
+	public RankData(String rank, String group, String format) {
+		this(rank, group, format, "", "");
 	}
 
-	public RankData(String group, String format, String prefix, String suffix) {
+	public RankData(String rank, String group, String format, String prefix, String suffix) {
+		this.rank = rank;
 		this.setGroup(group);
 		this.setFormat(format);
 		this.setPrefix(prefix);
 		this.setSuffix(suffix);
+		cache.put(rank, this);
+	}
+
+	public static void clearCache() {
+		cache.clear();
+	}
+
+	public static RankData getCache(String rank) {
+		return cache.get(rank);
 	}
 
 	public String getGroup() {
@@ -32,8 +46,17 @@ public class RankData {
 		return this.prefix;
 	}
 
+	public String getRank() {
+		return this.rank;
+	}
+
 	public String getSuffix() {
 		return this.suffix;
+	}
+
+	public static void removeCache(String rank) {
+		if (cache.containsKey(rank))
+			cache.remove(rank);
 	}
 
 	public void setGroup(String value) {

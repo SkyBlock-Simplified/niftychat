@@ -23,7 +23,7 @@ public class Login extends BukkitListener {
 		event.setJoinMessage(null);
 		Player player = event.getPlayer();
 		String playerName = player.getName();
-		UserData userData = Cache.userData.get(playerName);
+		UserData userData = UserData.getCache(playerName);
 
 		try {
 			Cache.MySQL.update("INSERT IGNORE INTO `nc_users` (`user`) VALUES (?);", playerName);
@@ -43,8 +43,7 @@ public class Login extends BukkitListener {
 	public void onPlayerLogin(PlayerLoginEvent event) {
 		Player player = event.getPlayer();
 		String playerName = player.getName();
-		UserData userData = new UserData(this.getPlugin(), playerName);
-		Cache.userData.put(playerName, userData);
+		new UserData(this.getPlugin(), playerName);
 
 		if (this.hasPermissions(player, "vanish", "see"))
 			Cache.ghosts.add(player);

@@ -27,7 +27,7 @@ public class Chat extends BukkitListener {
 	@EventHandler(priority = EventPriority.LOW)
 	public void checkPlayerMessage(AsyncPlayerChatEvent event) {
 		Player player = event.getPlayer();
-		UserData userData = Cache.userData.get(player.getName());
+		UserData userData = UserData.getCache(player.getName());
 		String stripMessage = RegexUtil.strip(event.getMessage(), RegexUtil.REPLACE_ALL_PATTERN);
 
 		if ("".equals(stripMessage)) event.setCancelled(true);
@@ -47,11 +47,11 @@ public class Chat extends BukkitListener {
 	public void onPlayerChat(AsyncPlayerChatEvent event) {
 		if (event.isCancelled()) return;
 		Player player = event.getPlayer();
-		UserData userData = Cache.userData.get(player.getName());
+		UserData userData = UserData.getCache(player.getName());
 		String message = event.getMessage();
 
 		String rank = userData.getPrimaryRank();
-		RankData rankInfo = Cache.rankData.get(rank);
+		RankData rankInfo = RankData.getCache(rank);
 		String format = rankInfo.getFormat();
 		String group = rankInfo.getGroup();
 		group = (group == null ? rank : group);

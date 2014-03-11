@@ -3,7 +3,10 @@ package net.netcoding.niftychat.managers;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
+import java.util.Set;
+import java.util.concurrent.ConcurrentHashMap;
 
 import net.netcoding.niftybukkit.database.ResultCallback;
 import net.netcoding.niftybukkit.minecraft.BukkitHelper;
@@ -14,6 +17,8 @@ import org.bukkit.entity.Player;
 import org.bukkit.plugin.java.JavaPlugin;
 
 public class UserData extends BukkitHelper {
+
+	private static final transient ConcurrentHashMap<String, UserData> cache = new ConcurrentHashMap<>();
 
 	private String playerName;
 
@@ -34,6 +39,7 @@ public class UserData extends BukkitHelper {
 	public UserData(JavaPlugin plugin, String playerName) {
 		super(plugin);
 		this.playerName = playerName;
+		cache.put(playerName, this);
 	}
 
 	/*public void addRank(String rank) {
@@ -46,6 +52,18 @@ public class UserData extends BukkitHelper {
 
 	public void clearRanks() {
 		this.ranks.clear();
+	}
+
+	public static UserData getCache(String playerName) {
+		return cache.get(matchPlayerName(playerName));
+	}
+
+	public static Collection<UserData> getCachedData() {
+		return cache.values();
+	}
+
+	public static Set<String> getCachedPlayers() {
+		return cache.keySet();
 	}
 
 	public String getDisplayName() {
@@ -73,7 +91,7 @@ public class UserData extends BukkitHelper {
 					displayName   = (result.wasNull() ? displayName : ("*" + RegexUtil.replaceColor(nick, RegexUtil.REPLACE_ALL_PATTERN)));
 				}
 
-				RankData rankInfo = Cache.rankData.get(rank);
+				RankData rankInfo = RankData.getCache(rank);
 				String prefix     = rankInfo.getPrefix();
 				String suffix     = rankInfo.getSuffix();
 
@@ -87,7 +105,7 @@ public class UserData extends BukkitHelper {
 	}
 
 	public static String getOfflineDisplayName(String playerName) throws SQLException {
-		UserData userData = Cache.userData.get(playerName);
+		UserData userData = getCache(playerName);
 
 		if (userData != null) {
 			return userData.getDisplayName();
@@ -98,7 +116,7 @@ public class UserData extends BukkitHelper {
 	}
 
 	public static List<String> getOfflineRanks(final String playerName) throws SQLException {
-		UserData userData = Cache.userData.get(playerName);
+		UserData userData = getCache(playerName);
 
 		if (userData != null) {
 			return userData.getRanks();
@@ -179,6 +197,11 @@ public class UserData extends BukkitHelper {
 				return playerName;
 			}
 		}
+	}
+
+	public static void removeCache(String playerName) {
+		if (cache.containsKey(playerName))
+			cache.remove(playerName);
 	}
 
 	public void removeRank(String rank) {

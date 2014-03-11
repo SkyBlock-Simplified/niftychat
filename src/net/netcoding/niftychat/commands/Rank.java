@@ -38,9 +38,9 @@ public class Rank extends BukkitCommand {
 
 							if (action.equalsIgnoreCase("create")) {
 								create = "created";
-								Cache.rankData.put(rank, new RankData(rank, group));
+								new RankData(rank, group, "");
 							} else
-								Cache.rankData.get(rank).setGroup(group);
+								RankData.getCache(rank).setGroup(group);
 
 							this.getLog().message(sender, "The rank {%1$s} has been %2$s.", rank, create);
 						} else

@@ -156,7 +156,7 @@ public class Nick extends BukkitTabCommand {
 	public List<String> tabComplete(CommandSender sender, String[] args) {
 		final String firstArg = (args.length > 0 ? args[0] : "");
 
-		Iterable<String> iterable = Iterables.transform(Iterables.filter(Cache.userData.values(), new Predicate<UserData>() {
+		Iterable<String> iterable = Iterables.transform(Iterables.filter(UserData.getCachedData(), new Predicate<UserData>() {
 			@Override
 			public boolean apply(UserData userData) {
 				String noColorNick = RegexUtil.strip(userData.getDisplayName(), RegexUtil.VANILLA_PATTERN);

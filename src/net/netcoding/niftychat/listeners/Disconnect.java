@@ -3,6 +3,7 @@ package net.netcoding.niftychat.listeners;
 import net.netcoding.niftybukkit.minecraft.BukkitListener;
 import net.netcoding.niftychat.NiftyChat;
 import net.netcoding.niftychat.managers.Cache;
+import net.netcoding.niftychat.managers.UserData;
 
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
@@ -16,7 +17,7 @@ public class Disconnect extends BukkitListener {
 	}
 
 	private void playerDisconnect(Player player) {
-		Cache.userData.remove(player.getName());
+		UserData.removeCache(player.getName());
 
 		if (Cache.ghosts.hasPlayer(player))
 			Cache.ghosts.remove(player);

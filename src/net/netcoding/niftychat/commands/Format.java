@@ -59,7 +59,7 @@ public class Format extends BukkitCommand {
 
 											if (Cache.MySQL.update(String.format("UPDATE `nc_ranks` SET `%1$s` = ? WHERE `rank` = ?;", action), format, rank)) {
 												now = "set to";
-												RankData rankInfo = Cache.rankData.get(rank);
+												RankData rankInfo = RankData.getCache(rank);
 
 												if (action.equalsIgnoreCase("prefix"))
 													rankInfo.setPrefix(format);

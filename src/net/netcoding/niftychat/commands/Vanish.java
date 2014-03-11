@@ -49,7 +49,7 @@ public class Vanish extends BukkitCommand {
 				}
 
 				String matchedName = BukkitHelper.matchPlayerName(playerName);
-				UserData userData = Cache.userData.get(matchedName);
+				UserData userData = UserData.getCache(matchedName);
 
 				if (userData != null) {
 					userData.setVanished(toggleValue ? !userData.isVanished() : setValue);

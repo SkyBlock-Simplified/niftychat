@@ -5,7 +5,7 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 
-import net.netcoding.niftybukkit.database.ResultSetCallbackNR;
+import net.netcoding.niftybukkit.database.ResultCallback;
 import net.netcoding.niftybukkit.minecraft.BukkitCommand;
 import net.netcoding.niftychat.NiftyChat;
 import net.netcoding.niftychat.managers.Cache;
@@ -24,16 +24,18 @@ public class Realname extends BukkitCommand {
 			String nickName = args[0];
 
 			try {
-				final List<String> foundData = new ArrayList<String>();
-
-				Cache.MySQL.query("SELECT * FROM `nc_users` WHERE LOWER(`ufnick`) = LOWER(?) OR LOWER(`ufnick`) LIKE LOWER(?) GROUP BY `ufnick`;", new ResultSetCallbackNR() {
+				final List<String> foundData = Cache.MySQL.query("SELECT * FROM `nc_users` WHERE LOWER(`ufnick`) = LOWER(?) OR LOWER(`ufnick`) LIKE LOWER(?) GROUP BY `ufnick`;", new ResultCallback<List<String>>() {
 					@Override
-					public void handleResult(ResultSet result) throws SQLException, Exception {
+					public List<String> handle(ResultSet result) throws SQLException {
+						List<String> data = new ArrayList<>();
+
 						if (result.next()) {
-							foundData.add(result.getString("user"));
+							data.add(result.getString("user"));
 							String nick = result.getString("nick");
-							foundData.add(result.wasNull() ? null : nick);
+							data.add(result.wasNull() ? null : nick);
 						}
+
+						return data;
 					}
 				}, nickName, ("%" + nickName + "%"));
 

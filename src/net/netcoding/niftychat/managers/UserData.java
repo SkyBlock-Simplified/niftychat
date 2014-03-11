@@ -5,8 +5,7 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 
-import net.netcoding.niftybukkit.database.ResultSetCallback;
-import net.netcoding.niftybukkit.database.ResultSetCallbackNR;
+import net.netcoding.niftybukkit.database.ResultCallback;
 import net.netcoding.niftybukkit.minecraft.BukkitHelper;
 import net.netcoding.niftybukkit.util.RegexUtil;
 
@@ -53,14 +52,15 @@ public class UserData extends BukkitHelper {
 		return this.displayName;
 	}
 
-	private String _getDisplayName() throws SQLException, Exception {
+	private String _getDisplayName() throws SQLException {
 		return _getDisplayName(this.getName(), this.getPrimaryRank());
 	}
 
-	private static String _getDisplayName(final String playerName, final String primaryRank) throws SQLException, Exception {
-		return String.valueOf(Cache.MySQL.query("SELECT * FROM `nc_users` WHERE `user` = ? LIMIT 1;", new ResultSetCallback() {
+	private static String _getDisplayName(final String playerName, final String primaryRank) throws SQLException {
+
+		return Cache.MySQL.query("SELECT * FROM `nc_users` WHERE `user` = ? LIMIT 1;", new ResultCallback<String>() {
 			@Override
-			public Object handleResult(ResultSet result) throws SQLException, Exception {
+			public String handle(ResultSet result) throws SQLException {
 				String displayName = playerName;
 				String rank        = "default";
 
@@ -79,14 +79,14 @@ public class UserData extends BukkitHelper {
 
 				return String.format("%1$s%2$s%3$s", prefix, displayName, suffix);
 			}
-		}, playerName));
+		}, matchPlayerName(playerName));
 	}
 
 	public String getName() {
 		return this.playerName;
 	}
 
-	public static String getOfflineDisplayName(String playerName) throws SQLException, Exception {
+	public static String getOfflineDisplayName(String playerName) throws SQLException {
 		UserData userData = Cache.userData.get(playerName);
 
 		if (userData != null) {
@@ -97,7 +97,7 @@ public class UserData extends BukkitHelper {
 		}
 	}
 
-	public static List<String> getOfflineRanks(final String playerName) throws SQLException, Exception {
+	public static List<String> getOfflineRanks(final String playerName) throws SQLException {
 		UserData userData = Cache.userData.get(playerName);
 
 		if (userData != null) {
@@ -118,23 +118,20 @@ public class UserData extends BukkitHelper {
 		return this.ranks;
 	}
 
-	public List<String> _getRanks() throws SQLException, Exception {
+	public List<String> _getRanks() throws SQLException {
 		return _getRanks(this.getName());
 	}
 
-	private static List<String> _getRanks(String playerName) throws SQLException, Exception {
-		playerName = matchPlayerName(playerName);
-		final List<String> ranks = new ArrayList<String>();
-
-		Cache.MySQL.query("SELECT `rank` FROM `nc_ranks` `r` LEFT JOIN `nc_user_ranks` `ur` ON `ur`.`rank_id` = `r`.`id` JOIN `nc_users` `u` ON `u`.`id` = `ur`.`user_id` WHERE `u`.`user` = ?;", new ResultSetCallbackNR() {
+	private static List<String> _getRanks(String playerName) throws SQLException {
+		return Cache.MySQL.query("SELECT `rank` FROM `nc_ranks` `r` LEFT JOIN `nc_user_ranks` `ur` ON `ur`.`rank_id` = `r`.`id` JOIN `nc_users` `u` ON `u`.`id` = `ur`.`user_id` WHERE `u`.`user` = ?;", new ResultCallback<List<String>>() {
 			@Override
-			public void handleResult(ResultSet result) throws SQLException, Exception {
+			public List<String> handle(ResultSet result) throws SQLException {
+				List<String> ranks = new ArrayList<>();
 				while (result.next()) ranks.add(result.getString("rank"));
 				if (ranks.size() == 0) ranks.add("default");
+				return ranks;
 			}
-		}, playerName);
-
-		return ranks;
+		}, matchPlayerName(playerName));
 	}
 
 	public boolean hasMoved() {
@@ -172,13 +169,13 @@ public class UserData extends BukkitHelper {
 			return player.getName();
 		else {
 			try {
-				return String.valueOf(Cache.MySQL.query("SELECT `user` FROM `nc_users` WHERE LOWER(`user`) = LOWER(?) OR LOWER(`user`) LIKE LOWER(?) GROUP BY `user` LIMIT 1;", new ResultSetCallback() {
+				return Cache.MySQL.query("SELECT `user` FROM `nc_users` WHERE LOWER(`user`) = LOWER(?) OR LOWER(`user`) LIKE LOWER(?) GROUP BY `user` LIMIT 1;", new ResultCallback<String>() {
 					@Override
-					public Object handleResult(ResultSet result) throws SQLException, Exception {
+					public String handle(ResultSet result) throws SQLException {
 						return (result.next() ? result.getString("user") : playerName);
 					}
-				}, playerName, (playerName + "%")));
-			} catch (Exception ex) {
+				}, playerName, (playerName + "%"));
+			} catch (SQLException ex) {
 				//Log.console(ex);
 			}
 
@@ -206,25 +203,24 @@ public class UserData extends BukkitHelper {
 		this.isVanished = vanished;
 	}
 
-	public static String setRank(final String playerName, final String rank) throws SQLException, Exception {
-		return String.valueOf(Cache.MySQL.query("SELECT * FROM `nc_ranks` WHERE `rank` = ? LIMIT 1;", new ResultSetCallback() {
+	public static String setRank(final String playerName, final String rank) throws SQLException {		
+		return Cache.MySQL.query("SELECT * FROM `nc_ranks` WHERE `rank` = ? LIMIT 1;", new ResultCallback<String>() {
 			@Override
-			public Object handleResult(ResultSet result) throws SQLException, Exception {
+			public String handle(ResultSet result) throws SQLException {
 				if (result.next()) {
 					final int rankId = result.getInt("id");
 					String userName  = matchPlayerName(playerName);
 
-					Cache.MySQL.query("SELECT * FROM `nc_users` WHERE `user` = ? LIMIT 1;", new ResultSetCallback() {
+					Cache.MySQL.query("SELECT * FROM `nc_users` WHERE `user` = ? LIMIT 1;", new ResultCallback<Void>() {
 						@Override
-						public Object handleResult(ResultSet result) throws SQLException, Exception {
+						public Void handle(ResultSet result) throws SQLException {
 							if (result.next()) {
 								int userId = result.getInt("id");
 								Cache.MySQL.update("DELETE FROM `nc_user_ranks` WHERE `user_id` = ?;", userId);
 								Cache.MySQL.update("INSERT INTO `nc_user_ranks` (`user_id`, `rank_id`) VALUES (?, ?);", userId, rankId);
-								return true;
 							}
 
-							return false;
+							return null;
 						}
 					}, userName);
 
@@ -233,10 +229,10 @@ public class UserData extends BukkitHelper {
 
 				return null;
 			}
-		}, rank));
+		}, rank);
 	}
 
-	public void updateDisplayName() throws SQLException, Exception {
+	public void updateDisplayName() throws SQLException {
 		String displayName = this._getDisplayName();
 		this.displayName = displayName;
 		Player player = Bukkit.getPlayer(this.getName());
@@ -247,7 +243,7 @@ public class UserData extends BukkitHelper {
 		}
 	}
 
-	public void updateRanks() throws SQLException, Exception {
+	public void updateRanks() throws SQLException {
 		this.clearRanks();
 		this.addRanks(this._getRanks());
 	}

@@ -3,7 +3,7 @@ package net.netcoding.niftychat.commands;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 
-import net.netcoding.niftybukkit.database.ResultSetCallback;
+import net.netcoding.niftybukkit.database.ResultCallback;
 import net.netcoding.niftybukkit.minecraft.BukkitCommand;
 import net.netcoding.niftybukkit.util.RegexUtil;
 import net.netcoding.niftybukkit.util.StringUtil;
@@ -28,9 +28,9 @@ public class Format extends BukkitCommand {
 
 				if (action.matches("^prefix|suffix|format$")) {
 					try {
-						Cache.MySQL.query("SELECT * FROM `nc_ranks` WHERE `rank` = ? LIMIT 1;", new ResultSetCallback() {
+						Cache.MySQL.query("SELECT * FROM `nc_ranks` WHERE `rank` = ? LIMIT 1;", new ResultCallback<Void>() {
 							@Override
-							public Object handleResult(ResultSet result) throws SQLException, Exception {
+							public Void handle(ResultSet result) throws SQLException {
 								if (result.next()) {
 									String format  = null;
 									String _format = null;
@@ -69,18 +69,17 @@ public class Format extends BukkitCommand {
 													rankInfo.setFormat(format);
 											} else {
 												getLog().error(sender, "Unable to set format for {%1$s}!", rank);
-												return false;
+												return null;
 											}
 										}
 									}
 
 									String proper = Character.toUpperCase(action.charAt(0)) + action.substring(1);
 									getLog().message(sender, "{%1$s} of {%2$s} %3$s {%4$s}", proper, rank, now, _format);
-									return true;
 								} else
 									getLog().error(sender, "{%1$s} is not a valid rank!", rank);
 
-								return false;
+								return null;
 							}
 						}, rank);
 					} catch (Exception ex) {

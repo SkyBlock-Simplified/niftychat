@@ -4,7 +4,7 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.List;
 
-import net.netcoding.niftybukkit.database.ResultSetCallback;
+import net.netcoding.niftybukkit.database.ResultCallback;
 import net.netcoding.niftybukkit.minecraft.BukkitHelper;
 import net.netcoding.niftybukkit.minecraft.BukkitTabCommand;
 import net.netcoding.niftybukkit.util.RegexUtil;
@@ -106,9 +106,9 @@ public class Nick extends BukkitTabCommand {
 						}
 					}
 
-					boolean taken = (boolean)Cache.MySQL.query("SELECT * FROM `nc_users` WHERE LOWER(`ufnick`) = LOWER(?) AND LOWER(`user`) <> ?;", new ResultSetCallback() {
+					boolean taken = Cache.MySQL.query("SELECT * FROM `nc_users` WHERE LOWER(`ufnick`) = LOWER(?) AND LOWER(`user`) <> ?;", new ResultCallback<Boolean>() {
 						@Override
-						public Object handleResult(ResultSet result) {
+						public Boolean handle(ResultSet result) {
 							try {
 								return result.next();
 							} catch (SQLException ex) {

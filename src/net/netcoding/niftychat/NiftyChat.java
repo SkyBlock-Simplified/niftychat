@@ -7,14 +7,23 @@ import net.netcoding.niftybukkit.NiftyBukkit;
 import net.netcoding.niftybukkit.database.DatabaseListener;
 import net.netcoding.niftybukkit.database.DatabaseNotification;
 import net.netcoding.niftybukkit.database.MySQL;
-import net.netcoding.niftybukkit.database.ResultSetCallback;
-import net.netcoding.niftybukkit.database.ResultSetCallbackNR;
+import net.netcoding.niftybukkit.database.ResultCallback;
 import net.netcoding.niftybukkit.database.TriggerEvent;
 import net.netcoding.niftybukkit.ghosts.GhostBusters;
 import net.netcoding.niftybukkit.minecraft.Log;
-import net.netcoding.niftychat.commands.*;
-import net.netcoding.niftychat.listeners.*;
-import net.netcoding.niftychat.managers.*;
+import net.netcoding.niftychat.commands.Censor;
+import net.netcoding.niftychat.commands.Format;
+import net.netcoding.niftychat.commands.Nick;
+import net.netcoding.niftychat.commands.Rank;
+import net.netcoding.niftychat.commands.Realname;
+import net.netcoding.niftychat.listeners.Chat;
+import net.netcoding.niftychat.listeners.Disconnect;
+import net.netcoding.niftychat.listeners.Login;
+import net.netcoding.niftychat.listeners.Move;
+import net.netcoding.niftychat.managers.Cache;
+import net.netcoding.niftychat.managers.CompiledCensor;
+import net.netcoding.niftychat.managers.RankData;
+import net.netcoding.niftychat.managers.UserData;
 
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.plugin.java.JavaPlugin;
@@ -37,7 +46,9 @@ public class NiftyChat extends JavaPlugin implements DatabaseListener {
 				config.getString("schema"), config.getString("user"),
 				config.getString("pass"));
 
-		if (!Cache.MySQL.testConnection()) {
+		if (Cache.MySQL.testConnection())
+			Cache.MySQL.setAutoReconnect();
+		else {
 			log.console("Invalid MySQL Configuration!");
 			this.setEnabled(false);
 			return;
@@ -93,9 +104,9 @@ public class NiftyChat extends JavaPlugin implements DatabaseListener {
 				this.loadFormats();
 			else {
 				try {
-					notification.getUpdatedRow(new ResultSetCallbackNR() {
+					notification.getUpdatedRow(new ResultCallback<Void>() {
 						@Override
-						public void handleResult(ResultSet result) throws SQLException, Exception {
+						public Void handle(ResultSet result) throws SQLException {
 							if (result.next()) {
 								String rank = result.getString("rank");
 								RankData rankData = Cache.rankData.get(rank);
@@ -115,6 +126,8 @@ public class NiftyChat extends JavaPlugin implements DatabaseListener {
 
 								//User.updateTabListNames();
 							}
+
+							return null;
 						}
 					});
 				} catch (Exception ex) {
@@ -125,15 +138,15 @@ public class NiftyChat extends JavaPlugin implements DatabaseListener {
 		case "nc_user_ranks":
 			try {
 				if (notification.getEvent() != TriggerEvent.DELETE) {
-					notification.getUpdatedRow(new ResultSetCallbackNR() {
+					notification.getUpdatedRow(new ResultCallback<Void>() {
 						@Override
-						public void handleResult(ResultSet result) throws SQLException, Exception {
+						public Void handle(ResultSet result) throws SQLException {
 							if (result.next()) {
 								int userId = result.getInt("user_id");
 
-								Cache.MySQL.query("SELECT * FROM `nc_users` WHERE `id` = ?", new ResultSetCallbackNR() {
+								Cache.MySQL.query("SELECT * FROM `nc_users` WHERE `id` = ?", new ResultCallback<Void>() {
 									@Override
-									public void handleResult(ResultSet result) throws SQLException, Exception {
+									public Void handle(ResultSet result) throws SQLException {
 										if (result.next()) {
 											UserData userData = Cache.userData.get(result.getString("user"));
 											
@@ -144,9 +157,13 @@ public class NiftyChat extends JavaPlugin implements DatabaseListener {
 												userData.updateVaultRanks();
 											}
 										}
+
+										return null;
 									}
 								}, userId);
 							}
+
+							return null;
 						}
 					});
 				}
@@ -156,9 +173,9 @@ public class NiftyChat extends JavaPlugin implements DatabaseListener {
 			break;
 		case "nc_users":
 			try {
-				notification.getUpdatedRow(new ResultSetCallbackNR() {
+				notification.getUpdatedRow(new ResultCallback<Void>() {
 					@Override
-					public void handleResult(ResultSet result) throws SQLException, Exception {
+					public Void handle(ResultSet result) throws SQLException {
 						if (result.next()) {
 							UserData userData = Cache.userData.get(result.getString("user"));
 
@@ -167,6 +184,8 @@ public class NiftyChat extends JavaPlugin implements DatabaseListener {
 								userData.updateTabListName();
 							}
 						}
+
+						return null;
 					}
 				});
 			} catch (Exception ex) {
@@ -180,23 +199,17 @@ public class NiftyChat extends JavaPlugin implements DatabaseListener {
 		try {
 			Cache.censorList.clear();
 
-			Cache.MySQL.query("SELECT * FROM `nc_censor`;", new ResultSetCallback() {
+			Cache.MySQL.query("SELECT * FROM `nc_censor`;", new ResultCallback<Void>() {
 				@Override
-				public Object handleResult(ResultSet result) {
-					try {
-						while (result.next()) {
-							String badword = result.getString("badword");
-							String replace = result.getString("replace");
-							replace        = (result.wasNull() ? null : replace);
-							Cache.censorList.put(badword, new CompiledCensor(badword, replace));
-						}
-
-						return true;
-					} catch (SQLException ex) {
-						ex.printStackTrace();
+				public Void handle(ResultSet result) throws SQLException {
+					while (result.next()) {
+						String badword = result.getString("badword");
+						String replace = result.getString("replace");
+						replace        = (result.wasNull() ? null : replace);
+						Cache.censorList.put(badword, new CompiledCensor(badword, replace));
 					}
-
-					return false;
+					
+					return null;
 				}
 			});
 		} catch (Exception ex) {
@@ -208,9 +221,9 @@ public class NiftyChat extends JavaPlugin implements DatabaseListener {
 		try {
 			Cache.rankData.clear();
 
-			Cache.MySQL.query("SELECT * FROM `nc_ranks`;", new ResultSetCallback() {
+			Cache.MySQL.query("SELECT * FROM `nc_ranks`;", new ResultCallback<Void>() {
 				@Override
-				public Object handleResult(ResultSet result) throws SQLException {
+				public Void handle(ResultSet result) throws SQLException {
 					while (result.next()) {
 						String rank = result.getString("rank");
 						String group = result.getString("group");
@@ -225,7 +238,7 @@ public class NiftyChat extends JavaPlugin implements DatabaseListener {
 						Cache.rankData.put(rank, rankInfo);
 					}
 
-					return true;
+					return null;
 				}
 			});
 		} catch (Exception ex) {

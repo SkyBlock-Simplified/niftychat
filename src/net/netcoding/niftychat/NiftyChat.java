@@ -1,29 +1,22 @@
 package net.netcoding.niftychat;
 
-import static net.netcoding.niftychat.managers.Cache.Log;
-
 import java.sql.ResultSet;
 import java.sql.SQLException;
 
+import net.netcoding.niftybukkit.NiftyBukkit;
 import net.netcoding.niftybukkit.database.DatabaseListener;
 import net.netcoding.niftybukkit.database.DatabaseNotification;
+import net.netcoding.niftybukkit.database.MySQL;
 import net.netcoding.niftybukkit.database.ResultSetCallback;
 import net.netcoding.niftybukkit.database.ResultSetCallbackNR;
 import net.netcoding.niftybukkit.database.TriggerEvent;
-import net.netcoding.niftychat.commands.Censor;
-import net.netcoding.niftychat.commands.Format;
-import net.netcoding.niftychat.commands.Nick;
-import net.netcoding.niftychat.commands.Rank;
-import net.netcoding.niftychat.commands.Realname;
-import net.netcoding.niftychat.listeners.Chat;
-import net.netcoding.niftychat.listeners.Disconnect;
-import net.netcoding.niftychat.listeners.Login;
-import net.netcoding.niftychat.listeners.Move;
-import net.netcoding.niftychat.managers.Cache;
-import net.netcoding.niftychat.managers.CompiledCensor;
-import net.netcoding.niftychat.managers.RankData;
-import net.netcoding.niftychat.managers.UserData;
+import net.netcoding.niftybukkit.ghosts.GhostBusters;
+import net.netcoding.niftybukkit.minecraft.Log;
+import net.netcoding.niftychat.commands.*;
+import net.netcoding.niftychat.listeners.*;
+import net.netcoding.niftychat.managers.*;
 
+import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.plugin.java.JavaPlugin;
 
 public class NiftyChat extends JavaPlugin implements DatabaseListener {
@@ -32,15 +25,25 @@ public class NiftyChat extends JavaPlugin implements DatabaseListener {
 	public void onEnable() {
 		this.saveDefaultConfig();
 		this.saveConfig();
-		new Cache(this);
+		Log log = new Log(this);
+		Cache.ghosts = new GhostBusters(this);
+
+		if ((Cache.permissions = NiftyBukkit.getPermissions()) != null)
+			log.console("Connected to Vault");
+
+		log.console("Loading MySQL");
+		FileConfiguration config = this.getConfig();
+		Cache.MySQL = new MySQL(config.getString("host"), config.getInt("port"),
+				config.getString("schema"), config.getString("user"),
+				config.getString("pass"));
 
 		if (!Cache.MySQL.testConnection()) {
-			Log.console("Invalid MySQL Configuration!");
+			log.console("Invalid MySQL Configuration!");
 			this.setEnabled(false);
 			return;
 		}
 
-		Log.console("Updating MySQL Tables & Data");
+		log.console("Updating MySQL Tables & Data");
 		if (!this.setupTables()) return;
 
 		try {
@@ -49,11 +52,11 @@ public class NiftyChat extends JavaPlugin implements DatabaseListener {
 			Cache.MySQL.addDatabaseListener("nc_users", this);
 			Cache.MySQL.addDatabaseListener("nc_user_ranks", this);
 		} catch (Exception ex) {
-			Log.console(ex);
+			log.console(ex);
 			return;
 		}
 
-		Log.console("Registering Commands");
+		log.console("Registering Commands");
 		new Censor(this);
 		new Format(this);
 		//new Mute(this);
@@ -61,16 +64,16 @@ public class NiftyChat extends JavaPlugin implements DatabaseListener {
 		new Rank(this);
 		new Realname(this);
 
-		Log.console("Registering Event Listeners");
+		log.console("Registering Event Listeners");
 		new Chat(this);
 		new Disconnect(this);
 		new Login(this);
 		new Move(this);
 
-		Log.console("Loading Censor List");
+		log.console("Loading Censor List");
 		this.loadCensorList();
 
-		Log.console("Loading Rank Formats");
+		log.console("Loading Rank Formats");
 		this.loadFormats();
 	}
 

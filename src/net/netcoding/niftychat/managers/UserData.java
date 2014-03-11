@@ -1,7 +1,5 @@
 package net.netcoding.niftychat.managers;
 
-import static net.netcoding.niftychat.managers.Cache.Log;
-
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
@@ -181,7 +179,7 @@ public class UserData extends BukkitHelper {
 					}
 				}, playerName, (playerName + "%")));
 			} catch (Exception ex) {
-				Log.console(ex);
+				//Log.console(ex);
 			}
 
 			return playerName;

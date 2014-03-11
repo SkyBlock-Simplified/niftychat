@@ -1,7 +1,5 @@
 package net.netcoding.niftychat.listeners;
 
-import static net.netcoding.niftychat.managers.Cache.Log;
-
 import java.util.regex.Pattern;
 
 import net.netcoding.niftybukkit.minecraft.BukkitListener;
@@ -35,12 +33,12 @@ public class Chat extends BukkitListener {
 		if ("".equals(stripMessage)) event.setCancelled(true);
 
 		if (!userData.hasMoved()) {
-			Log.error(player, "You must move before you can speak!");
+			this.getLog().error(player, "You must move before you can speak!");
 			event.setCancelled(true);
 		}
 
 		if (userData.hasRepeatedMessage(stripMessage)) {
-			Log.error(player, "You cannot send the same message!");
+			this.getLog().error(player, "You cannot send the same message!");
 			event.setCancelled(true);
 		}
 	}

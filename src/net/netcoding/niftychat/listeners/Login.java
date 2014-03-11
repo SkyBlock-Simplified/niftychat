@@ -1,6 +1,5 @@
 package net.netcoding.niftychat.listeners;
 
-import static net.netcoding.niftychat.managers.Cache.Log;
 import net.netcoding.niftybukkit.minecraft.BukkitListener;
 import net.netcoding.niftychat.NiftyChat;
 import net.netcoding.niftychat.managers.Cache;
@@ -36,7 +35,7 @@ public class Login extends BukkitListener {
 			if (userData.hasPermissions("chat", "bypass", "move"))
 				userData.setMoved();
 		} catch (Exception ex) {
-			Log.console(ex);
+			this.getLog().console(ex);
 		}
 	}
 

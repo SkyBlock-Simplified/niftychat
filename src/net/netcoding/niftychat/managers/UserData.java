@@ -176,10 +176,8 @@ public class UserData extends BukkitHelper {
 					}
 				}, playerName, (playerName + "%"));
 			} catch (SQLException ex) {
-				//Log.console(ex);
+				return playerName;
 			}
-
-			return playerName;
 		}
 	}
 

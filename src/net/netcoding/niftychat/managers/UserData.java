@@ -3,14 +3,12 @@ package net.netcoding.niftychat.managers;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.List;
-import java.util.Set;
-import java.util.concurrent.ConcurrentHashMap;
 
 import net.netcoding.niftybukkit.database.ResultCallback;
 import net.netcoding.niftybukkit.minecraft.BukkitHelper;
 import net.netcoding.niftybukkit.util.RegexUtil;
+import net.netcoding.niftybukkit.util.concurrent.ConcurrentSet;
 
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
@@ -18,7 +16,7 @@ import org.bukkit.plugin.java.JavaPlugin;
 
 public class UserData extends BukkitHelper {
 
-	private static final transient ConcurrentHashMap<String, UserData> cache = new ConcurrentHashMap<>();
+	private static final transient ConcurrentSet<UserData> cache = new ConcurrentSet<>();
 
 	private String playerName;
 
@@ -39,7 +37,7 @@ public class UserData extends BukkitHelper {
 	public UserData(JavaPlugin plugin, String playerName) {
 		super(plugin);
 		this.playerName = playerName;
-		cache.put(playerName, this);
+		cache.add(this);
 	}
 
 	/*public void addRank(String rank) {
@@ -54,16 +52,17 @@ public class UserData extends BukkitHelper {
 		this.ranks.clear();
 	}
 
+	public static ConcurrentSet<UserData> getCache() {
+		return cache;
+	}
+
 	public static UserData getCache(String playerName) {
-		return cache.get(matchPlayerName(playerName));
-	}
+		for (UserData data : cache) {
+			if (data.getName().equalsIgnoreCase(playerName))
+				return data;
+		}
 
-	public static Collection<UserData> getCachedData() {
-		return cache.values();
-	}
-
-	public static Set<String> getCachedPlayers() {
-		return cache.keySet();
+		return null;
 	}
 
 	public String getDisplayName() {
@@ -75,7 +74,6 @@ public class UserData extends BukkitHelper {
 	}
 
 	private static String _getDisplayName(final String playerName, final String primaryRank) throws SQLException {
-
 		return Cache.MySQL.query("SELECT * FROM `nc_users` WHERE `user` = ? LIMIT 1;", new ResultCallback<String>() {
 			@Override
 			public String handle(ResultSet result) throws SQLException {
@@ -200,8 +198,10 @@ public class UserData extends BukkitHelper {
 	}
 
 	public static void removeCache(String playerName) {
-		if (cache.containsKey(playerName))
-			cache.remove(playerName);
+		for (UserData data : cache) {
+			if (data.getName().equalsIgnoreCase(playerName))
+				cache.remove(data);
+		}
 	}
 
 	public void removeRank(String rank) {

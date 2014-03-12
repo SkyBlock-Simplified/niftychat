@@ -2,14 +2,14 @@ package net.netcoding.niftychat.managers;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.util.concurrent.ConcurrentHashMap;
 
 import net.netcoding.niftybukkit.database.ResultCallback;
 import net.netcoding.niftybukkit.util.RegexUtil;
+import net.netcoding.niftybukkit.util.concurrent.ConcurrentSet;
 
 public class RankData {
 
-	private static final ConcurrentHashMap<String, RankData> cache = new ConcurrentHashMap<>();
+	private static final transient ConcurrentSet<RankData> cache = new ConcurrentSet<>();
 	private String rank;
 	private String group;
 	private String format;
@@ -26,11 +26,20 @@ public class RankData {
 		this.setFormat(format);
 		this.setPrefix(prefix);
 		this.setSuffix(suffix);
-		cache.put(rank, this);
+		cache.add(this);
+	}
+
+	public static ConcurrentSet<RankData> getCache() {
+		return cache;
 	}
 
 	public static RankData getCache(String rank) {
-		return cache.get(rank);
+		for (RankData data : cache) {
+			if (data.getRank().equals(rank))
+				return data;
+		}
+
+		return null;
 	}
 
 	public String getGroup() {
@@ -82,8 +91,10 @@ public class RankData {
 	}
 
 	public static void removeCache(String rank) {
-		if (cache.containsKey(rank))
-			cache.remove(rank);
+		for (RankData data : cache) {
+			if (data.getRank().equals(rank))
+				cache.remove(data);
+		}
 	}
 
 	public void setGroup(String value) {

@@ -9,8 +9,8 @@ import net.netcoding.niftybukkit.util.concurrent.ConcurrentSet;
 
 public class CensorData {
 
-	private static final ConcurrentSet<CensorData> cache = new ConcurrentSet<>();
-	public static final String DEFAULT_REPLACE = "***";
+	private static final transient ConcurrentSet<CensorData> cache = new ConcurrentSet<>();
+	public static final transient String DEFAULT_REPLACE = "***";
 	private String badword;
 	private Pattern pattern;
 	private String replace;
@@ -29,19 +29,17 @@ public class CensorData {
 		return this.badword;
 	}
 
-	public static CensorData getCache(String badword) {
-		if ("".equals(badword)) return null;
+	public static ConcurrentSet<CensorData> getCache() {
+		return cache;
+	}
 
-		for (CensorData censor : cache) {
-			if (censor.getBadword().equalsIgnoreCase(badword))
-				return censor;
+	public static CensorData getCache(String badword) {
+		for (CensorData data : cache) {
+			if (data.getBadword().equalsIgnoreCase(badword))
+				return data;
 		}
 
 		return null;
-	}
-
-	public static ConcurrentSet<CensorData> getCache() {
-		return cache;
 	}
 
 	public Pattern getPattern() {

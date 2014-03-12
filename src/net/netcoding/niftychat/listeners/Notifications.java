@@ -38,9 +38,7 @@ public class Notifications implements DatabaseListener {
 								rankData.setSuffix(result.getString("suffix"));
 								rankData.setFormat(result.getString("format"));
 
-								for (String playerName : UserData.getCachedPlayers()) {
-									UserData userData = UserData.getCache(playerName);
-
+								for (UserData userData : UserData.getCache()) {
 									if (userData.getPrimaryRank() == rank) {
 										userData.updateDisplayName();
 										userData.updateTabListName();

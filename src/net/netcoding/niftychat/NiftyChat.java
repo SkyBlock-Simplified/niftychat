@@ -1,14 +1,7 @@
 package net.netcoding.niftychat;
 
-import java.sql.ResultSet;
-import java.sql.SQLException;
-
 import net.netcoding.niftybukkit.NiftyBukkit;
-import net.netcoding.niftybukkit.database.DatabaseListener;
-import net.netcoding.niftybukkit.database.DatabaseNotification;
 import net.netcoding.niftybukkit.database.MySQL;
-import net.netcoding.niftybukkit.database.ResultCallback;
-import net.netcoding.niftybukkit.database.TriggerEvent;
 import net.netcoding.niftybukkit.ghosts.GhostBusters;
 import net.netcoding.niftybukkit.minecraft.Log;
 import net.netcoding.niftychat.commands.Censor;
@@ -20,15 +13,15 @@ import net.netcoding.niftychat.listeners.Chat;
 import net.netcoding.niftychat.listeners.Disconnect;
 import net.netcoding.niftychat.listeners.Login;
 import net.netcoding.niftychat.listeners.Move;
+import net.netcoding.niftychat.listeners.Notifications;
 import net.netcoding.niftychat.managers.Cache;
-import net.netcoding.niftychat.managers.CompiledCensor;
+import net.netcoding.niftychat.managers.CensorData;
 import net.netcoding.niftychat.managers.RankData;
-import net.netcoding.niftychat.managers.UserData;
 
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.plugin.java.JavaPlugin;
 
-public class NiftyChat extends JavaPlugin implements DatabaseListener {
+public class NiftyChat extends JavaPlugin {
 
 	@Override
 	public void onEnable() {
@@ -58,10 +51,11 @@ public class NiftyChat extends JavaPlugin implements DatabaseListener {
 		if (!this.setupTables()) return;
 
 		try {
-			Cache.MySQL.addDatabaseListener("nc_censor", this);
-			Cache.MySQL.addDatabaseListener("nc_ranks", this);
-			Cache.MySQL.addDatabaseListener("nc_users", this);
-			Cache.MySQL.addDatabaseListener("nc_user_ranks", this);
+			Cache.notifications = new Notifications();
+			Cache.MySQL.addDatabaseListener("nc_censor", Cache.notifications);
+			Cache.MySQL.addDatabaseListener("nc_ranks", Cache.notifications);
+			Cache.MySQL.addDatabaseListener("nc_users", Cache.notifications);
+			Cache.MySQL.addDatabaseListener("nc_user_ranks", Cache.notifications);
 		} catch (Exception ex) {
 			log.console(ex);
 			return;
@@ -82,167 +76,15 @@ public class NiftyChat extends JavaPlugin implements DatabaseListener {
 		new Move(this);
 
 		log.console("Loading Censor List");
-		this.loadCensorList();
+		CensorData.reload();
 
 		log.console("Loading Rank Formats");
-		this.loadFormats();
+		RankData.reload();
 	}
 
 	@Override
 	public void onDisable() {
 		Cache.MySQL.stopListening();
-	}
-
-	@Override
-	public void onDatabaseNotification(DatabaseNotification notification) {
-		switch (notification.getTable()) {
-		case "nc_censor":
-			this.loadCensorList();
-			break;
-		case "nc_ranks":
-			if (notification.getEvent() != TriggerEvent.UPDATE)
-				this.loadFormats();
-			else {
-				try {
-					notification.getUpdatedRow(new ResultCallback<Void>() {
-						@Override
-						public Void handle(ResultSet result) throws SQLException {
-							if (result.next()) {
-								String rank = result.getString("rank");
-								RankData rankData = RankData.getCache(rank);
-								rankData.setGroup(result.getString("group"));
-								rankData.setPrefix(result.getString("prefix"));
-								rankData.setSuffix(result.getString("suffix"));
-								rankData.setFormat(result.getString("format"));
-
-								for (String playerName : UserData.getCachedPlayers()) {
-									UserData userData = UserData.getCache(playerName);
-
-									if (userData.getPrimaryRank() == rank) {
-										userData.updateDisplayName();
-										userData.updateTabListName();
-									}
-								}
-
-								//User.updateTabListNames();
-							}
-
-							return null;
-						}
-					});
-				} catch (Exception ex) {
-					ex.printStackTrace();
-				}
-			}
-			break;
-		case "nc_user_ranks":
-			try {
-				if (notification.getEvent() != TriggerEvent.DELETE) {
-					notification.getUpdatedRow(new ResultCallback<Void>() {
-						@Override
-						public Void handle(ResultSet result) throws SQLException {
-							if (result.next()) {
-								int userId = result.getInt("user_id");
-
-								Cache.MySQL.query("SELECT * FROM `nc_users` WHERE `id` = ?", new ResultCallback<Void>() {
-									@Override
-									public Void handle(ResultSet result) throws SQLException {
-										if (result.next()) {
-											UserData userData = UserData.getCache(result.getString("user"));
-											
-											if (userData != null) { // Online
-												userData.updateRanks();
-												userData.updateDisplayName();
-												userData.updateTabListName();
-												userData.updateVaultRanks();
-											}
-										}
-
-										return null;
-									}
-								}, userId);
-							}
-
-							return null;
-						}
-					});
-				}
-			} catch (Exception ex) {
-				ex.printStackTrace();
-			}
-			break;
-		case "nc_users":
-			try {
-				notification.getUpdatedRow(new ResultCallback<Void>() {
-					@Override
-					public Void handle(ResultSet result) throws SQLException {
-						if (result.next()) {
-							UserData userData = UserData.getCache(result.getString("user"));
-
-							if (userData != null) {
-								userData.updateDisplayName();
-								userData.updateTabListName();
-							}
-						}
-
-						return null;
-					}
-				});
-			} catch (Exception ex) {
-				ex.printStackTrace();
-			}
-			break;
-		}
-	}
-
-	private void loadCensorList() {
-		try {
-			Cache.censorList.clear();
-
-			Cache.MySQL.query("SELECT * FROM `nc_censor`;", new ResultCallback<Void>() {
-				@Override
-				public Void handle(ResultSet result) throws SQLException {
-					while (result.next()) {
-						String badword = result.getString("badword");
-						String replace = result.getString("replace");
-						replace        = (result.wasNull() ? null : replace);
-						Cache.censorList.put(badword, new CompiledCensor(badword, replace));
-					}
-					
-					return null;
-				}
-			});
-		} catch (Exception ex) {
-			ex.printStackTrace();
-		}
-	}
-
-	private void loadFormats() {
-		try {
-			RankData.clearCache();
-
-			Cache.MySQL.query("SELECT * FROM `nc_ranks`;", new ResultCallback<Void>() {
-				@Override
-				public Void handle(ResultSet result) throws SQLException {
-					while (result.next()) {
-						String rank = result.getString("rank");
-						String group = result.getString("group");
-						String prefix = result.getString("prefix");
-						if ("".equals(prefix)) prefix = null;
-						String suffix = result.getString("suffix");
-						if ("".equals(suffix)) suffix = null;
-						String format = result.getString("format");
-						if (result.wasNull()) format = null;
-
-						new RankData(rank, group, format, prefix, suffix);
-					}
-
-					return null;
-				}
-			});
-		} catch (Exception ex) {
-			ex.printStackTrace();
-		}
 	}
 
 	private boolean setupTables() {

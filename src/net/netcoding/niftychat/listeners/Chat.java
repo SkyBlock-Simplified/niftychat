@@ -6,8 +6,7 @@ import net.netcoding.niftybukkit.minecraft.BukkitListener;
 import net.netcoding.niftybukkit.util.RegexUtil;
 import net.netcoding.niftybukkit.util.StringUtil;
 import net.netcoding.niftychat.NiftyChat;
-import net.netcoding.niftychat.managers.Cache;
-import net.netcoding.niftychat.managers.CompiledCensor;
+import net.netcoding.niftychat.managers.CensorData;
 import net.netcoding.niftychat.managers.RankData;
 import net.netcoding.niftychat.managers.UserData;
 
@@ -108,8 +107,7 @@ public class Chat extends BukkitListener {
 		}
 
 		if (!this.hasPermissions(player, "chat", "bypass", "censor")) {
-			for (String badword : Cache.censorList.keySet()) {
-				CompiledCensor censor = Cache.censorList.get(badword);
+			for (CensorData censor : CensorData.getCache()) {
 				Pattern pattern = censor.getPattern();
 
 				while (pattern.matcher(message).find())

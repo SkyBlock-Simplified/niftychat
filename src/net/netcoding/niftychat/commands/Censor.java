@@ -9,7 +9,7 @@ import net.netcoding.niftybukkit.minecraft.BukkitCommand;
 import net.netcoding.niftybukkit.util.StringUtil;
 import net.netcoding.niftychat.NiftyChat;
 import net.netcoding.niftychat.managers.Cache;
-import net.netcoding.niftychat.managers.CompiledCensor;
+import net.netcoding.niftychat.managers.CensorData;
 
 import org.bukkit.ChatColor;
 import org.bukkit.command.CommandSender;
@@ -30,12 +30,12 @@ public class Censor extends BukkitCommand {
 					if (this.hasPermissions(sender, "censor", "list")) {
 						List<String> censorList = new ArrayList<String>();
 
-						if (Cache.censorList.size() > 0) {
-							for (String badword : Cache.censorList.keySet()) {
-								CompiledCensor censor = Cache.censorList.get(badword);
-								String match          = ChatColor.RED + badword + ChatColor.GRAY;
-								String replace        = censor.getReplace();
-								replace               = ChatColor.RED + replace + ChatColor.GRAY;
+						if (CensorData.getCache().size() > 0) {
+							for (CensorData censor : CensorData.getCache()) {
+								String badword = censor.getBadword();
+								String match   = ChatColor.RED + badword + ChatColor.GRAY;
+								String replace = censor.getReplace();
+								replace        = ChatColor.RED + replace + ChatColor.GRAY;
 								censorList.add(String.format("%1$s => %2$s", match, replace));
 							}
 
@@ -60,12 +60,12 @@ public class Censor extends BukkitCommand {
 
 						try {
 							if (Cache.MySQL.update("INSERT INTO `nc_censor` (`badword`,  `replace`) VALUES (?, ?) ON DUPLICATE KEY UPDATE `replace` = ?;", badword, replace, replace)) {
-								String _replace = (replace == null ? CompiledCensor.DEFAULT_REPLACE : replace);
+								String _replace = (replace == null ? CensorData.DEFAULT_REPLACE : replace);
 
 								if (action.equalsIgnoreCase("add"))
-									Cache.censorList.put(badword, new CompiledCensor(badword, _replace));
+									new CensorData(badword, _replace);
 								else
-									Cache.censorList.get(badword).setReplace(_replace);
+									CensorData.getCache(badword).setReplace(_replace);
 
 								this.getLog().message(sender, "{%1$s} now filters to {%2$s}", badword, _replace);
 							}
@@ -79,7 +79,7 @@ public class Censor extends BukkitCommand {
 
 						try {
 							if (Cache.MySQL.update("DELETE FROM `nc_censor` WHERE `badword` = ?;", badword)) {
-								Cache.censorList.remove(badword);
+								CensorData.removeCache(badword);
 								this.getLog().message(sender, "Censored word {%1$s} removed", badword);
 							} else
 								this.getLog().error(sender, "Unable to remove censored word!");

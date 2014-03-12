@@ -1,7 +1,10 @@
 package net.netcoding.niftychat.managers;
 
+import java.sql.ResultSet;
+import java.sql.SQLException;
 import java.util.concurrent.ConcurrentHashMap;
 
+import net.netcoding.niftybukkit.database.ResultCallback;
 import net.netcoding.niftybukkit.util.RegexUtil;
 
 public class RankData {
@@ -26,10 +29,6 @@ public class RankData {
 		cache.put(rank, this);
 	}
 
-	public static void clearCache() {
-		cache.clear();
-	}
-
 	public static RankData getCache(String rank) {
 		return cache.get(rank);
 	}
@@ -52,6 +51,34 @@ public class RankData {
 
 	public String getSuffix() {
 		return this.suffix;
+	}
+
+	public static void reload() {
+		try {
+			cache.clear();
+
+			Cache.MySQL.query("SELECT * FROM `nc_ranks`;", new ResultCallback<Void>() {
+				@Override
+				public Void handle(ResultSet result) throws SQLException {
+					while (result.next()) {
+						String rank = result.getString("rank");
+						String group = result.getString("group");
+						String prefix = result.getString("prefix");
+						if ("".equals(prefix)) prefix = null;
+						String suffix = result.getString("suffix");
+						if ("".equals(suffix)) suffix = null;
+						String format = result.getString("format");
+						if (result.wasNull()) format = null;
+
+						new RankData(rank, group, format, prefix, suffix);
+					}
+
+					return null;
+				}
+			});
+		} catch (Exception ex) {
+			ex.printStackTrace();
+		}
 	}
 
 	public static void removeCache(String rank) {

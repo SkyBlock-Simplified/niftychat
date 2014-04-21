@@ -2,6 +2,7 @@ package net.netcoding.niftychat.listeners;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.Map;
 import java.util.UUID;
 
 import net.netcoding.niftybukkit.database.DatabaseListener;
@@ -40,8 +41,8 @@ public class Notifications implements DatabaseListener {
 			}
 		} else if (table.equals(Config.FORMAT_TABLE)) {
 			if (event.equals(TriggerEvent.DELETE)) {
-				//HashMap<String, Object> data = databaseNotification.getDeletedData();
-				//CensorData.removeCache(String.valueOf(data.get("rank")));
+				Map<String, Object> data = databaseNotification.getDeletedData();
+				RankFormat.removeCache((String)data.get("rank"));
 			} else if (event.equals(TriggerEvent.INSERT)) {
 				databaseNotification.getUpdatedRow(new ResultCallback<Void>() {
 					@Override
@@ -49,8 +50,6 @@ public class Notifications implements DatabaseListener {
 						if (result.next()) {
 							String rank = result.getString("rank");
 							new RankFormat(rank, result.getString("group"), result.getString("format"));
-							//result.getString("suffix");
-							//result.getString("format");
 						}
 
 						return null;
@@ -63,10 +62,10 @@ public class Notifications implements DatabaseListener {
 						if (result.next()) {
 							String rank = result.getString("rank");
 							RankFormat rankData = RankFormat.getCache(rank);
+							rankData.setFormat(result.getString("format"));
 							rankData.setGroup(result.getString("group"));
 							rankData.setPrefix(result.getString("prefix"));
 							rankData.setSuffix(result.getString("suffix"));
-							rankData.setFormat(result.getString("format"));
 
 							for (UserChatData userData : UserChatData.getCache()) {
 								if (userData.getRankData().getPrimaryRank().equalsIgnoreCase(rank)) {

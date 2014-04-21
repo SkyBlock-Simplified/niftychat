@@ -1,9 +1,10 @@
 package net.netcoding.niftychat.listeners;
 
+import net.netcoding.niftybukkit.NiftyBukkit;
 import net.netcoding.niftybukkit.minecraft.BukkitListener;
+import net.netcoding.niftybukkit.mojang.MojangProfile;
 import net.netcoding.niftychat.NiftyChat;
-import net.netcoding.niftychat.managers.Cache;
-import net.netcoding.niftychat.managers.UserData;
+import net.netcoding.niftychat.cache.UserChatData;
 
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
@@ -17,10 +18,11 @@ public class Disconnect extends BukkitListener {
 	}
 
 	private void playerDisconnect(Player player) {
-		UserData.removeCache(player.getName());
+		MojangProfile profile = NiftyBukkit.getMojangRepository().searchByExactPlayer(player);
+		UserChatData.removeCache(profile.getUniqueId());
 
-		if (Cache.ghosts.hasPlayer(player))
-			Cache.ghosts.remove(player);
+		//if (Cache.ghosts.hasPlayer(player))
+		//	Cache.ghosts.remove(player);
 	}
 
 	@EventHandler

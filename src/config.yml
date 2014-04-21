@@ -1,5 +1,0 @@
-host: localhost
-user: root
-schema: mysql
-pass: 
-port: 3306

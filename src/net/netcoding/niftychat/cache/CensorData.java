@@ -1,10 +1,11 @@
-package net.netcoding.niftychat.managers;
+package net.netcoding.niftychat.cache;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.regex.Pattern;
 
 import net.netcoding.niftybukkit.database.ResultCallback;
+import net.netcoding.niftybukkit.util.StringUtil;
 import net.netcoding.niftybukkit.util.concurrent.ConcurrentSet;
 
 public class CensorData {
@@ -54,7 +55,7 @@ public class CensorData {
 		try {
 			cache.clear();
 
-			Cache.MySQL.query("SELECT * FROM `nc_censor`;", new ResultCallback<Void>() {
+			Cache.MySQL.query(StringUtil.format("SELECT * FROM `{0}`;", Config.CENSOR_TABLE), new ResultCallback<Void>() {
 				@Override
 				public Void handle(ResultSet result) throws SQLException {
 					while (result.next()) {

@@ -1,34 +1,29 @@
 name: NiftyChat
-version: 0.9.5
+version: 1.0
 website: http://netcoding.net/
 author: Brian Graham
 
 main: net.netcoding.niftychat.NiftyChat
-depend: [NiftyBukkit]
+depend: [NiftyBukkit, NiftyRanks]
 softdepend: [Vault]
 
 commands:
   censor:
     description: Manage chat censoring
-    permission: niftychat.censor
     usage: /<command> <add|edit|remove|list> <badword> [replace]
     aliases: cl
   format:
     description: Manage chat formatting
-    permission: niftychat.format
     usage: /<command> <rank> <prefix|suffix|format> [value]
+#  mute:
+#    description: Mute player from chat
+#    permission: niftychat.chat.mute
+#    usage: /<command> <player> [time]
   nick:
     description: Sets player nickname
-    permission: niftychat.nick
     usage: /<command> <<nick|clear>|<player> <nick|clear|revoke|grant>>
-    aliases: nickname
-  rank:
-    description: Manage player rank
-    permission: niftychat.rank
-    usage: /<command> [create|edit|check|player]
   realname:
     description: Find a players realname by nickname
-    permission: niftychat.realname
     usage: /<command> <nick>
     aliases: rn
 
@@ -79,6 +74,8 @@ permissions:
       niftychat.nick.*:
         description: Allows you to access all nicknames features and commands
         children:
+          niftychat.nick:
+            description: Allows you to set your nickname
           niftychat.nick.clear:
             description: Allows you to clear player nicknames
           niftychat.nick.revoke:
@@ -91,13 +88,5 @@ permissions:
             description: Allows you to set nicknames with magic
           niftychat.nick.format:
             description: Allows you to set nicknames with formatting
-      niftychat.rank.*:
-        description: Allows you to access all rank commands
-        children:
-          niftychat.rank: true
-          niftychat.rank.check:
-            description: Allows you to check the rank of a player
-          niftychat.rank.manage:
-            description: Allows you to create, edit and remove ranks
       niftychat.realname:
         description: Allows you to find a players realname by nickname

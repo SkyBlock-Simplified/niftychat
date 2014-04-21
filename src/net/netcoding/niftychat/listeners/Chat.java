@@ -2,13 +2,15 @@ package net.netcoding.niftychat.listeners;
 
 import java.util.regex.Pattern;
 
+import net.netcoding.niftybukkit.NiftyBukkit;
 import net.netcoding.niftybukkit.minecraft.BukkitListener;
+import net.netcoding.niftybukkit.mojang.MojangProfile;
 import net.netcoding.niftybukkit.util.RegexUtil;
 import net.netcoding.niftybukkit.util.StringUtil;
 import net.netcoding.niftychat.NiftyChat;
-import net.netcoding.niftychat.managers.CensorData;
-import net.netcoding.niftychat.managers.RankData;
-import net.netcoding.niftychat.managers.UserData;
+import net.netcoding.niftychat.cache.CensorData;
+import net.netcoding.niftychat.cache.RankFormat;
+import net.netcoding.niftychat.cache.UserChatData;
 
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
@@ -26,10 +28,11 @@ public class Chat extends BukkitListener {
 	@EventHandler(priority = EventPriority.LOW)
 	public void checkPlayerMessage(AsyncPlayerChatEvent event) {
 		Player player = event.getPlayer();
-		UserData userData = UserData.getCache(player.getName());
+		MojangProfile profile = NiftyBukkit.getMojangRepository().searchByExactPlayer(player);
+		UserChatData userData = UserChatData.getCache(profile.getUniqueId());
 		String stripMessage = RegexUtil.strip(event.getMessage(), RegexUtil.REPLACE_ALL_PATTERN);
 
-		if ("".equals(stripMessage)) event.setCancelled(true);
+		if (StringUtil.isEmpty(stripMessage)) event.setCancelled(true);
 
 		if (!userData.hasMoved()) {
 			this.getLog().error(player, "You must move before you can speak!");
@@ -46,16 +49,17 @@ public class Chat extends BukkitListener {
 	public void onPlayerChat(AsyncPlayerChatEvent event) {
 		if (event.isCancelled()) return;
 		Player player = event.getPlayer();
-		UserData userData = UserData.getCache(player.getName());
+		MojangProfile profile = NiftyBukkit.getMojangRepository().searchByExactPlayer(player);
+		UserChatData userData = UserChatData.getCache(profile.getUniqueId());
 		String message = event.getMessage();
 
-		String rank = userData.getPrimaryRank();
-		RankData rankInfo = RankData.getCache(rank);
+		String rank = userData.getRankData().getPrimaryRank();
+		RankFormat rankInfo = RankFormat.getCache(rank);
 		String format = rankInfo.getFormat();
 		String group = rankInfo.getGroup();
 		group = (group == null ? rank : group);
 		String world = player.getWorld().getName();
-		Team team = player.getScoreboard().getPlayerTeam(Bukkit.getOfflinePlayer(player.getName()));
+		Team team = player.getScoreboard().getPlayerTeam(Bukkit.getOfflinePlayer(profile.getUniqueId()));
 
 		format = format.replace("{0}", group);
 		format = format.replace("{1}", world);
@@ -70,7 +74,7 @@ public class Chat extends BukkitListener {
 		event.setMessage(message);
 
 		synchronized (this) {
-			event.setFormat(StringUtil.join(format, (userData.getDisplayName() + (RegexUtil.SECTOR_SYMBOL + "r")), message ));
+			event.setFormat(StringUtil.format(format, (userData.getDisplayName() + (RegexUtil.SECTOR_SYMBOL + "r")), message ));
 		}
 	}
 

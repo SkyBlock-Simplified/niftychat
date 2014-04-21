@@ -2,15 +2,11 @@ package net.netcoding.niftychat.listeners;
 
 import net.netcoding.niftybukkit.minecraft.BukkitListener;
 import net.netcoding.niftychat.NiftyChat;
-import net.netcoding.niftychat.managers.Cache;
-import net.netcoding.niftychat.managers.UserData;
+import net.netcoding.niftychat.cache.UserChatData;
 
-import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
-import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.event.player.PlayerLoginEvent;
-import org.bukkit.event.player.PlayerLoginEvent.Result;
 
 public class Login extends BukkitListener {
 
@@ -18,17 +14,11 @@ public class Login extends BukkitListener {
 		super(plugin);
 	}
 
-	@EventHandler
-	public void onPlayerJoin(PlayerJoinEvent event) {
-		event.setJoinMessage(null);
-		Player player = event.getPlayer();
-		String playerName = player.getName();
-		UserData userData = UserData.getCache(playerName);
+	@EventHandler(priority = EventPriority.LOWEST)
+	public void onPlayerLogin(PlayerLoginEvent event) {
+		UserChatData userData = new UserChatData(this.getPlugin(), event.getPlayer());
 
 		try {
-			Cache.MySQL.update("INSERT IGNORE INTO `nc_users` (`user`) VALUES (?);", playerName);
-			userData.updateRanks();
-			userData.updateVaultRanks();
 			userData.updateDisplayName();
 			userData.updateTabListName();
 
@@ -37,19 +27,9 @@ public class Login extends BukkitListener {
 		} catch (Exception ex) {
 			this.getLog().console(ex);
 		}
-	}
 
-	@EventHandler(priority = EventPriority.LOWEST)
-	public void onPlayerLogin(PlayerLoginEvent event) {
-		Player player = event.getPlayer();
-		String playerName = player.getName();
-		new UserData(this.getPlugin(), playerName);
-
-		if (this.hasPermissions(player, "vanish", "see"))
-			Cache.ghosts.add(player);
-
-		if (event.getResult() == Result.KICK_FULL && this.hasPermissions(player, "join", "fullserver"))
-			event.setResult(Result.ALLOWED);
+		//if (this.hasPermissions(player, "vanish", "see"))
+		//	Cache.ghosts.add(player);
 	}
 
 }

@@ -1,26 +1,28 @@
-package net.netcoding.niftychat.managers;
+package net.netcoding.niftychat.cache;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
 
 import net.netcoding.niftybukkit.database.ResultCallback;
 import net.netcoding.niftybukkit.util.RegexUtil;
+import net.netcoding.niftybukkit.util.StringUtil;
 import net.netcoding.niftybukkit.util.concurrent.ConcurrentSet;
+import net.netcoding.niftyranks.cache.Cache;
 
-public class RankData {
+public class RankFormat {
 
-	private static final transient ConcurrentSet<RankData> cache = new ConcurrentSet<>();
+	private static final transient ConcurrentSet<RankFormat> cache = new ConcurrentSet<>();
 	private String rank;
 	private String group;
 	private String format;
 	private String prefix;
 	private String suffix;
 
-	public RankData(String rank, String group, String format) {
+	public RankFormat(String rank, String group, String format) {
 		this(rank, group, format, "", "");
 	}
 
-	public RankData(String rank, String group, String format, String prefix, String suffix) {
+	public RankFormat(String rank, String group, String format, String prefix, String suffix) {
 		this.rank = rank;
 		this.setGroup(group);
 		this.setFormat(format);
@@ -29,12 +31,12 @@ public class RankData {
 		cache.add(this);
 	}
 
-	public static ConcurrentSet<RankData> getCache() {
+	public static ConcurrentSet<RankFormat> getCache() {
 		return cache;
 	}
 
-	public static RankData getCache(String rank) {
-		for (RankData data : cache) {
+	public static RankFormat getCache(String rank) {
+		for (RankFormat data : cache) {
 			if (data.getRank().equals(rank))
 				return data;
 		}
@@ -66,20 +68,20 @@ public class RankData {
 		try {
 			cache.clear();
 
-			Cache.MySQL.query("SELECT * FROM `nc_ranks`;", new ResultCallback<Void>() {
+			Cache.MySQL.query(StringUtil.format("SELECT * FROM `{0}`;", Config.FORMAT_TABLE), new ResultCallback<Void>() {
 				@Override
 				public Void handle(ResultSet result) throws SQLException {
 					while (result.next()) {
 						String rank = result.getString("rank");
 						String group = result.getString("group");
 						String prefix = result.getString("prefix");
-						if ("".equals(prefix)) prefix = null;
+						if (StringUtil.isEmpty(prefix)) prefix = null;
 						String suffix = result.getString("suffix");
-						if ("".equals(suffix)) suffix = null;
+						if (StringUtil.isEmpty(suffix)) suffix = null;
 						String format = result.getString("format");
 						if (result.wasNull()) format = null;
 
-						new RankData(rank, group, format, prefix, suffix);
+						new RankFormat(rank, group, format, prefix, suffix);
 					}
 
 					return null;
@@ -91,7 +93,7 @@ public class RankData {
 	}
 
 	public static void removeCache(String rank) {
-		for (RankData data : cache) {
+		for (RankFormat data : cache) {
 			if (data.getRank().equals(rank))
 				cache.remove(data);
 		}
@@ -103,7 +105,7 @@ public class RankData {
 
 	public void setFormat(String value) {
 		String _default = "{displayname}&f: &7{msg}";
-		if (value == null) value = _default;
+		if (StringUtil.isEmpty(value)) value = _default;
 
 		try {
 			value = RegexUtil.replaceColor(value, RegexUtil.REPLACE_ALL_PATTERN);
@@ -124,11 +126,11 @@ public class RankData {
 	}
 
 	public void setPrefix(String value) {
-		this.prefix = (value == null ? "" : RegexUtil.replaceColor(value, RegexUtil.REPLACE_ALL_PATTERN));
+		this.prefix = StringUtil.isEmpty(value) ? "" : RegexUtil.replaceColor(value, RegexUtil.REPLACE_ALL_PATTERN);
 	}
 
 	public void setSuffix(String value) {
-		this.suffix = (value == null ? "" : RegexUtil.replaceColor(value, RegexUtil.REPLACE_ALL_PATTERN));
+		this.suffix = StringUtil.isEmpty(value) ? "" : RegexUtil.replaceColor(value, RegexUtil.REPLACE_ALL_PATTERN);
 	}
 
 }

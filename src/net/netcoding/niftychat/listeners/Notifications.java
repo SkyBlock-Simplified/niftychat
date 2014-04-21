@@ -2,93 +2,31 @@ package net.netcoding.niftychat.listeners;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.util.HashMap;
+import java.util.UUID;
 
 import net.netcoding.niftybukkit.database.DatabaseListener;
 import net.netcoding.niftybukkit.database.DatabaseNotification;
 import net.netcoding.niftybukkit.database.ResultCallback;
 import net.netcoding.niftybukkit.database.TriggerEvent;
-import net.netcoding.niftychat.managers.Cache;
-import net.netcoding.niftychat.managers.CensorData;
-import net.netcoding.niftychat.managers.RankData;
-import net.netcoding.niftychat.managers.UserData;
+import net.netcoding.niftychat.cache.CensorData;
+import net.netcoding.niftychat.cache.Config;
+import net.netcoding.niftychat.cache.RankFormat;
+import net.netcoding.niftychat.cache.UserChatData;
 
 public class Notifications implements DatabaseListener {
 
 	@Override
-	public void onDatabaseNotification(DatabaseNotification databaseNotification) {
-		try {
-			switch (databaseNotification.getTable()) {
-			case "nc_censor":
-				CensorData.reload();
-				break;
-			case "nc_ranks":
-				if (databaseNotification.getEvent() == TriggerEvent.DELETE) {
-					HashMap<String, Object> data = databaseNotification.getDeletedData();
-					CensorData.removeCache(String.valueOf(data.get("rank")));
-				} else {
-					databaseNotification.getUpdatedRow(new ResultCallback<Void>() {
-						@Override
-						public Void handle(ResultSet result) throws SQLException {
-							if (result.next()) {
-								String rank = result.getString("rank");
-								RankData rankData = RankData.getCache(rank);
-								rankData.setGroup(result.getString("group"));
-								rankData.setPrefix(result.getString("prefix"));
-								rankData.setSuffix(result.getString("suffix"));
-								rankData.setFormat(result.getString("format"));
+	public void onDatabaseNotification(DatabaseNotification databaseNotification) throws SQLException {
+		TriggerEvent event = databaseNotification.getEvent();
+		String table = databaseNotification.getTable();
 
-								for (UserData userData : UserData.getCache()) {
-									if (userData.getPrimaryRank() == rank) {
-										userData.updateDisplayName();
-										userData.updateTabListName();
-									}
-								}
-							}
-
-							return null;
-						}
-					});
-				}
-				break;
-			case "nc_user_ranks":
-				if (databaseNotification.getEvent() != TriggerEvent.DELETE) {
-					databaseNotification.getUpdatedRow(new ResultCallback<Void>() {
-						@Override
-						public Void handle(ResultSet result) throws SQLException {
-							if (result.next()) {
-								int userId = result.getInt("user_id");
-
-								Cache.MySQL.query("SELECT * FROM `nc_users` WHERE `id` = ?", new ResultCallback<Void>() {
-									@Override
-									public Void handle(ResultSet result) throws SQLException {
-										if (result.next()) {
-											UserData userData = UserData.getCache(result.getString("user"));
-
-											if (userData != null) { // Online
-												userData.updateRanks();
-												userData.updateDisplayName();
-												userData.updateTabListName();
-												userData.updateVaultRanks();
-											}
-										}
-
-										return null;
-									}
-								}, userId);
-							}
-
-							return null;
-						}
-					});
-				}
-				break;
-			case "nc_users":
+		if (table.equals(Config.USER_TABLE)) {
+			if (event.equals(TriggerEvent.UPDATE)) {
 				databaseNotification.getUpdatedRow(new ResultCallback<Void>() {
 					@Override
 					public Void handle(ResultSet result) throws SQLException {
 						if (result.next()) {
-							UserData userData = UserData.getCache(result.getString("user"));
+							UserChatData userData = UserChatData.getCache(UUID.fromString(result.getString("uuid")));
 
 							if (userData != null) {
 								userData.updateDisplayName();
@@ -99,10 +37,51 @@ public class Notifications implements DatabaseListener {
 						return null;
 					}
 				});
-				break;
 			}
-		} catch (SQLException ex) {
-			ex.printStackTrace();
+		} else if (table.equals(Config.FORMAT_TABLE)) {
+			if (event.equals(TriggerEvent.DELETE)) {
+				//HashMap<String, Object> data = databaseNotification.getDeletedData();
+				//CensorData.removeCache(String.valueOf(data.get("rank")));
+			} else if (event.equals(TriggerEvent.INSERT)) {
+				databaseNotification.getUpdatedRow(new ResultCallback<Void>() {
+					@Override
+					public Void handle(ResultSet result) throws SQLException {
+						if (result.next()) {
+							String rank = result.getString("rank");
+							new RankFormat(rank, result.getString("group"), result.getString("format"));
+							//result.getString("suffix");
+							//result.getString("format");
+						}
+
+						return null;
+					}
+				});
+			} else if (event.equals(TriggerEvent.UPDATE)) {
+				databaseNotification.getUpdatedRow(new ResultCallback<Void>() {
+					@Override
+					public Void handle(ResultSet result) throws SQLException {
+						if (result.next()) {
+							String rank = result.getString("rank");
+							RankFormat rankData = RankFormat.getCache(rank);
+							rankData.setGroup(result.getString("group"));
+							rankData.setPrefix(result.getString("prefix"));
+							rankData.setSuffix(result.getString("suffix"));
+							rankData.setFormat(result.getString("format"));
+
+							for (UserChatData userData : UserChatData.getCache()) {
+								if (userData.getRankData().getPrimaryRank().equalsIgnoreCase(rank)) {
+									userData.updateDisplayName();
+									userData.updateTabListName();
+								}
+							}
+						}
+
+						return null;
+					}
+				});
+			}
+		} else if (table.equals(Config.CENSOR_TABLE)) {
+			CensorData.reload();
 		}
 	}
 

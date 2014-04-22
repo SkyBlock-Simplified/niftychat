@@ -82,7 +82,7 @@ public class NiftyChat extends BukkitPlugin {
 		try {
 			Cache.MySQL.createTable(Config.FORMAT_TABLE, "`rank` VARCHAR(50) NOT NULL PRIMARY KEY, `group` VARCHAR(255), `prefix` VARCHAR(255), `suffix` VARCHAR(255), `format` VARCHAR(255)");
 			Cache.MySQL.createTable(Config.CENSOR_TABLE, "`badword` VARCHAR(255) NOT NULL PRIMARY KEY, `replace` VARCHAR(255)");
-			Cache.MySQL.createTable(Config.USER_TABLE, "`uuid` VARCHAR(64) NOT NULL PRIMARY KEY, `nick` VARCHAR(255), `ufnick` VARCHAR(16) UNIQUE");
+			Cache.MySQL.createTable(Config.USER_TABLE, "`uuid` VARCHAR(37) NOT NULL PRIMARY KEY, `nick` VARCHAR(255), `ufnick` VARCHAR(16) UNIQUE");
 			Cache.MySQL.update(StringUtil.format("INSERT IGNORE INTO `{0}` (`rank`, `prefix`, `format`) VALUES (?, ?, ?);", Config.FORMAT_TABLE), "default", "&7", "{displayname} &8> &7{msg}");
 			//Cache.MySQL.createTable("nifty_server_flags", "`server_name` VARCHAR(50) NOT NULL, `flag` VARCHAR(50) NOT NULL UNIQUE, PRIMARY KEY (`server_name`, `flag`)");
 			//Cache.MySQL.createTable("nifty_user_flags",   "`uuid` VARCHAR(64) NOT NULL, `flag` VARCHAR(50) NOT NULL UNIQUE, PRIMARY KEY (`uuid`, `flag`), FOREIGN KEY (`uuid`) REFERENCES `nifty_users_chat`(`uuid`) ON DELETE CASCADE");

@@ -10,11 +10,17 @@ import net.netcoding.niftychat.cache.UserChatData;
 
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
+import org.bukkit.event.player.PlayerJoinEvent;
 
 public class Login extends BukkitListener {
 
 	public Login(NiftyChat plugin) {
 		super(plugin);
+	}
+
+	@EventHandler
+	public void onPlayerJoin(PlayerJoinEvent event) {
+		event.setJoinMessage("");
 	}
 
 	@EventHandler(priority = EventPriority.LOW)

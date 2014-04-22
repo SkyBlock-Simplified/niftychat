@@ -105,7 +105,7 @@ public class RankFormat {
 	}
 
 	public void setGroup(String value) {
-		this.group = StringUtil.isEmpty(value) ? this.rank : value;
+		this.group = StringUtil.isEmpty(value) ? this.rank : RegexUtil.replaceColor(value, RegexUtil.REPLACE_ALL_PATTERN);
 	}
 
 	public void setFormat(String value) {

@@ -33,7 +33,7 @@ public class Disconnect extends BukkitListener {
 
 	@EventHandler
 	public void onPlayerLeave(PlayerQuitEvent event) {
-		event.setQuitMessage(null);
+		event.setQuitMessage("");
 		this.playerDisconnect(event.getPlayer());
 	}
 

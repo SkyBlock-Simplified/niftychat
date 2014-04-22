@@ -36,12 +36,20 @@ public class Nick extends BukkitTabCommand {
 		else if (args.length >= 1 && args.length <= 2) {
 			String playerName  = (args.length == 2 ? args[0] : sender.getName());
 			String nick  = (args.length == 2 ? args[1] : args[0]);
-			String your  = (sender.getName() == playerName ? ChatColor.GRAY + "You" : String.format("%2$s%1$s%3$s", playerName, ChatColor.RED, ChatColor.GRAY));
+			String your  = (sender.getName() == playerName ? ChatColor.GRAY + "You" : StringUtil.format("{{0}}", playerName));
 			String has   = (sender.getName() == playerName ? "have" : "has");
 			String _nick = nick.toLowerCase();
 			boolean off  = _nick.matches("^off|clear$");
 			boolean rev  = _nick.matches("^revoke|disable$");
 			boolean ena  = _nick.matches("^grant|allow|enable$");
+			MojangProfile profile;
+
+			try {
+				profile = NiftyBukkit.getMojangRepository().searchByUsername(playerName)[0];
+			} catch (ProfileNotFoundException pnfe) {
+				this.getLog().error(sender, "Unable to locate the uuid of {{0}}!", playerName);
+				return;
+			}
 
 			if (off) {
 				if (!playerName.equalsIgnoreCase(sender.getName())) {
@@ -109,7 +117,7 @@ public class Nick extends BukkitTabCommand {
 					}
 				}
 
-				boolean taken = Cache.MySQL.query("SELECT * FROM `nc_users` WHERE LOWER(`ufnick`) = LOWER(?) AND LOWER(`user`) <> ?;", new ResultCallback<Boolean>() {
+				boolean taken = Cache.MySQL.query(StringUtil.format("SELECT * FROM `{0}` WHERE LOWER(`ufnick`) = LOWER(?) AND `uuid` <> ?;", Config.USER_TABLE), new ResultCallback<Boolean>() {
 					@Override
 					public Boolean handle(ResultSet result) {
 						try {
@@ -120,7 +128,7 @@ public class Nick extends BukkitTabCommand {
 
 						return true;
 					}
-				}, strippedNick, sender.getName());
+				}, strippedNick, profile.getUniqueId());
 
 				if (taken) {
 					this.getLog().error(sender, "The nickname {{0}} is already taken!", nick);
@@ -134,7 +142,6 @@ public class Nick extends BukkitTabCommand {
 				//User.enableNick(user);
 			} else {
 				try {
-					MojangProfile profile = NiftyBukkit.getMojangRepository().searchByUsername(playerName)[0];
 					String _ufnick = null;
 					if (nick != null) _ufnick = RegexUtil.replaceColor(nick, RegexUtil.REPLACE_ALL_PATTERN);
 
@@ -145,8 +152,6 @@ public class Nick extends BukkitTabCommand {
 							this.getLog().message(sender, "{{0}} now {1} the nickname {{2}}.", your, has, RegexUtil.replaceColor(nick, RegexUtil.REPLACE_COLOR_PATTERN));
 					} else
 						this.getLog().error(sender, "Player {{0}} not found!", playerName);
-				} catch (ProfileNotFoundException pnfe) {
-					this.getLog().error(sender, "Unable to locate the uuid of {{0}}!", playerName);
 				} catch (Exception ex) {
 					this.getLog().error(sender, "Unable to set nickname {{0}} for {{1}}.", ex, nick, playerName);
 				}

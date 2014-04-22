@@ -30,12 +30,9 @@ public class UserChatData extends BukkitHelper {
 
 	private boolean isVanished = false;
 
-	private UserRankData rankData;
-
 	public UserChatData(JavaPlugin plugin, Player player) {
 		super(plugin);
 		this.profile = NiftyBukkit.getMojangRepository().searchByExactPlayer(player);
-		this.rankData = UserRankData.getCache(this.profile.getUniqueId());
 		cache.add(this);
 	}
 
@@ -45,7 +42,7 @@ public class UserChatData extends BukkitHelper {
 
 	public static UserChatData getCache(UUID uuid) {
 		for (UserChatData data : cache) {
-			if (data.getUniqueId().equals(uuid))
+			if (uuid.equals(data.getUniqueId()))
 				return data;
 		}
 
@@ -68,7 +65,7 @@ public class UserChatData extends BukkitHelper {
 				String rank = "default";
 
 				if (result.next()) {
-					displayName = result.getString("user");
+					displayName = profile.getName();
 					rank = UserRankData.getOfflineRanks(profile).get(0);
 					Player player = findPlayer(displayName);
 					if (player != null) displayName = player.getName();
@@ -77,7 +74,7 @@ public class UserChatData extends BukkitHelper {
 				}
 
 				RankFormat rankInfo = RankFormat.getCache(rank);
-				String prefix = rankInfo.getPrefix();
+				String prefix = StringUtil.isEmpty(rankInfo.getPrefix()) ? "&7" : rankInfo.getPrefix();
 				String suffix = rankInfo.getSuffix();
 
 				return StringUtil.format("{0}{1}{2}", prefix, displayName, suffix);
@@ -103,7 +100,7 @@ public class UserChatData extends BukkitHelper {
 	}
 
 	public UserRankData getRankData() {
-		return this.rankData;
+		return UserRankData.getCache(this.profile.getUniqueId());
 	}
 
 	public UUID getUniqueId() {

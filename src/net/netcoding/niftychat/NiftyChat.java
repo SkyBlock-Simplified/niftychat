@@ -1,7 +1,10 @@
 package net.netcoding.niftychat;
 
+import java.sql.SQLException;
+
 import net.netcoding.niftybukkit.database.MySQL;
 import net.netcoding.niftybukkit.minecraft.BukkitPlugin;
+import net.netcoding.niftybukkit.util.StringUtil;
 import net.netcoding.niftychat.cache.Cache;
 import net.netcoding.niftychat.cache.CensorData;
 import net.netcoding.niftychat.cache.Config;
@@ -15,7 +18,6 @@ import net.netcoding.niftychat.listeners.Disconnect;
 import net.netcoding.niftychat.listeners.Login;
 import net.netcoding.niftychat.listeners.Move;
 import net.netcoding.niftychat.listeners.Notifications;
-import net.netcoding.niftyranks.commands.Rank;
 
 public class NiftyChat extends BukkitPlugin {
 
@@ -26,13 +28,11 @@ public class NiftyChat extends BukkitPlugin {
 		Cache.Config.init();
 
 		this.getLog().console("Loading MySQL");
-		Cache.MySQL = new MySQL(Cache.Config.getHost(), Cache.Config.getPort(),
-				Cache.Config.getUser(), Cache.Config.getPass(), Cache.Config.getSchema());
-
-		if (Cache.MySQL.testConnection())
-			Cache.MySQL.setAutoReconnect();
-		else {
-			this.getLog().console("Invalid MySQL Configuration!");
+		try {
+			Cache.MySQL = new MySQL(Cache.Config.getHost(), Cache.Config.getPort(),
+					Cache.Config.getUser(), Cache.Config.getPass(), Cache.Config.getSchema());
+		} catch (SQLException ex) {
+			this.getLog().console("Invalid MySQL Configuration!", ex);
 			this.setEnabled(false);
 			return;
 		}
@@ -55,7 +55,6 @@ public class NiftyChat extends BukkitPlugin {
 		new Format(this);
 		//new Mute(this);
 		new Nick(this);
-		new Rank(this);
 		new Realname(this);
 
 		this.getLog().console("Registering Listeners");
@@ -84,6 +83,7 @@ public class NiftyChat extends BukkitPlugin {
 			Cache.MySQL.createTable(Config.FORMAT_TABLE, "`rank` VARCHAR(50) NOT NULL PRIMARY KEY, `group` VARCHAR(255), `prefix` VARCHAR(255), `suffix` VARCHAR(255), `format` VARCHAR(255)");
 			Cache.MySQL.createTable(Config.CENSOR_TABLE, "`badword` VARCHAR(255) NOT NULL PRIMARY KEY, `replace` VARCHAR(255)");
 			Cache.MySQL.createTable(Config.USER_TABLE, "`uuid` VARCHAR(64) NOT NULL PRIMARY KEY, `nick` VARCHAR(255), `ufnick` VARCHAR(16) UNIQUE");
+			Cache.MySQL.update(StringUtil.format("INSERT IGNORE INTO `{0}` (`rank`, `prefix`, `format`) VALUES (?, ?, ?);", Config.FORMAT_TABLE), "default", "&7", "{displayname} &8> &7{msg}");
 			//Cache.MySQL.createTable("nifty_server_flags", "`server_name` VARCHAR(50) NOT NULL, `flag` VARCHAR(50) NOT NULL UNIQUE, PRIMARY KEY (`server_name`, `flag`)");
 			//Cache.MySQL.createTable("nifty_user_flags",   "`uuid` VARCHAR(64) NOT NULL, `flag` VARCHAR(50) NOT NULL UNIQUE, PRIMARY KEY (`uuid`, `flag`), FOREIGN KEY (`uuid`) REFERENCES `nifty_users_chat`(`uuid`) ON DELETE CASCADE");
 			return true;

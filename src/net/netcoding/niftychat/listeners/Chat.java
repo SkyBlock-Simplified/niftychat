@@ -55,7 +55,7 @@ public class Chat extends BukkitListener {
 
 		String rank = userData.getRankData().getPrimaryRank();
 		RankFormat rankInfo = RankFormat.getCache(rank);
-		String format = rankInfo.getFormat();
+		String format = rankInfo.getFormat(); //
 		String group = rankInfo.getGroup();
 		group = (group == null ? rank : group);
 		String world = player.getWorld().getName();

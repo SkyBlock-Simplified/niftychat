@@ -5,7 +5,6 @@ author: Brian Graham
 
 main: net.netcoding.niftychat.NiftyChat
 depend: [NiftyBukkit, NiftyRanks]
-softdepend: [Vault]
 
 commands:
   censor:

@@ -36,12 +36,17 @@ public class RankFormat {
 	}
 
 	public static RankFormat getCache(String rank) {
+		RankFormat _default = null;
+
 		for (RankFormat data : cache) {
-			if (data.getRank().equals(rank))
+			if (data.getRank().equalsIgnoreCase("default"))
+				_default = data;
+
+			if (data.getRank().equalsIgnoreCase(rank))
 				return data;
 		}
 
-		return null;
+		return _default;
 	}
 
 	public String getGroup() {
@@ -100,7 +105,7 @@ public class RankFormat {
 	}
 
 	public void setGroup(String value) {
-		this.group = value;
+		this.group = StringUtil.isEmpty(value) ? this.rank : value;
 	}
 
 	public void setFormat(String value) {

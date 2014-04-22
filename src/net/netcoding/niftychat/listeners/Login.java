@@ -1,6 +1,7 @@
 package net.netcoding.niftychat.listeners;
 
 import net.netcoding.niftybukkit.minecraft.BukkitListener;
+import net.netcoding.niftybukkit.minecraft.events.PlayerPostLoginEvent;
 import net.netcoding.niftybukkit.util.StringUtil;
 import net.netcoding.niftychat.NiftyChat;
 import net.netcoding.niftychat.cache.Cache;
@@ -9,7 +10,6 @@ import net.netcoding.niftychat.cache.UserChatData;
 
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
-import org.bukkit.event.player.PlayerLoginEvent;
 
 public class Login extends BukkitListener {
 
@@ -17,8 +17,8 @@ public class Login extends BukkitListener {
 		super(plugin);
 	}
 
-	@EventHandler(priority = EventPriority.LOWEST)
-	public void onPlayerLogin(PlayerLoginEvent event) {
+	@EventHandler(priority = EventPriority.LOW)
+	public void onPlayerPostLogin(PlayerPostLoginEvent event) {
 		UserChatData userData = new UserChatData(this.getPlugin(), event.getPlayer());
 
 		try {

@@ -10,9 +10,10 @@ import net.netcoding.niftybukkit.util.StringUtil;
 import net.netcoding.niftychat.NiftyChat;
 import net.netcoding.niftychat.cache.Cache;
 import net.netcoding.niftychat.cache.Config;
-import net.netcoding.niftychat.cache.RankFormat;
 
 import org.bukkit.command.CommandSender;
+
+import com.mysql.jdbc.exceptions.jdbc4.MySQLIntegrityConstraintViolationException;
 
 public class Format extends BukkitCommand {
 
@@ -23,64 +24,64 @@ public class Format extends BukkitCommand {
 	@Override
 	public void onCommand(final CommandSender sender, String alias, final String[] args) throws SQLException {
 		if (args.length >= 2) {
-			final String rank   = args[0].toLowerCase();
-			final String action = args[1].toLowerCase();
+			final String action = args[0].toLowerCase();
+			final String rank = args[1].toLowerCase();
+			final String _null = RegexUtil.SECTOR_SYMBOL + "onull";
+			String format = null;
 
-			if (action.matches("^prefix|suffix|format$")) {
-				Cache.MySQL.query(StringUtil.format("SELECT * FROM `{0}` WHERE `rank` = ? LIMIT 1;", Config.FORMAT_TABLE), new ResultCallback<Void>() {
-					@Override
-					public Void handle(ResultSet result) throws SQLException {
-						if (result.next()) {
-							String format  = null;
-							String _format = null;
-							String _null   = RegexUtil.SECTOR_SYMBOL + "onull";
-							String now     = "is";
+			if (action.matches("^create|delete$")) {
+				if (args.length >= 2) {
+					if (hasPermissions(sender, "format", "manage")) {
+						String group = args.length >= 3 ? args[2] : "";
 
-							if (args.length == 2) {
-								if (hasPermissions(sender, "format", "view")) {
-									format  = result.getString(action);
-									_format = format;
+						if (args.length >= 4) {
+							if (!args[3].matches("null|\"\"|''"))
+								format = StringUtil.implode(" ", args, 3);
+						}
 
-									if (result.wasNull()) {
-										format  = null;
-										_format = _null;
-									}
-								}
-							} else if (args.length >= 3) {
-								if (hasPermissions(sender, "format", "manage")) {
-									format  = StringUtil.implode(" ", args, 2);
-									_format = format;
-
-									if (format.matches("null|\"\"|''")) {
-										format  = null;
-										_format = _null;
-									}
-
-									if (Cache.MySQL.update(StringUtil.format("UPDATE `{0}` SET `{1}` = ? WHERE `rank` = ?;", Config.FORMAT_TABLE, action), format, rank)) {
-										now = "set to";
-										RankFormat rankInfo = RankFormat.getCache(rank);
-
-										if (action.equalsIgnoreCase("prefix"))
-											rankInfo.setPrefix(format);
-										else if (action.equalsIgnoreCase("suffix"))
-											rankInfo.setSuffix(format);
-										else if (action.equalsIgnoreCase("format"))
-											rankInfo.setFormat(format);
-									} else {
-										getLog().error(sender, "Unable to set format for {{0}}!", rank);
-										return null;
-									}
-								}
+						if (action.equalsIgnoreCase("create")) {
+							try {
+								Cache.MySQL.update(StringUtil.format("INSERT INTO `{0}` (`rank`, `group`, `format`) VALUES (?, ?, ?);", Config.FORMAT_TABLE), rank, group, format);
+							} catch (MySQLIntegrityConstraintViolationException ex) {
+								this.getLog().error(sender, "The format entry for {{0}} already exists!", rank);
 							}
-
-							String proper = Character.toUpperCase(action.charAt(0)) + action.substring(1);
-							getLog().message(sender, "{{0}} of {{1}} {2} {{3}}", proper, rank, now, _format);
 						} else
-							getLog().error(sender, "{{0}} is not a valid rank!", rank);
+							Cache.MySQL.update(StringUtil.format("DELETE FROM `{0}` WHERE `rank` = ?;", Config.FORMAT_TABLE), rank);
 
-						return null;
+						this.getLog().message(sender, "The format entry for {{0}} has been {1}d.", rank, action);
 					}
-				}, rank);
+				} else
+					this.showUsage(sender);
+			} else if (action.matches("^prefix|suffix|format|group$")) {
+				if (!net.netcoding.niftyranks.cache.Cache.ranks.contains(rank)) {
+					this.getLog().error(sender, "The rank {{0}} does not exist!", rank);
+					return;
+				}
+
+				if (args.length == 2) {
+					if (hasPermissions(sender, "format", "view")) {
+						String result = Cache.MySQL.query(StringUtil.format("SELECT `{0}` FROM `{1}` WHERE `rank` = ?;", action, Config.FORMAT_TABLE), new ResultCallback<String>() {
+							@Override
+							public String handle(ResultSet result) throws SQLException {
+								if (result.next())
+									return result.getString(action);
+								else
+									return _null;
+							}
+						}, rank);
+	
+						this.getLog().message(sender, "The {0} for {{1}} is {{2}}.", action, rank, result);
+					}
+				} else {
+					if (hasPermissions(sender, "format", "manage")) {
+						format = StringUtil.implode(" ", args, 2);
+
+						if (Cache.MySQL.update(StringUtil.format("UPDATE `{0}` SET `{1}` = ? WHERE `rank` = ?;", Config.FORMAT_TABLE, action), format, rank))
+							this.getLog().message(sender, "The {0} for {{1}} has been set to {{2}}.", action, rank, format);
+						else
+							this.getLog().error(sender, "Unable to set {{0}} for {{1}}!", action, rank);
+					}
+				}
 			} else
 				this.showUsage(sender);
 		} else

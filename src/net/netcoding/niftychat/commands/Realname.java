@@ -4,9 +4,14 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.UUID;
 
+import net.netcoding.niftybukkit.NiftyBukkit;
 import net.netcoding.niftybukkit.database.ResultCallback;
 import net.netcoding.niftybukkit.minecraft.BukkitCommand;
+import net.netcoding.niftybukkit.mojang.MojangProfile;
+import net.netcoding.niftybukkit.mojang.exceptions.ProfileNotFoundException;
+import net.netcoding.niftybukkit.util.ListUtil;
 import net.netcoding.niftybukkit.util.StringUtil;
 import net.netcoding.niftychat.NiftyChat;
 import net.netcoding.niftychat.cache.Cache;
@@ -21,32 +26,35 @@ public class Realname extends BukkitCommand {
 	}
 
 	@Override
-	public void onCommand(CommandSender sender, String alias, String[] args) {
-		String nickName = args[0];
+	public void onCommand(final CommandSender sender, String alias, final String[] args) throws SQLException {
+		final List<String> foundData = Cache.MySQL.query(StringUtil.format("SELECT * FROM `{0}` WHERE LOWER(`ufnick`) = LOWER(?) OR LOWER(`ufnick`) LIKE LOWER(?) GROUP BY `ufnick`;", Config.USER_TABLE), new ResultCallback<List<String>>() {
+			@Override
+			public List<String> handle(ResultSet result) throws SQLException {
+				List<String> data = new ArrayList<>();
 
-		try {
-			final List<String> foundData = Cache.MySQL.query(StringUtil.format("SELECT * FROM `{0}` WHERE LOWER(`ufnick`) = LOWER(?) OR LOWER(`ufnick`) LIKE LOWER(?) GROUP BY `ufnick`;", Config.USER_TABLE), new ResultCallback<List<String>>() {
-				@Override
-				public List<String> handle(ResultSet result) throws SQLException {
-					List<String> data = new ArrayList<>();
+				if (result.next()) {
+					MojangProfile profile;
 
-					if (result.next()) {
-						data.add(result.getString("user"));
-						String nick = result.getString("nick");
-						data.add(result.wasNull() ? null : nick);
+					try {
+						profile = NiftyBukkit.getMojangRepository().searchByExactUUID(UUID.fromString(result.getString("uuid")));
+					} catch (ProfileNotFoundException pnfe) {
+						getLog().error(sender, "Unable to locate the realname of {{0}}!", args[0]);
+						return data;
 					}
 
-					return data;
+					data.add(profile.getName());
+					String nick = result.getString("nick");
+					data.add(result.wasNull() ? null : nick);
 				}
-			}, nickName, ("%" + nickName + "%"));
 
-			if (foundData.size() != 0 && StringUtil.notEmpty(foundData.get(1)))
-				this.getLog().message(sender, "{{0}} has the nickname {{1}}.", foundData.get(0), foundData.get(1));
-			else
-				this.getLog().error(sender, "No player with the nickname {{0}} was found!", nickName);
-		} catch (Exception ex) {
-			ex.printStackTrace();
-		}
+				return data;
+			}
+		}, args[0], ("%" + args[0] + "%"));
+
+		if (ListUtil.notEmpty(foundData))
+			this.getLog().message(sender, "{{0}} has the nickname {{1}}.", foundData.get(0), foundData.get(1));
+		else
+			this.getLog().error(sender, "No player with the nickname {{0}} was found!", args[0]);
 	}
 
 }

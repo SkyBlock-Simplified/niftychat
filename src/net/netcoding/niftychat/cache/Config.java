@@ -10,6 +10,8 @@ public class Config extends net.netcoding.niftybukkit.yaml.Config {
 	public static final transient String USER_TABLE = TABLE_PREFIX + "users";
 	public static final transient String CENSOR_TABLE = TABLE_PREFIX + "censors";
 	public static final transient String FORMAT_TABLE = TABLE_PREFIX + "formats";
+	public static final transient String USER_FLAGS_TABLE = TABLE_PREFIX + "flags_users";
+	public static final transient String SERVER_FLAGS_TABLE = TABLE_PREFIX + "flags_servers";
 
 	@Path("mysql.host")
 	private String hostname = "localhost";

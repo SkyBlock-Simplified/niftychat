@@ -10,14 +10,13 @@ commands:
   censor:
     description: Manage chat censoring
     usage: /<command> <add|edit|remove|list> <badword> [replace]
-    aliases: cl
   format:
     description: Manage chat formatting
-    usage: /<command> <rank> <prefix|suffix|format> [value]
-#  mute:
-#    description: Mute player from chat
-#    permission: niftychat.chat.mute
-#    usage: /<command> <player> [time]
+    usage: /<command> <group|format|prefix|suffix> <rank> [value]
+  mute:
+    description: Mute player from chat
+    usage: /<command> <player> [time]
+    aliases: [unmute, globalmute, globalunmute, gmute, gunmute]
   nick:
     description: Sets player nickname
     usage: /<command> <<nick|clear>|<player> <nick|clear|revoke|grant>>
@@ -70,6 +69,8 @@ permissions:
             description: Allows you to view rank format, prefix and suffix
       niftychat.join.fullserver:
         description: Allows you to join the server even when it is full
+      niftychat.mute:
+        description: Allows you to mute players
       niftychat.nick.*:
         description: Allows you to access all nicknames features and commands
         children:

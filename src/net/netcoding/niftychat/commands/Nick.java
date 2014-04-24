@@ -34,14 +34,14 @@ public class Nick extends BukkitTabCommand {
 		if ((isConsole(sender)) && args.length < 2)
 			this.getLog().error(sender, "The nickname command requires a player name when used by the console!");
 		else if (args.length >= 1 && args.length <= 2) {
-			String playerName  = (args.length == 2 ? args[0] : sender.getName());
-			String nick  = (args.length == 2 ? args[1] : args[0]);
-			String your  = (sender.getName() == playerName ? ChatColor.GRAY + "You" : StringUtil.format("{{0}}", playerName));
-			String has   = (sender.getName() == playerName ? "have" : "has");
+			String playerName = (args.length == 2 ? args[0] : sender.getName());
+			String nick = (args.length == 2 ? args[1] : args[0]);
+			String your = (sender.getName() == playerName ? ChatColor.GRAY + "You" : playerName);
+			String has = (sender.getName() == playerName ? "have" : "has");
 			String _nick = nick.toLowerCase();
-			boolean off  = _nick.matches("^off|clear$");
-			boolean rev  = _nick.matches("^revoke|disable$");
-			boolean ena  = _nick.matches("^grant|allow|enable$");
+			boolean off = _nick.matches("^off|clear$");
+			boolean rev = _nick.matches("^revoke|disable$");
+			boolean ena = _nick.matches("^grant|allow|enable$");
 			MojangProfile profile;
 
 			try {
@@ -97,21 +97,21 @@ public class Nick extends BukkitTabCommand {
 				}
 
 				if (RegexUtil.replaceColor(nick, RegexUtil.REPLACE_COLOR_PATTERN) != nick) {
-					if (!this.hasPermissions(sender, "nick", "color")) {
+					if (!this.hasPermissions(sender, false, "nick", "color")) {
 						this.getLog().error(sender, "You do not have access to use color in nicknames!");
 						return;
 					}
 				}
 
 				if (RegexUtil.replaceColor(nick, RegexUtil.REPLACE_MAGIC_PATTERN) != nick) {
-					if (!this.hasPermissions(sender, "nick", "magic")) {
+					if (!this.hasPermissions(sender, false, "nick", "magic")) {
 						this.getLog().error(sender, "You do not have access to use magic nicknames!");
 						return;
 					}
 				}
 
 				if (RegexUtil.replaceColor(nick, RegexUtil.REPLACE_FORMAT_PATTERN) != nick) {
-					if (!this.hasPermissions(sender, "nick", "format")) {
+					if (!this.hasPermissions(sender, false, "nick", "format")) {
 						this.getLog().error(sender, "You do not have access to use formatting in nicknames!");
 						return;
 					}
@@ -119,14 +119,8 @@ public class Nick extends BukkitTabCommand {
 
 				boolean taken = Cache.MySQL.query(StringUtil.format("SELECT * FROM `{0}` WHERE LOWER(`ufnick`) = LOWER(?) AND `uuid` <> ?;", Config.USER_TABLE), new ResultCallback<Boolean>() {
 					@Override
-					public Boolean handle(ResultSet result) {
-						try {
-							return result.next();
-						} catch (SQLException ex) {
-							ex.printStackTrace();
-						}
-
-						return true;
+					public Boolean handle(ResultSet result) throws SQLException {
+						return result.next();
 					}
 				}, strippedNick, profile.getUniqueId());
 

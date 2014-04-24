@@ -25,7 +25,7 @@ public class Login extends BukkitListener {
 
 	@EventHandler(priority = EventPriority.LOW)
 	public void onPlayerPostLogin(PlayerPostLoginEvent event) {
-		UserChatData userData = new UserChatData(this.getPlugin(), event.getPlayer());
+		final UserChatData userData = new UserChatData(this.getPlugin(), event.getPlayer());
 
 		try {
 			Cache.MySQL.update(StringUtil.format("INSERT IGNORE INTO `{0}` (`uuid`) VALUES (?);", Config.USER_TABLE), userData.getUniqueId());

@@ -21,6 +21,7 @@ public class Vanish extends BukkitCommand {
 		return toggle.matches("^on|yes|enable$");
 	}
 
+	@SuppressWarnings("unused")
 	@Override
 	public void onCommand(CommandSender sender, String alias, String[] args) throws SQLException, Exception {
 		if (isConsole(sender) && args.length < 2)
@@ -52,7 +53,7 @@ public class Vanish extends BukkitCommand {
 				UserChatData userData = UserChatData.getCache(profile.getUniqueId());
 
 				if (userData != null) {
-					userData.setVanished(toggleValue ? !userData.isVanished() : setValue);
+					//userData.setVanished(toggleValue ? !userData.isVanished() : setValue);
 					//Player player = userData.getPlayer();
 					//Cache.ghosts.setGhost(player, userData.isVanished());
 

@@ -2,6 +2,8 @@ package net.netcoding.niftychat.listeners;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.sql.Timestamp;
+import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 
@@ -13,6 +15,7 @@ import net.netcoding.niftychat.cache.CensorData;
 import net.netcoding.niftychat.cache.Config;
 import net.netcoding.niftychat.cache.RankFormat;
 import net.netcoding.niftychat.cache.UserChatData;
+import net.netcoding.niftychat.cache.UserFlagData;
 
 public class Notifications implements DatabaseListener {
 
@@ -81,6 +84,46 @@ public class Notifications implements DatabaseListener {
 			}
 		} else if (table.equals(Config.CENSOR_TABLE)) {
 			CensorData.reload();
+		} else if (table.equals(Config.USER_FLAGS_TABLE)) {
+			if (event.equals(TriggerEvent.DELETE)) {
+				Map<String, Object> data = databaseNotification.getDeletedData();
+				UserChatData userData = UserChatData.getCache(UUID.fromString((String)data.get("uuid")));
+				userData.reloadFlagData();
+			} else {
+				databaseNotification.getUpdatedRow(new ResultCallback<Void>() {
+					@Override
+					public Void handle(ResultSet result) throws SQLException {
+						if (result.next()) {
+							UserChatData userData = UserChatData.getCache(UUID.fromString(result.getString("uuid")));
+							String flag = result.getString("flag");
+							List<UserFlagData> flagDatas = userData.getFlagData(flag);
+							String server = result.getString("server");
+							long _submitted = result.getTimestamp("_submitted").getTime();
+							Timestamp expires = result.getTimestamp("_expires");
+							long _expires = result.wasNull() ? 0 : expires.getTime();
+							UserFlagData flagMatch = null;
+
+							for (UserFlagData flagData : flagDatas) {
+								if (flagData.isGlobal() && server.equals("*")) {
+									flagMatch = flagData;
+									break;
+								} else if (!flagData.isGlobal() && flagData.getServerName().equals(server)) {
+									flagMatch = flagData;
+									break;
+								}
+							}
+
+							if (flagMatch == null) userData.addFlagData(flagMatch = new UserFlagData(flag));
+							flagMatch.setExpires(_expires);
+							flagMatch.setServer(server);
+							flagMatch.setSubmitted(_submitted);
+							flagMatch.setValue(result.getBoolean("value"));
+						}
+
+						return null;
+					}
+				});
+			}
 		}
 	}
 

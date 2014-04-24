@@ -2,11 +2,15 @@ package net.netcoding.niftychat.cache;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.sql.Timestamp;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.UUID;
 
 import net.netcoding.niftybukkit.NiftyBukkit;
 import net.netcoding.niftybukkit.database.ResultCallback;
 import net.netcoding.niftybukkit.minecraft.BukkitHelper;
+import net.netcoding.niftybukkit.minecraft.BungeeHelper;
 import net.netcoding.niftybukkit.mojang.MojangProfile;
 import net.netcoding.niftybukkit.util.RegexUtil;
 import net.netcoding.niftybukkit.util.StringUtil;
@@ -22,18 +26,20 @@ public class UserChatData extends BukkitHelper {
 
 	private MojangProfile profile;
 
-	private String displayName;
-
 	private String lastMessage;
 
 	private boolean hasMoved = false;
 
-	private boolean isVanished = false;
+	private List<UserFlagData> flagData;
 
 	public UserChatData(JavaPlugin plugin, Player player) {
 		super(plugin);
 		this.profile = NiftyBukkit.getMojangRepository().searchByExactPlayer(player);
 		cache.add(this);
+	}
+
+	public void addFlagData(UserFlagData flagData) {
+		this.flagData.add(flagData);
 	}
 
 	public static ConcurrentSet<UserChatData> getCache() {
@@ -50,11 +56,7 @@ public class UserChatData extends BukkitHelper {
 	}
 
 	public String getDisplayName() {
-		return this.displayName;
-	}
-
-	private String _getDisplayName() throws SQLException {
-		return _getDisplayName(this.profile);
+		return this.getPlayer().getDisplayName();
 	}
 
 	private static String _getDisplayName(final MojangProfile profile) throws SQLException {
@@ -80,6 +82,40 @@ public class UserChatData extends BukkitHelper {
 				return StringUtil.format("{0}{1}{2}", prefix, displayName, suffix);
 			}
 		}, profile.getUniqueId());
+	}
+
+	public List<UserFlagData> getFlagData(String flag) {
+		if (this.flagData == null) this.reloadFlagData();
+		List<UserFlagData> flagMatches = new ArrayList<>();
+
+		for (UserFlagData flagData : this.flagData) {
+			if (flagData.getFlag().equalsIgnoreCase(flag))
+				flagMatches.add(flagData);
+		}
+
+		return flagMatches;
+	}
+
+	private boolean getFlagValue(String flag) {
+		List<UserFlagData> flagDatas = this.getFlagData(flag);
+		BungeeHelper bungeeHelper = NiftyBukkit.getBungeeHelper();
+		boolean value = false;
+
+		for (UserFlagData flagData : flagDatas) {
+			if (flagData.isGlobal() && flagData.getValue()) {
+				value = true;
+				break;
+			} else if (flagData.getValue()) {
+				if (bungeeHelper.isOnline()) {
+					if (bungeeHelper.getServer().equals(flagData.getServer())) {
+						value = true;
+						break;
+					}
+				}
+			}
+		}
+
+		return value;
 	}
 
 	public String getName() {
@@ -127,33 +163,46 @@ public class UserChatData extends BukkitHelper {
 		return false;
 	}
 
-	public boolean isVanished() {
-		return this.isVanished;
+	public boolean isMuted() {
+		return this.getFlagValue("muted");
 	}
 
-	/*public static String matchPlayerName(final String playerName) {
-		Player player = BukkitHelper.findPlayer(playerName);
-
-		if (player != null)
-			return player.getName();
-		else {
-			try {
-				return Cache.MySQL.query("SELECT `user` FROM `nc_users` WHERE LOWER(`user`) = LOWER(?) OR LOWER(`user`) LIKE LOWER(?) GROUP BY `user` LIMIT 1;", new ResultCallback<String>() {
-					@Override
-					public String handle(ResultSet result) throws SQLException {
-						return (result.next() ? result.getString("user") : playerName);
-					}
-				}, playerName, (playerName + "%"));
-			} catch (SQLException ex) {
-				return playerName;
-			}
-		}
-	}*/
+	public boolean isVanished() {
+		return this.getFlagValue("vanished");
+	}
 
 	public static void removeCache(UUID uuid) {
 		for (UserChatData data : cache) {
 			if (data.getUniqueId().equals(uuid))
 				cache.remove(data);
+		}
+	}
+
+	public void reloadFlagData() {
+		try {
+			if (this.flagData == null) this.flagData = new ArrayList<>();
+			this.flagData.clear();
+
+			this.flagData.addAll(Cache.MySQL.query(StringUtil.format("SELECT * FROM `{0}` WHERE `uuid` = ?;", Config.USER_FLAGS_TABLE), new ResultCallback<List<UserFlagData>>() {
+				@Override
+				public List<UserFlagData> handle(ResultSet result) throws SQLException {
+					List<UserFlagData> flags = new ArrayList<>();
+
+					while (result.next()) {
+						UserFlagData flagData = new UserFlagData(result.getString("flag"));
+						Timestamp expires = result.getTimestamp("_expires");
+						flagData.setExpires(result.wasNull() ? 0 : expires.getTime());
+						flagData.setSubmitted(result.getTimestamp("_submitted").getTime());
+						flagData.setServer(result.getString("server"));
+						flagData.setValue(result.getBoolean("value"));
+						flags.add(flagData);
+					}
+
+					return flags;
+				}
+			}, this.getUniqueId()));
+		} catch (SQLException ex) {
+			this.getLog().console(ex);
 		}
 	}
 
@@ -165,17 +214,8 @@ public class UserChatData extends BukkitHelper {
 		this.hasMoved = moved;
 	}
 
-	public void setVanished() {
-		this.setVanished(true);
-	}
-
-	public void setVanished(boolean vanished) {
-		this.isVanished = vanished;
-	}
-
 	public void updateDisplayName() throws SQLException {
-		String displayName = this._getDisplayName();
-		this.displayName = displayName;
+		String displayName = _getDisplayName(this.profile);
 		this.getPlayer().setDisplayName(displayName);
 		this.getPlayer().setCustomName(displayName);
 	}
@@ -185,10 +225,5 @@ public class UserChatData extends BukkitHelper {
 		if (displayName.length() > 16) displayName = displayName.substring(0, 16);
 		this.getPlayer().setPlayerListName(displayName);
 	}
-
-	/*public static void updateTabListNames() {
-		for (String playerName : Cache.userData.keySet())
-			Cache.userData.get(playerName).updateTabListName();
-	}*/
 
 }

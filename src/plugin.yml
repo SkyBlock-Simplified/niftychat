@@ -15,7 +15,7 @@ commands:
     usage: /<command> <group|format|prefix|suffix> <rank> [value]
   mute:
     description: Mute player from chat
-    usage: /<command> <player> [time]
+    usage: /<command> <player> [time] [server]
     aliases: [unmute, globalmute, globalunmute, gmute, gunmute]
   nick:
     description: Sets player nickname

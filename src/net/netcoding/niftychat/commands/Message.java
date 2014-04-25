@@ -60,17 +60,19 @@ public class Message extends BukkitCommand {
 			Player player = (Player)sender;
 			String playerName = args[0];
 			MojangProfile profile;
-			String message = StringUtil.implode(" ", args, 1);
+			boolean reply = alias.matches("^r(?:eply)?$");
+			String message = StringUtil.implode(" ", args, reply ? 0 : 1);
 			boolean sent = false;
 			MojangProfile senderprofile = NiftyBukkit.getMojangRepository().searchByExactPlayer(player);
 			UserChatData senderData = UserChatData.getCache(senderprofile.getUniqueId());
 
-			if (alias.matches("^reply|r")) {
+			System.out.println(sender.getName() + " to " + (playerName == null ? "null" : playerName));
+			if (reply) {
 				MojangProfile lastMessenger = senderData.getLastMessenger();
 
-				if (lastMessenger != null)
+				if (lastMessenger != null) {
 					playerName = lastMessenger.getName();
-				else {
+				} else {
 					this.getLog().error(sender, "You have no one to reply to!");
 					return;
 				}

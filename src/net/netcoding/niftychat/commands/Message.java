@@ -49,7 +49,7 @@ public class Message extends BukkitCommand {
 			}
 		}
 
-		if (sendHere.getPlayer() != null) {
+		if (receiverData.getPlayer() != null) {
 			helper.getLog().message(sendHere.getPlayer(), "{{0}} {1} {{2}} {3} {4}", senderData.getDisplayName(), (ChatColor.DARK_GRAY + "->" + ChatColor.RESET), receiverData.getDisplayName(), (ChatColor.DARK_GRAY + ">" + ChatColor.RESET), (ChatColor.WHITE + message));
 			if (receiverData.getPlayer() != null) receiverData.setLastMessenger(senderProfile);
 			return true;
@@ -126,7 +126,7 @@ public class Message extends BukkitCommand {
 				}
 
 			} else
-				sent = true;
+				sent = false;
 
 			if (!sent) this.getLog().error(sender, "Unable to locate {{0}}!", profile.getName());
 		} else

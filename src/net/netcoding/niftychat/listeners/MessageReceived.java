@@ -39,7 +39,7 @@ public class MessageReceived extends BukkitHelper implements BungeeListener {
 			MojangProfile receiverProfile = NiftyBukkit.getMojangRepository().searchByExactUsername(receiverName);
 			UserChatData receiverData = UserChatData.getCache(receiverProfile.getUniqueId());
 			receiverData.setLastMessenger(senderProfile);
-			Message.send(this, receiverName, senderName, msg, false);
+			Message.send(this, senderName, receiverName, msg, true);
 		}
 	}
 

@@ -24,7 +24,7 @@ public class Message extends BukkitCommand {
 		this.setPlayerOnly();
 	}
 
-	public static boolean send(BukkitHelper helper, String senderName, String receiverName, String message, boolean checks) {
+	public static boolean send(BukkitHelper helper, String senderName, String receiverName, String message, boolean reverse) {
 		MojangProfile senderProfile = NiftyBukkit.getMojangRepository().searchByExactUsername(senderName);
 		UserChatData senderData = UserChatData.getCache(senderProfile.getUniqueId());
 		senderData = senderData == null ? new UserChatData(helper.getPlugin(), senderProfile) : senderData;
@@ -33,8 +33,16 @@ public class Message extends BukkitCommand {
 		UserChatData receiverData = UserChatData.getCache(receiverProfile.getUniqueId());
 		receiverData = receiverData == null ? new UserChatData(helper.getPlugin(), receiverProfile) : receiverData;
 
-		if (checks) {
-			if (senderData.isMuted()) {
+		if (reverse) {
+			MojangProfile tempProfile = senderProfile;
+			senderProfile = receiverProfile;
+			receiverProfile = tempProfile;
+
+			UserChatData tempData = senderData;
+			senderData = receiverData;
+			receiverData = tempData;
+		} else {
+			if (senderData.isMuted() && !helper.hasPermissions(senderData.getPlayer(), "mute", "roar")) {
 				Mute.sendMutedError(helper.getLog(), senderData.getPlayer(), senderData);
 				return false;
 			}
@@ -46,7 +54,7 @@ public class Message extends BukkitCommand {
 		}
 
 		if (receiverData.getPlayer() != null) {
-			helper.getLog().message(senderData.getPlayer(), "{{0}}{{1}} {2} {{3}}{{4}} {5}", "[", senderData.getDisplayName(), (ChatColor.DARK_GRAY + ">" + ChatColor.RESET), receiverData.getDisplayName(), "]", (ChatColor.DARK_GREEN + message));
+			helper.getLog().message(receiverData.getPlayer(), "{{0}}{{1}} {2} {{3}}{{4}} {5}", "[", receiverData.getDisplayName(), (ChatColor.DARK_GRAY + ">" + ChatColor.RESET), senderData.getDisplayName(), "]", (ChatColor.DARK_GREEN + message));
 			if (receiverData.getPlayer() != null) receiverData.setLastMessenger(senderProfile);
 			return true;
 		}
@@ -66,7 +74,6 @@ public class Message extends BukkitCommand {
 			MojangProfile senderprofile = NiftyBukkit.getMojangRepository().searchByExactPlayer(player);
 			UserChatData senderData = UserChatData.getCache(senderprofile.getUniqueId());
 
-			System.out.println(sender.getName() + " to " + (playerName == null ? "null" : playerName));
 			if (reply) {
 				MojangProfile lastMessenger = senderData.getLastMessenger();
 
@@ -84,8 +91,8 @@ public class Message extends BukkitCommand {
 			}
 
 			if (Chat.check(this, player, message)) {
-				message = Chat.filter(this, player, message);
-				message = Chat.format(this, player, message);
+				message = Chat.filter(this, player, "message", message);
+				message = Chat.format(this, player, "message", message);
 			} else
 				return;
 
@@ -101,7 +108,7 @@ public class Message extends BukkitCommand {
 				return;
 			}
 
-			if (send(this, sender.getName(), profile.getName(), message, true)) {
+			if (send(this, sender.getName(), profile.getName(), message, false)) {
 				if (!Cache.chatHelper.isOnline()) {
 					UserChatData receiverData = UserChatData.getCache(profile.getUniqueId());
 

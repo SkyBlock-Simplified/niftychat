@@ -52,18 +52,18 @@ public class Chat extends BukkitListener {
 		return true;
 	}
 
-	public static String format(BukkitHelper helper, Player player, String message) {
-		if (helper.hasPermissions(player, "chat", "color"))
+	public static String format(BukkitHelper helper, Player player, String action, String message) {
+		if (helper.hasPermissions(player, action, "color"))
 			message = RegexUtil.replaceColor(message, RegexUtil.REPLACE_COLOR_PATTERN);
 		else
 			message = RegexUtil.strip(message, RegexUtil.VANILLA_COLOR_PATTERN);
 
-		if (helper.hasPermissions(player, "chat", "magic"))
+		if (helper.hasPermissions(player, action, "magic"))
 			message = RegexUtil.replaceColor(message, RegexUtil.REPLACE_MAGIC_PATTERN);
 		else
 			message = RegexUtil.strip(message, RegexUtil.VANILLA_MAGIC_PATTERN);
 
-		if (helper.hasPermissions(player, "chat", "format"))
+		if (helper.hasPermissions(player, action, "format"))
 			message = RegexUtil.replaceColor(message, RegexUtil.REPLACE_FORMAT_PATTERN);
 		else
 			message = RegexUtil.strip(message, RegexUtil.VANILLA_FORMAT_PATTERN);
@@ -71,20 +71,20 @@ public class Chat extends BukkitListener {
 		return message;
 	}
 
-	public static String filter(BukkitHelper helper, Player player, String message) {
-		if (!helper.hasPermissions(player, "chat", "bypass", "advertise")) {
+	public static String filter(BukkitHelper helper, Player player, String action, String message) {
+		if (!helper.hasPermissions(player, action, "bypass", "advertise")) {
 			message = RegexUtil.IP_FILTER_PATTERN.matcher(message).replaceAll("*.*.*.*");
 
 			while (RegexUtil.URL_FILTER_PATTERN.matcher(message).find())
 				message = RegexUtil.URL_FILTER_PATTERN.matcher(message).replaceAll("$1 $2");
 		}
 
-		if (!helper.hasPermissions(player, "chat", "bypass", "url")) {
+		if (!helper.hasPermissions(player, action, "bypass", "url")) {
 			while (RegexUtil.URL_PATTERN.matcher(message).find())
 				message = RegexUtil.URL_PATTERN.matcher(message).replaceAll("$1 $2");
 		}
 
-		if (!helper.hasPermissions(player, "chat", "bypass", "censor")) {
+		if (!helper.hasPermissions(player, action, "bypass", "censor")) {
 			for (CensorData censor : CensorData.getCache()) {
 				Pattern pattern = censor.getPattern();
 
@@ -93,7 +93,7 @@ public class Chat extends BukkitListener {
 			}
 		}
 
-		if (!helper.hasPermissions(player, "chat", "bypass", "caps")) {
+		if (!helper.hasPermissions(player, action, "bypass", "caps")) {
 			String[] words = message.split("\\s");
 
 			for (int i = 0; i < words.length; i++)
@@ -111,8 +111,8 @@ public class Chat extends BukkitListener {
 		String message = event.getMessage();
 
 		if (check(this, player, message)) {
-			message = format(this, player, message);
-			message = filter(this, player, message);
+			message = format(this, player, "chat", message);
+			message = filter(this, player, "chat", message);
 		} else
 			event.setCancelled(true);
 

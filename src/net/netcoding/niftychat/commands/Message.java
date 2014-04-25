@@ -24,7 +24,7 @@ public class Message extends BukkitCommand {
 		this.setPlayerOnly();
 	}
 
-	public static boolean send(BukkitHelper helper, String senderName, String receiverName, String message, boolean reverse) {
+	public static boolean send(BukkitHelper helper, String senderName, String receiverName, String message, boolean isReceiving) {
 		MojangProfile senderProfile = NiftyBukkit.getMojangRepository().searchByExactUsername(senderName);
 		UserChatData senderData = UserChatData.getCache(senderProfile.getUniqueId());
 		senderData = senderData == null ? new UserChatData(helper.getPlugin(), senderProfile) : senderData;
@@ -33,15 +33,11 @@ public class Message extends BukkitCommand {
 		UserChatData receiverData = UserChatData.getCache(receiverProfile.getUniqueId());
 		receiverData = receiverData == null ? new UserChatData(helper.getPlugin(), receiverProfile) : receiverData;
 
-		if (reverse) {
-			MojangProfile tempProfile = senderProfile;
-			senderProfile = receiverProfile;
-			receiverProfile = tempProfile;
+		UserChatData sendHere = senderData;
 
-			UserChatData tempData = senderData;
-			senderData = receiverData;
-			receiverData = tempData;
-		} else {
+		if (isReceiving)
+			sendHere = receiverData;
+		else {
 			if (senderData.isMuted() && !helper.hasPermissions(senderData.getPlayer(), "mute", "roar")) {
 				Mute.sendMutedError(helper.getLog(), senderData.getPlayer(), senderData);
 				return false;
@@ -53,8 +49,8 @@ public class Message extends BukkitCommand {
 			}
 		}
 
-		if (receiverData.getPlayer() != null) {
-			helper.getLog().message(receiverData.getPlayer(), "{{0}}{{1}} {2} {{3}}{{4}} {5}", "[", receiverData.getDisplayName(), (ChatColor.DARK_GRAY + ">" + ChatColor.RESET), senderData.getDisplayName(), "]", (ChatColor.DARK_GREEN + message));
+		if (sendHere.getPlayer() != null) {
+			helper.getLog().message(sendHere.getPlayer(), "{{0}} {1} {{2}} {3} {4}", senderData.getDisplayName(), (ChatColor.DARK_GRAY + "->" + ChatColor.RESET), receiverData.getDisplayName(), (ChatColor.DARK_GRAY + ">" + ChatColor.RESET), (ChatColor.WHITE + message));
 			if (receiverData.getPlayer() != null) receiverData.setLastMessenger(senderProfile);
 			return true;
 		}

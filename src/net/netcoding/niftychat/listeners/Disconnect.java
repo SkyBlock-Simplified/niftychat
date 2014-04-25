@@ -27,7 +27,7 @@ public class Disconnect extends BukkitListener {
 
 	@EventHandler
 	public void onPlayerKick(PlayerKickEvent event) {
-		event.setLeaveMessage(null);
+		event.setLeaveMessage("");
 		this.playerDisconnect(event.getPlayer());
 	}
 

@@ -24,6 +24,7 @@ public class CensorData {
 		this.badword = badword;
 		this.pattern = Pattern.compile(String.format("(?i)\\b(%1$s)\\b", badword.replaceAll("%", "[\\\\S-]*")));
 		this.replace = (replace == null ? DEFAULT_REPLACE : replace);
+		cache.add(this);
 	}
 
 	public String getBadword() {

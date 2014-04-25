@@ -26,7 +26,7 @@ public class Realname extends BukkitCommand {
 	}
 
 	@Override
-	public void onCommand(final CommandSender sender, String alias, final String[] args) throws SQLException {
+	public void onCommand(final CommandSender sender, String alias, final String[] args) throws Exception {
 		final List<String> foundData = Cache.MySQL.query(StringUtil.format("SELECT * FROM `{0}` WHERE LOWER(`ufnick`) = LOWER(?) OR LOWER(`ufnick`) LIKE LOWER(?) GROUP BY `ufnick`;", Config.USER_TABLE), new ResultCallback<List<String>>() {
 			@Override
 			public List<String> handle(ResultSet result) throws SQLException {

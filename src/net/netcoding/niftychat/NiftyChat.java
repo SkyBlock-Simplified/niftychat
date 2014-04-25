@@ -11,6 +11,7 @@ import net.netcoding.niftychat.cache.Config;
 import net.netcoding.niftychat.cache.RankFormat;
 import net.netcoding.niftychat.commands.Censor;
 import net.netcoding.niftychat.commands.Format;
+import net.netcoding.niftychat.commands.Message;
 import net.netcoding.niftychat.commands.Mute;
 import net.netcoding.niftychat.commands.Nick;
 import net.netcoding.niftychat.commands.Realname;
@@ -55,6 +56,7 @@ public class NiftyChat extends BukkitPlugin {
 		this.getLog().console("Registering Commands");
 		new Censor(this);
 		new Format(this);
+		new Message(this);
 		new Mute(this);
 		new Nick(this);
 		new Realname(this);
@@ -79,8 +81,6 @@ public class NiftyChat extends BukkitPlugin {
 	}
 
 	private boolean setupTables() {
-		//   user: muted, nick-enabled
-		// server: chat-enabled
 		try {
 			Cache.MySQL.createTable(Config.FORMAT_TABLE, "`rank` VARCHAR(50) NOT NULL PRIMARY KEY, `group` VARCHAR(255), `prefix` VARCHAR(255), `suffix` VARCHAR(255), `format` VARCHAR(255)");
 			Cache.MySQL.createTable(Config.CENSOR_TABLE, "`badword` VARCHAR(255) NOT NULL PRIMARY KEY, `replace` VARCHAR(255)");

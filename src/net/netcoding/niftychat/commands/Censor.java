@@ -1,6 +1,5 @@
 package net.netcoding.niftychat.commands;
 
-import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.regex.Pattern;
@@ -23,7 +22,7 @@ public class Censor extends BukkitCommand {
 	}
 
 	@Override
-	public void onCommand(final CommandSender sender, String alias, final String[] args) throws SQLException {
+	public void onCommand(final CommandSender sender, String alias, final String[] args) throws Exception {
 		if (args.length >= 1) {
 			String action = args[0].toLowerCase();
 
@@ -59,7 +58,7 @@ public class Censor extends BukkitCommand {
 						}
 					}
 
-					if (Cache.MySQL.update(StringUtil.format("INSERT INTO `{0}` (`badword`,  `replace`) VALUES (?, ?) ON DUPLICATE KEY UPDATE `replace` = ?;", Config.CENSOR_TABLE), badword, replace, replace)) {
+					if (Cache.MySQL.update(StringUtil.format("INSERT INTO `{0}` (`badword`, `replace`) VALUES (?, ?) ON DUPLICATE KEY UPDATE `replace` = ?;", Config.CENSOR_TABLE), badword, replace, replace)) {
 						String _replace = (replace == null ? CensorData.DEFAULT_REPLACE : replace);
 
 						if (action.equalsIgnoreCase("add"))

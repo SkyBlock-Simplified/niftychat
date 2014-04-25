@@ -22,7 +22,7 @@ public class Format extends BukkitCommand {
 	}
 
 	@Override
-	public void onCommand(final CommandSender sender, String alias, final String[] args) throws SQLException {
+	public void onCommand(final CommandSender sender, String alias, final String[] args) throws Exception {
 		if (args.length >= 2) {
 			final String action = args[0].toLowerCase();
 			final String rank = args[1].toLowerCase();

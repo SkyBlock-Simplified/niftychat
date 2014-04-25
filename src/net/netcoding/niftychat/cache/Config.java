@@ -6,7 +6,8 @@ import org.bukkit.plugin.java.JavaPlugin;
 
 public class Config extends net.netcoding.niftybukkit.yaml.Config {
 
-	private static final transient String TABLE_PREFIX = "niftychat_";
+	public static final transient String CHAT_CHANNEL = "NiftyChat";
+	private static final transient String TABLE_PREFIX = CHAT_CHANNEL.toLowerCase() + "_";
 	public static final transient String USER_TABLE = TABLE_PREFIX + "users";
 	public static final transient String CENSOR_TABLE = TABLE_PREFIX + "censors";
 	public static final transient String FORMAT_TABLE = TABLE_PREFIX + "formats";

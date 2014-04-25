@@ -13,6 +13,10 @@ commands:
   format:
     description: Manage chat formatting
     usage: /<command> <group|format|prefix|suffix> <rank> [value]
+  message:
+    description: Send a message to another player
+    usage: /<command> <player> <message>
+    aliases: [msg, whisper, tell, shout, reply, m, w, t, s, r]
   mute:
     description: Mute player from chat
     usage: /<command> <player> [time] [server]

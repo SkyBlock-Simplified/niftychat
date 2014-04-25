@@ -1,6 +1,8 @@
 package net.netcoding.niftychat.listeners;
 
 import net.netcoding.niftybukkit.minecraft.BukkitListener;
+import net.netcoding.niftybukkit.minecraft.BungeeHelper;
+import net.netcoding.niftybukkit.minecraft.events.BungeeLoadedEvent;
 import net.netcoding.niftybukkit.minecraft.events.PlayerPostLoginEvent;
 import net.netcoding.niftybukkit.util.StringUtil;
 import net.netcoding.niftychat.NiftyChat;
@@ -16,6 +18,11 @@ public class Login extends BukkitListener {
 
 	public Login(NiftyChat plugin) {
 		super(plugin);
+	}
+
+	@EventHandler
+	public void onBungeeLoaded(BungeeLoadedEvent event) {
+		Cache.chatHelper = new BungeeHelper(this.getPlugin(), new MessageReceived(this.getPlugin()), true);
 	}
 
 	@EventHandler

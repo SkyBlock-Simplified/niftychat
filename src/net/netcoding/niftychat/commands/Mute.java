@@ -1,12 +1,10 @@
 package net.netcoding.niftychat.commands;
 
-import java.sql.SQLException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 
 import net.netcoding.niftybukkit.NiftyBukkit;
 import net.netcoding.niftybukkit.minecraft.BukkitCommand;
-import net.netcoding.niftybukkit.minecraft.BungeeHelper;
 import net.netcoding.niftybukkit.minecraft.Log;
 import net.netcoding.niftybukkit.mojang.MojangProfile;
 import net.netcoding.niftybukkit.mojang.exceptions.ProfileNotFoundException;
@@ -39,9 +37,8 @@ public class Mute extends BukkitCommand {
 	}
 
 	@Override
-	public void onCommand(CommandSender sender, String alias, String[] args) throws SQLException {
+	public void onCommand(CommandSender sender, String alias, String[] args) throws Exception {
 		if (args.length >= 1 && args.length <= 3) {
-			BungeeHelper bungeeHelper = NiftyBukkit.getBungeeHelper();
 			String playerName = args[0];
 			MojangProfile profile;
 			long expires = args.length >= 2 ? TimeUtil.getDateTime(args[1]) : 0;
@@ -64,11 +61,11 @@ public class Mute extends BukkitCommand {
 				return;
 			}
 
-			if (bungeeHelper.isOnline()) {
-				server = bungeeHelper.getServerName();
+			if (Cache.chatHelper.isOnline()) {
+				server = Cache.chatHelper.getServerName();
 
 				if ((args.length == 2 && expires == 0) || args.length == 3) {
-					if (bungeeHelper.getServer(args[args.length - 1]) != null)
+					if (Cache.chatHelper.getServer(args[args.length - 1]) != null)
 						server = args[args.length - 1];
 				}
 			}
@@ -94,12 +91,12 @@ public class Mute extends BukkitCommand {
 			if (!sender.getName().equalsIgnoreCase(profile.getName()))
 				this.getLog().message(sender, sendMsg, profile.getName(), (!server.equals("*") ? "" : "globally "), (!isMuted ? "" : "un"), serverMsg, expireMsg);
 
-			if (!bungeeHelper.isOnline()) {
+			if (!Cache.chatHelper.isOnline()) {
 				if (userData.getPlayer() != null)
 					this.getLog().message(userData.getPlayer(), receiveMsg, "", (!isMuted ? "" : "un"), "", expireMsg);
 			} else {
-				if (isConsole(sender) && bungeeHelper.getServer().getPlayerCount() == 0) return;
-				bungeeHelper.message(profile.getName(), ChatColor.GRAY + StringUtil.format(receiveMsg, (!server.equals("*") ? "" : "globally "), (!isMuted ? "" : "un"), serverMsg, expireMsg));
+				if (isConsole(sender) && Cache.chatHelper.getServer().getPlayerCount() == 0) return;
+				Cache.chatHelper.message(profile, ChatColor.GRAY + StringUtil.format(receiveMsg, (!server.equals("*") ? "" : "globally "), (!isMuted ? "" : "un"), serverMsg, expireMsg));
 			}
 		} else
 			this.showUsage(sender);

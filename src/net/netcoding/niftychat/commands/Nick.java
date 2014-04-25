@@ -30,7 +30,7 @@ public class Nick extends BukkitTabCommand {
 	}
 
 	@Override
-	public void onCommand(CommandSender sender, String alias, String[] args) throws SQLException, Exception {
+	public void onCommand(CommandSender sender, String alias, String[] args) throws Exception, Exception {
 		if ((isConsole(sender)) && args.length < 2)
 			this.getLog().error(sender, "The nickname command requires a player name when used by the console!");
 		else if (args.length >= 1 && args.length <= 2) {

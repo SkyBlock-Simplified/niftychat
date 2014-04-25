@@ -82,9 +82,9 @@ public class Notifications implements DatabaseListener {
 					}
 				});
 			}
-		} else if (table.equals(Config.CENSOR_TABLE)) {
+		} else if (table.equals(Config.CENSOR_TABLE))
 			CensorData.reload();
-		} else if (table.equals(Config.USER_FLAGS_TABLE)) {
+		else if (table.equals(Config.USER_FLAGS_TABLE)) {
 			if (!event.equals(TriggerEvent.INSERT)) {
 				Map<String, Object> data = databaseNotification.getDeletedData();
 				UserChatData userData = UserChatData.getCache(UUID.fromString((String)data.get("uuid")));

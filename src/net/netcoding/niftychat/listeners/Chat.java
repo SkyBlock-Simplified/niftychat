@@ -3,6 +3,7 @@ package net.netcoding.niftychat.listeners;
 import java.util.regex.Pattern;
 
 import net.netcoding.niftybukkit.NiftyBukkit;
+import net.netcoding.niftybukkit.minecraft.BukkitHelper;
 import net.netcoding.niftybukkit.minecraft.BukkitListener;
 import net.netcoding.niftybukkit.mojang.MojangProfile;
 import net.netcoding.niftybukkit.util.RegexUtil;
@@ -26,72 +27,64 @@ public class Chat extends BukkitListener {
 		super(plugin);
 	}
 
-	@EventHandler(priority = EventPriority.LOWEST)
-	public void checkPlayerMessage(AsyncPlayerChatEvent event) {
-		Player player = event.getPlayer();
+	public static boolean check(BukkitHelper helper, Player player, String message) {
 		MojangProfile profile = NiftyBukkit.getMojangRepository().searchByExactPlayer(player);
 		UserChatData userData = UserChatData.getCache(profile.getUniqueId());
-		String stripMessage = RegexUtil.strip(event.getMessage(), RegexUtil.REPLACE_ALL_PATTERN);
+		String stripMessage = RegexUtil.strip(message, RegexUtil.REPLACE_ALL_PATTERN);
 
-		if (StringUtil.isEmpty(stripMessage)) event.setCancelled(true);
+		if (StringUtil.isEmpty(stripMessage)) return false;
 
 		if (!userData.hasMoved()) {
-			this.getLog().error(player, "You must move before you can speak!");
-			event.setCancelled(true);
-			return;
+			helper.getLog().error(player, "You must move before you can speak!");
+			return false;
 		}
 
 		if (userData.hasRepeatedMessage(stripMessage)) {
-			this.getLog().error(player, "You cannot send the same message!");
-			event.setCancelled(true);
-			return;
+			helper.getLog().error(player, "You cannot send the same message!");
+			return false;
 		}
 
-		if (userData.isMuted() && !this.hasPermissions(player, "mute", "roar")) {
-			Mute.sendMutedError(this.getLog(), player, userData);
-			/*UserFlagData muteData = userData.getFlagData("muted");
-			String expiry = muteData.hasExpiry() ? StringUtil.format(" until {{0}}", Mute.EXPIRE_FORMAT.format(new Date(muteData.getExpires()))) : "";
-			String server = muteData.isGlobal() ? "" : StringUtil.format(" in {{0}}", muteData.getServerName());
-			this.getLog().error(player, "You are {{0}}muted{1}{2}.", (muteData.isGlobal() ? "" : "globally "), server, expiry);*/
-			event.setCancelled(true);
-			return;
+		if (userData.isMuted() && !helper.hasPermissions(player, "mute", "roar")) {
+			Mute.sendMutedError(helper.getLog(), player, userData);
+			return false;
 		}
+
+		return true;
 	}
 
-	@EventHandler(priority = EventPriority.LOW)
-	public void formatPlayerMessage(AsyncPlayerChatEvent event) {
-		if (event.isCancelled()) return;
-		Player player = event.getPlayer();
-		String message = event.getMessage();
-
-		if (this.hasPermissions(player, "chat", "color"))
+	public static String format(BukkitHelper helper, Player player, String message) {
+		if (helper.hasPermissions(player, "chat", "color"))
 			message = RegexUtil.replaceColor(message, RegexUtil.REPLACE_COLOR_PATTERN);
 		else
 			message = RegexUtil.strip(message, RegexUtil.VANILLA_COLOR_PATTERN);
 
-		if (this.hasPermissions(player, "chat", "magic"))
+		if (helper.hasPermissions(player, "chat", "magic"))
 			message = RegexUtil.replaceColor(message, RegexUtil.REPLACE_MAGIC_PATTERN);
 		else
 			message = RegexUtil.strip(message, RegexUtil.VANILLA_MAGIC_PATTERN);
 
-		if (this.hasPermissions(player, "chat", "format"))
+		if (helper.hasPermissions(player, "chat", "format"))
 			message = RegexUtil.replaceColor(message, RegexUtil.REPLACE_FORMAT_PATTERN);
 		else
 			message = RegexUtil.strip(message, RegexUtil.VANILLA_FORMAT_PATTERN);
 
-		if (!this.hasPermissions(player, "chat", "bypass", "advertise")) {
+		return message;
+	}
+
+	public static String filter(BukkitHelper helper, Player player, String message) {
+		if (!helper.hasPermissions(player, "chat", "bypass", "advertise")) {
 			message = RegexUtil.IP_FILTER_PATTERN.matcher(message).replaceAll("*.*.*.*");
 
 			while (RegexUtil.URL_FILTER_PATTERN.matcher(message).find())
 				message = RegexUtil.URL_FILTER_PATTERN.matcher(message).replaceAll("$1 $2");
 		}
 
-		if (!this.hasPermissions(player, "chat", "bypass", "url")) {
+		if (!helper.hasPermissions(player, "chat", "bypass", "url")) {
 			while (RegexUtil.URL_PATTERN.matcher(message).find())
 				message = RegexUtil.URL_PATTERN.matcher(message).replaceAll("$1 $2");
 		}
 
-		if (!this.hasPermissions(player, "chat", "bypass", "censor")) {
+		if (!helper.hasPermissions(player, "chat", "bypass", "censor")) {
 			for (CensorData censor : CensorData.getCache()) {
 				Pattern pattern = censor.getPattern();
 
@@ -100,7 +93,7 @@ public class Chat extends BukkitListener {
 			}
 		}
 
-		if (!this.hasPermissions(player, "chat", "bypass", "caps")) {
+		if (!helper.hasPermissions(player, "chat", "bypass", "caps")) {
 			String[] words = message.split("\\s");
 
 			for (int i = 0; i < words.length; i++)
@@ -108,6 +101,20 @@ public class Chat extends BukkitListener {
 
 			message = StringUtil.implode(" ", words);
 		}
+
+		return message;
+	}
+
+	@EventHandler(priority = EventPriority.LOWEST)
+	public void checkPlayerMessage(AsyncPlayerChatEvent event) {
+		Player player = event.getPlayer();
+		String message = event.getMessage();
+
+		if (check(this, player, message)) {
+			message = format(this, player, message);
+			message = filter(this, player, message);
+		} else
+			event.setCancelled(true);
 
 		event.setMessage(message);
 	}

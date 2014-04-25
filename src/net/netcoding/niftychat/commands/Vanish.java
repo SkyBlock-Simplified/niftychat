@@ -1,7 +1,5 @@
 package net.netcoding.niftychat.commands;
 
-import java.sql.SQLException;
-
 import net.netcoding.niftybukkit.NiftyBukkit;
 import net.netcoding.niftybukkit.minecraft.BukkitCommand;
 import net.netcoding.niftybukkit.mojang.MojangProfile;
@@ -23,7 +21,7 @@ public class Vanish extends BukkitCommand {
 
 	@SuppressWarnings("unused")
 	@Override
-	public void onCommand(CommandSender sender, String alias, String[] args) throws SQLException, Exception {
+	public void onCommand(CommandSender sender, String alias, String[] args) throws Exception {
 		if (isConsole(sender) && args.length < 2)
 			this.getLog().error(sender, "The vanish command requires a player name when used by the console!");
 		else if (args.length >= 0 && args.length <= 2) {

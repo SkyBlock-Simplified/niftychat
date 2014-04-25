@@ -28,6 +28,8 @@ public class UserChatData extends BukkitHelper {
 
 	private String lastMessage;
 
+	private MojangProfile lastMessenger;
+
 	private boolean hasMoved = false;
 
 	private List<UserFlagData> flagData;
@@ -73,9 +75,9 @@ public class UserChatData extends BukkitHelper {
 
 		try {
 			return _getDisplayName(this.profile);
-		} catch (SQLException ex) {
-			return this.getName();
-		}
+		} catch (SQLException ex) { }
+
+		return this.getName();
 	}
 
 	private static String _getDisplayName(final MojangProfile profile) throws SQLException {
@@ -139,6 +141,10 @@ public class UserChatData extends BukkitHelper {
 
 	public String getName() {
 		return this.profile.getName();
+	}
+
+	public MojangProfile getLastMessenger() {
+		return this.lastMessenger;
 	}
 
 	public Player getPlayer() {
@@ -214,6 +220,10 @@ public class UserChatData extends BukkitHelper {
 		} catch (SQLException ex) {
 			this.getLog().console(ex);
 		}
+	}
+
+	public void setLastMessenger(MojangProfile profile) {
+		this.lastMessenger = profile;
 	}
 
 	public void setMoved() {

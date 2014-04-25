@@ -40,7 +40,7 @@ public class UserFlagData {
 	}
 
 	public boolean getValue() {
-		return this.hasExpiry() ? (this.expires <= System.currentTimeMillis()) : this.value;
+		return this.hasExpiry() ? (this.expires >= System.currentTimeMillis()) : this.value;
 	}
 
 	public boolean hasExpiry() {

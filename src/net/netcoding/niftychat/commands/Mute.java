@@ -88,13 +88,12 @@ public class Mute extends BukkitCommand {
 			String serverMsg = "";
 			if (bungeeHelper.isOnline()) serverMsg = StringUtil.format("Server: {{0}}.", (server.equals("*") ? (ChatColor.ITALIC + "global" + ChatColor.RESET) : server));
 			String expireMsg = (!isMuted && expires != 0) ? StringUtil.format(" until {{0}}", EXPIRE_FORMAT.format(new Date(expires))) : "";
+			String receivMsg = "You have been {0}muted{1}.";
 
 			if (!sender.getName().equalsIgnoreCase(profile.getName())) {
 				this.getLog().message(sender, "{{0}} {1}muted{2}.", profile.getName(), (!isMuted ? "" : "un"), expireMsg);
 				this.getLog().message(sender, serverMsg);
 			}
-
-			String receivMsg = "You have been {0}muted{1}.";
 
 			if (!bungeeHelper.isOnline()) {
 				this.getLog().message(findPlayer(profile.getName()), receivMsg, (!isMuted ? "" : "un"), expireMsg);

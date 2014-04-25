@@ -53,7 +53,7 @@ public class Chat extends BukkitListener {
 		if (userData.isMuted()) {
 			UserFlagData muteData = userData.getFlagData("muted");
 			String expiry = muteData.hasExpiry() ? Mute.EXPIRE_FORMAT.format(new Date(muteData.getExpires())) : (ChatColor.ITALIC + "never" + ChatColor.RESET);
-			this.getLog().error(player, "You cannot speak as you are currently muted! Expires: {{0}}", expiry);
+			this.getLog().error(player, "You cannot speak as you are currently muted!\nExpires: {{0}}", expiry);
 			event.setCancelled(true);
 			return;
 		}

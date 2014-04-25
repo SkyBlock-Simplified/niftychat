@@ -164,7 +164,7 @@ public class UserChatData extends BukkitHelper {
 	}
 
 	public boolean isMuted() {
-		return this.getFlagValue("muted");
+		return this.getFlagValue("muted") && !this.hasPermissions("mute", "roar");
 	}
 
 	public boolean isVanished() {

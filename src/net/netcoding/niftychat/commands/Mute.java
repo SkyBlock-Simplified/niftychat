@@ -86,7 +86,7 @@ public class Mute extends BukkitCommand {
 			if (expires != 0) expires += System.currentTimeMillis();
 			Cache.MySQL.update(StringUtil.format("INSERT INTO `{0}` (`uuid`, `flag`, `value`, `server`, `_expires`) VALUES (?, ?, ?, ?, FROM_UNIXTIME(?)) ON DUPLICATE KEY UPDATE `value` = ?, `_expires` = FROM_UNIXTIME(?);", Config.USER_FLAGS_TABLE), profile.getUniqueId(), "muted", !isMuted, server, (expires == 0 ? null : expires), !isMuted, (expires == 0 ? null : expires));
 			String serverMsg = "";
-			if (bungeeHelper.isOnline()) serverMsg = StringUtil.format("Server: {{0}}.", (server.equals("*") ? "all servers" : server));
+			if (bungeeHelper.isOnline()) serverMsg = StringUtil.format("Server: {{0}}.", (server.equals("*") ? (ChatColor.ITALIC + "global" + ChatColor.RESET) : server));
 			String expireMsg = (!isMuted && expires != 0) ? StringUtil.format(" until {{0}}", EXPIRE_FORMAT.format(new Date(expires))) : "";
 
 			if (!sender.getName().equalsIgnoreCase(profile.getName())) {

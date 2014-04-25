@@ -96,7 +96,7 @@ public class Notifications implements DatabaseListener {
 						if (result.next()) {
 							UserChatData userData = UserChatData.getCache(UUID.fromString(result.getString("uuid")));
 							String flag = result.getString("flag");
-							List<UserFlagData> flagDatas = userData.getFlagData(flag);
+							List<UserFlagData> flagDatas = userData.getAllFlagData(flag);
 							String server = result.getString("server");
 							long _submitted = result.getTimestamp("_submitted").getTime();
 							Timestamp expires = result.getTimestamp("_expires");

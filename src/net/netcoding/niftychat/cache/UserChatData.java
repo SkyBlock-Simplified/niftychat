@@ -84,7 +84,7 @@ public class UserChatData extends BukkitHelper {
 		}, profile.getUniqueId());
 	}
 
-	public List<UserFlagData> getFlagData(String flag) {
+	public List<UserFlagData> getAllFlagData(String flag) {
 		if (this.flagData == null) this.reloadFlagData();
 		List<UserFlagData> flagMatches = new ArrayList<>();
 
@@ -96,26 +96,26 @@ public class UserChatData extends BukkitHelper {
 		return flagMatches;
 	}
 
-	private boolean getFlagValue(String flag) {
-		List<UserFlagData> flagDatas = this.getFlagData(flag);
+	public UserFlagData getFlagData(String flag) {
+		List<UserFlagData> flagDatas = this.getAllFlagData(flag);
 		BungeeHelper bungeeHelper = NiftyBukkit.getBungeeHelper();
-		boolean value = false;
+		UserFlagData found = new UserFlagData(flag);
 
 		for (UserFlagData flagData : flagDatas) {
 			if (flagData.isGlobal() && flagData.getValue()) {
-				value = true;
+				found = flagData;
 				break;
 			} else if (flagData.getValue()) {
 				if (bungeeHelper.isOnline()) {
 					if (bungeeHelper.getServer().equals(flagData.getServer())) {
-						value = true;
+						found = flagData;
 						break;
 					}
 				}
 			}
 		}
 
-		return value;
+		return found;
 	}
 
 	public String getName() {
@@ -164,11 +164,11 @@ public class UserChatData extends BukkitHelper {
 	}
 
 	public boolean isMuted() {
-		return this.getFlagValue("muted") && !this.hasPermissions("mute", "roar");
+		return this.getFlagData("muted").getValue() && !this.hasPermissions("mute", "roar");
 	}
 
 	public boolean isVanished() {
-		return this.getFlagValue("vanished");
+		return this.getFlagData("vanished").getValue();
 	}
 
 	public static void removeCache(UUID uuid) {

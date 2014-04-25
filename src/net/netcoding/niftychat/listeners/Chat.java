@@ -1,5 +1,6 @@
 package net.netcoding.niftychat.listeners;
 
+import java.util.Date;
 import java.util.regex.Pattern;
 
 import net.netcoding.niftybukkit.NiftyBukkit;
@@ -11,8 +12,11 @@ import net.netcoding.niftychat.NiftyChat;
 import net.netcoding.niftychat.cache.CensorData;
 import net.netcoding.niftychat.cache.RankFormat;
 import net.netcoding.niftychat.cache.UserChatData;
+import net.netcoding.niftychat.cache.UserFlagData;
+import net.netcoding.niftychat.commands.Mute;
 
 import org.bukkit.Bukkit;
+import org.bukkit.ChatColor;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
@@ -47,7 +51,9 @@ public class Chat extends BukkitListener {
 		}
 
 		if (userData.isMuted()) {
-			this.getLog().error(player, "You cannot speak as you are currently muted! Expires: ...");
+			UserFlagData muteData = userData.getFlagData("muted");
+			String expiry = muteData.hasExpiry() ? Mute.EXPIRE_FORMAT.format(new Date(muteData.getExpires())) : (ChatColor.ITALIC + "never" + ChatColor.RESET);
+			this.getLog().error(player, "You cannot speak as you are currently muted! Expires: {{0}}", expiry);
 			event.setCancelled(true);
 			return;
 		}

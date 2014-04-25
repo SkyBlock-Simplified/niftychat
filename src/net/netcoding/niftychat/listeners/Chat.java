@@ -16,7 +16,6 @@ import net.netcoding.niftychat.cache.UserFlagData;
 import net.netcoding.niftychat.commands.Mute;
 
 import org.bukkit.Bukkit;
-import org.bukkit.ChatColor;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
@@ -50,10 +49,10 @@ public class Chat extends BukkitListener {
 			return;
 		}
 
-		if (userData.isMuted()) {
+		if (userData.isMuted() && !this.hasPermissions(player, "mute", "roar")) {
 			UserFlagData muteData = userData.getFlagData("muted");
-			String expiry = muteData.hasExpiry() ? Mute.EXPIRE_FORMAT.format(new Date(muteData.getExpires())) : (ChatColor.ITALIC + "never" + ChatColor.RESET);
-			this.getLog().error(player, "You are muted until {{0}}.", expiry);
+			String expiry = muteData.hasExpiry() ? StringUtil.format(" until {{0}}", Mute.EXPIRE_FORMAT.format(new Date(muteData.getExpires()))) : "";
+			this.getLog().error(player, "You are {0}muted{1}.", (muteData.hasExpiry() ? "" : "permanently "), expiry);
 			event.setCancelled(true);
 			return;
 		}

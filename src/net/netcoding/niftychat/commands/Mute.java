@@ -1,13 +1,10 @@
 package net.netcoding.niftychat.commands;
 
-import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.sql.Timestamp;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 
 import net.netcoding.niftybukkit.NiftyBukkit;
-import net.netcoding.niftybukkit.database.ResultCallback;
 import net.netcoding.niftybukkit.minecraft.BukkitCommand;
 import net.netcoding.niftybukkit.minecraft.BungeeHelper;
 import net.netcoding.niftybukkit.mojang.MojangProfile;
@@ -17,6 +14,7 @@ import net.netcoding.niftybukkit.util.TimeUtil;
 import net.netcoding.niftychat.NiftyChat;
 import net.netcoding.niftychat.cache.Cache;
 import net.netcoding.niftychat.cache.Config;
+import net.netcoding.niftychat.cache.UserChatData;
 
 import org.bukkit.ChatColor;
 import org.bukkit.command.CommandSender;
@@ -66,34 +64,23 @@ public class Mute extends BukkitCommand {
 				}
 			}
 
-			boolean globalMute = alias.matches("^globalmute|globalunmute|gmute|gunmute$") || server.matches("^global|all|\\*$");
-
-			if (globalMute) {
+			if (alias.matches("^globalmute|globalunmute|gmute|gunmute$") || server.matches("^global|all|\\*$")) {
 				server = "*";
 				Cache.MySQL.update(StringUtil.format("DELETE FROM `{0}` WHERE `uuid` = ? AND `flag` = ? AND `server` <> ?;", Config.USER_FLAGS_TABLE), profile.getUniqueId(), "muted", "*");
 			}
 
-			boolean isMuted = Cache.MySQL.query(StringUtil.format("SELECT * FROM `{0}` WHERE `uuid` = ? AND `flag` = ? AND `server` = ?;", Config.USER_FLAGS_TABLE), new ResultCallback<Boolean>() {
-				@Override
-				public Boolean handle(ResultSet result) throws SQLException {
-					if (result.next()) {
-						Timestamp expires = result.getTimestamp("_expires");
-						long _expires = result.wasNull() ? 0 : expires.getTime();
-						return result.getBoolean("value") && _expires >= System.currentTimeMillis();
-					} else
-						return false;
-				}
-			}, profile.getUniqueId(), "muted", server);
-
+			UserChatData userData = UserChatData.getCache(profile.getUniqueId());
+			userData = userData == null ? new UserChatData(this.getPlugin(), profile) : userData;
+			boolean isMuted = userData.isMuted();
 			if (alias.matches("^unmute|globalunmute|gunmute$")) isMuted = true;
 			if (isMuted) expires = 0;
 			if (expires != 0) expires += System.currentTimeMillis();
-			Cache.MySQL.update(StringUtil.format("INSERT INTO `{0}` (`uuid`, `flag`, `value`, `server`, `_expires`) VALUES (?, ?, ?, ?, FROM_UNIXTIME(? / 1000)) ON DUPLICATE KEY UPDATE `value` = ?, `_expires` = FROM_UNIXTIME(? / 1000);", Config.USER_FLAGS_TABLE), profile.getUniqueId(), "muted", !isMuted, server, (expires == 0 ? null : expires), !isMuted, (expires == 0 ? null : expires));
+			String expireMsg = (!isMuted && expires != 0) ? StringUtil.format(" until {{0}}", EXPIRE_FORMAT.format(new Date(expires))) : "";
+			Cache.MySQL.update(StringUtil.format("INSERT INTO `{0}` (`uuid`, `flag`, `value`, `server`, `_expires`) VALUES (?, ?, ?, ?, ?) ON DUPLICATE KEY UPDATE `value` = ?, `_expires` = ?);", Config.USER_FLAGS_TABLE), profile.getUniqueId(), "muted", !isMuted, server, (expires == 0 ? null : expireMsg), !isMuted, (expires == 0 ? null : expireMsg));
 			String serverMsg = "";
 			if (bungeeHelper.isOnline()) serverMsg = StringUtil.format("Server: {{0}}.", (server.equals("*") ? (ChatColor.ITALIC + "global" + ChatColor.RESET) : server));
-			String expireMsg = (!isMuted && expires != 0) ? StringUtil.format(" until {{0}}", EXPIRE_FORMAT.format(new Date(expires))) : "";
 			String receivMsg = "You have been {0}muted{1}.";
-			if (!sender.getName().equalsIgnoreCase(profile.getName())) this.getLog().message(sender, "{{0}} {1}muted{2}.{0}", profile.getName(), (!isMuted ? "" : "un"), expireMsg, (StringUtil.notEmpty(serverMsg) ? "\n" + serverMsg : ""));
+			if (!sender.getName().equalsIgnoreCase(profile.getName())) this.getLog().message(sender, "{{0}} {1}muted{2}.{3}", profile.getName(), (!isMuted ? "" : "un"), expireMsg, (StringUtil.notEmpty(serverMsg) ? "\n" + serverMsg : ""));
 
 			if (!bungeeHelper.isOnline()) {
 				Player player = findPlayer(profile.getName());

@@ -85,11 +85,13 @@ public class Notifications implements DatabaseListener {
 		} else if (table.equals(Config.CENSOR_TABLE)) {
 			CensorData.reload();
 		} else if (table.equals(Config.USER_FLAGS_TABLE)) {
-			if (event.equals(TriggerEvent.DELETE)) {
+			if (!event.equals(TriggerEvent.INSERT)) {
 				Map<String, Object> data = databaseNotification.getDeletedData();
 				UserChatData userData = UserChatData.getCache(UUID.fromString((String)data.get("uuid")));
-				userData.reloadFlagData();
-			} else {
+				if (userData != null) userData.reloadFlagData();
+			}
+
+			if (!event.equals(TriggerEvent.DELETE)) {
 				databaseNotification.getUpdatedRow(new ResultCallback<Void>() {
 					@Override
 					public Void handle(ResultSet result) throws SQLException {
@@ -103,7 +105,7 @@ public class Notifications implements DatabaseListener {
 								long _submitted = result.getTimestamp("_submitted").getTime();
 								Timestamp expires = result.getTimestamp("_expires");
 								long _expires = result.wasNull() ? 0 : expires.getTime();
-								UserFlagData flagMatch = userData.getFlagData(flag);
+								UserFlagData flagMatch = null;
 
 								for (UserFlagData flagData : flagDatas) {
 									if (flagData.isGlobal() && server.equals("*")) {

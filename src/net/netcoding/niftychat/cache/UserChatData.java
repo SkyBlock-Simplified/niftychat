@@ -33,9 +33,13 @@ public class UserChatData extends BukkitHelper {
 	private List<UserFlagData> flagData;
 
 	public UserChatData(JavaPlugin plugin, Player player) {
-		super(plugin);
-		this.profile = NiftyBukkit.getMojangRepository().searchByExactPlayer(player);
+		this(plugin, NiftyBukkit.getMojangRepository().searchByExactPlayer(player));
 		cache.add(this);
+	}
+
+	public UserChatData(JavaPlugin plugin, MojangProfile profile) {
+		super(plugin);
+		this.profile = profile;
 	}
 
 	public void addFlagData(UserFlagData flagData) {
@@ -56,7 +60,7 @@ public class UserChatData extends BukkitHelper {
 	}
 
 	public String getDisplayName() {
-		return this.getPlayer().getDisplayName();
+		return this.getPlayer() != null ? this.getPlayer().getDisplayName() : this.getName();
 	}
 
 	private static String _getDisplayName(final MojangProfile profile) throws SQLException {
@@ -102,11 +106,11 @@ public class UserChatData extends BukkitHelper {
 		UserFlagData found = new UserFlagData(flag);
 
 		for (UserFlagData flagData : flagDatas) {
-			if (flagData.isGlobal() && flagData.getValue()) {
-				found = flagData;
-				break;
-			} else if (flagData.getValue()) {
-				if (bungeeHelper.isOnline()) {
+			if (flagData.getValue()) {
+				if (flagData.isGlobal()) {
+					found = flagData;
+					break;
+				} else if (bungeeHelper.isOnline()) {
 					if (bungeeHelper.getServer().equals(flagData.getServer())) {
 						found = flagData;
 						break;
@@ -164,7 +168,7 @@ public class UserChatData extends BukkitHelper {
 	}
 
 	public boolean isMuted() {
-		return this.getFlagData("muted").getValue() && !this.hasPermissions("mute", "roar");
+		return this.getFlagData("muted").getValue();
 	}
 
 	public boolean isVanished() {

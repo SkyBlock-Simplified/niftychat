@@ -46,7 +46,7 @@ public class Mute extends BukkitCommand {
 				return;
 			}
 
-			if (sender.getName().equalsIgnoreCase(profile.getName())) {
+			if (sender.getName().equalsIgnoreCase(profile.getName()) && !(alias.endsWith("unmute") && this.hasPermissions(sender, "mute", "roar"))) {
 				this.getLog().error(sender, "You cannot mute yourself!");
 				return;
 			}

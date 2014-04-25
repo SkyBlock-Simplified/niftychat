@@ -18,11 +18,12 @@ import net.netcoding.niftychat.cache.UserChatData;
 
 import org.bukkit.ChatColor;
 import org.bukkit.command.CommandSender;
-import org.bukkit.entity.Player;
 
 public class Mute extends BukkitCommand {
 
-	public static final transient SimpleDateFormat EXPIRE_FORMAT = new SimpleDateFormat("MMM dd, yyyy h:mm a z");
+	public static final transient SimpleDateFormat EXPIRE_FORMAT = new SimpleDateFormat("MMM dd, yyyy h:mm:ss a z");
+
+	public static final transient SimpleDateFormat SQL_FORMAT = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
 
 	public Mute(NiftyChat plugin) {
 		super(plugin, "mute");
@@ -75,24 +76,22 @@ public class Mute extends BukkitCommand {
 			if (alias.matches("^unmute|globalunmute|gunmute$")) isMuted = true;
 			if (isMuted) expires = 0;
 			if (expires != 0) expires += System.currentTimeMillis();
+			String sqlFormat = SQL_FORMAT.format(new Date(expires));
+			Cache.MySQL.update(StringUtil.format("INSERT INTO `{0}` (`uuid`, `flag`, `value`, `server`, `_expires`) VALUES (?, ?, ?, ?, ?) ON DUPLICATE KEY UPDATE `value` = ?, `_expires` = ?;", Config.USER_FLAGS_TABLE), profile.getUniqueId(), "muted", !isMuted, server, (expires == 0 ? null : sqlFormat), !isMuted, (expires == 0 ? null : sqlFormat));
+			String serverMsg = server.equals("*") ? "" : StringUtil.format(" in {{0}}", server);
 			String expireMsg = (!isMuted && expires != 0) ? StringUtil.format(" until {{0}}", EXPIRE_FORMAT.format(new Date(expires))) : "";
-			Cache.MySQL.update(StringUtil.format("INSERT INTO `{0}` (`uuid`, `flag`, `value`, `server`, `_expires`) VALUES (?, ?, ?, ?, ?) ON DUPLICATE KEY UPDATE `value` = ?, `_expires` = ?);", Config.USER_FLAGS_TABLE), profile.getUniqueId(), "muted", !isMuted, server, (expires == 0 ? null : expireMsg), !isMuted, (expires == 0 ? null : expireMsg));
-			String serverMsg = "";
-			if (bungeeHelper.isOnline()) serverMsg = StringUtil.format("Server: {{0}}.", (server.equals("*") ? (ChatColor.ITALIC + "global" + ChatColor.RESET) : server));
-			String receivMsg = "You have been {0}muted{1}.";
-			if (!sender.getName().equalsIgnoreCase(profile.getName())) this.getLog().message(sender, "{{0}} {1}muted{2}.{3}", profile.getName(), (!isMuted ? "" : "un"), expireMsg, (StringUtil.notEmpty(serverMsg) ? "\n" + serverMsg : ""));
+			String receiveMsg = "You are {{0}}{1}muted{2}{3}.";
+			String sendMsg = "{{0}} {{1}}{2}muted{3}{4}";
+
+			if (!sender.getName().equalsIgnoreCase(profile.getName()))
+				this.getLog().message(sender, sendMsg, profile.getName(), (!server.equals("*") ? "" : "globally "), (!isMuted ? "" : "un"), serverMsg, expireMsg);
 
 			if (!bungeeHelper.isOnline()) {
-				Player player = findPlayer(profile.getName());
-
-				if (player != null) {
-					this.getLog().message(player, receivMsg, (!isMuted ? "" : "un"), expireMsg);
-					this.getLog().message(player, serverMsg);
-				}
+				if (userData.getPlayer() != null)
+					this.getLog().message(userData.getPlayer(), receiveMsg, "", (!isMuted ? "" : "un"), "", expireMsg);
 			} else {
 				if (isConsole(sender) && bungeeHelper.getServer().getPlayerCount() == 0) return;
-				bungeeHelper.message(profile.getName(), ChatColor.GRAY + StringUtil.format(receivMsg, (!isMuted ? "" : "un"), expireMsg));
-				bungeeHelper.message(profile.getName(), ChatColor.GRAY + serverMsg);
+				bungeeHelper.message(profile.getName(), ChatColor.GRAY + StringUtil.format(receiveMsg, (!server.equals("*") ? "" : "globally "), (!isMuted ? "" : "un"), serverMsg, expireMsg));
 			}
 		} else
 			this.showUsage(sender);

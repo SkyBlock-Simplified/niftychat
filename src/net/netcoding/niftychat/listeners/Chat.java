@@ -52,7 +52,8 @@ public class Chat extends BukkitListener {
 		if (userData.isMuted() && !this.hasPermissions(player, "mute", "roar")) {
 			UserFlagData muteData = userData.getFlagData("muted");
 			String expiry = muteData.hasExpiry() ? StringUtil.format(" until {{0}}", Mute.EXPIRE_FORMAT.format(new Date(muteData.getExpires()))) : "";
-			this.getLog().error(player, "You are {0}muted{1}.", (muteData.hasExpiry() ? "" : "permanently "), expiry);
+			String server = muteData.isGlobal() ? "" : StringUtil.format(" in {{0}}", muteData.getServerName());
+			this.getLog().error(player, "You are {0}muted{1}{2}.", (muteData.isGlobal() ? "" : "globally "), server, expiry);
 			event.setCancelled(true);
 			return;
 		}

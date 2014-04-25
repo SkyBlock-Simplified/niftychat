@@ -60,7 +60,22 @@ public class UserChatData extends BukkitHelper {
 	}
 
 	public String getDisplayName() {
-		return this.getPlayer() != null ? this.getPlayer().getDisplayName() : this.getName();
+		return this.getDisplayName(false);
+	}
+
+	public String getDisplayName(boolean fetch) {
+		UserChatData userData = getCache(this.getUniqueId());
+
+		if (!fetch && userData != null) {
+			if (userData.getPlayer() != null)
+				return userData.getPlayer().getDisplayName();
+		}
+
+		try {
+			return _getDisplayName(this.profile);
+		} catch (SQLException ex) {
+			return this.getName();
+		}
 	}
 
 	private static String _getDisplayName(final MojangProfile profile) throws SQLException {
@@ -124,15 +139,6 @@ public class UserChatData extends BukkitHelper {
 
 	public String getName() {
 		return this.profile.getName();
-	}
-
-	public static String getOfflineDisplayName(MojangProfile profile) throws SQLException {
-		UserChatData userData = getCache(profile.getUniqueId());
-
-		if (userData != null)
-			return userData.getDisplayName();
-		else
-			return _getDisplayName(profile);
 	}
 
 	public Player getPlayer() {
@@ -218,14 +224,14 @@ public class UserChatData extends BukkitHelper {
 		this.hasMoved = moved;
 	}
 
-	public void updateDisplayName() throws SQLException {
-		String displayName = _getDisplayName(this.profile);
+	public void updateDisplayName() {
+		String displayName = this.getDisplayName(true);
 		this.getPlayer().setDisplayName(displayName);
 		this.getPlayer().setCustomName(displayName);
 	}
 
 	public void updateTabListName() {
-		String displayName = this.getDisplayName();
+		String displayName = this.getDisplayName(true);
 		if (displayName.length() > 16) displayName = displayName.substring(0, 16);
 		this.getPlayer().setPlayerListName(displayName);
 	}

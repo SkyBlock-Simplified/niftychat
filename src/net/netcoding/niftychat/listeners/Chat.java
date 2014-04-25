@@ -1,6 +1,5 @@
 package net.netcoding.niftychat.listeners;
 
-import java.util.Date;
 import java.util.regex.Pattern;
 
 import net.netcoding.niftybukkit.NiftyBukkit;
@@ -12,7 +11,6 @@ import net.netcoding.niftychat.NiftyChat;
 import net.netcoding.niftychat.cache.CensorData;
 import net.netcoding.niftychat.cache.RankFormat;
 import net.netcoding.niftychat.cache.UserChatData;
-import net.netcoding.niftychat.cache.UserFlagData;
 import net.netcoding.niftychat.commands.Mute;
 
 import org.bukkit.Bukkit;
@@ -50,10 +48,11 @@ public class Chat extends BukkitListener {
 		}
 
 		if (userData.isMuted() && !this.hasPermissions(player, "mute", "roar")) {
-			UserFlagData muteData = userData.getFlagData("muted");
+			Mute.sendMutedError(this.getLog(), player, userData);
+			/*UserFlagData muteData = userData.getFlagData("muted");
 			String expiry = muteData.hasExpiry() ? StringUtil.format(" until {{0}}", Mute.EXPIRE_FORMAT.format(new Date(muteData.getExpires()))) : "";
 			String server = muteData.isGlobal() ? "" : StringUtil.format(" in {{0}}", muteData.getServerName());
-			this.getLog().error(player, "You are {0}muted{1}{2}.", (muteData.isGlobal() ? "" : "globally "), server, expiry);
+			this.getLog().error(player, "You are {{0}}muted{1}{2}.", (muteData.isGlobal() ? "" : "globally "), server, expiry);*/
 			event.setCancelled(true);
 			return;
 		}

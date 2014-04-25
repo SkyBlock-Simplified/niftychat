@@ -7,6 +7,7 @@ import java.util.Date;
 import net.netcoding.niftybukkit.NiftyBukkit;
 import net.netcoding.niftybukkit.minecraft.BukkitCommand;
 import net.netcoding.niftybukkit.minecraft.BungeeHelper;
+import net.netcoding.niftybukkit.minecraft.Log;
 import net.netcoding.niftybukkit.mojang.MojangProfile;
 import net.netcoding.niftybukkit.mojang.exceptions.ProfileNotFoundException;
 import net.netcoding.niftybukkit.util.StringUtil;
@@ -15,6 +16,7 @@ import net.netcoding.niftychat.NiftyChat;
 import net.netcoding.niftychat.cache.Cache;
 import net.netcoding.niftychat.cache.Config;
 import net.netcoding.niftychat.cache.UserChatData;
+import net.netcoding.niftychat.cache.UserFlagData;
 
 import org.bukkit.ChatColor;
 import org.bukkit.command.CommandSender;
@@ -29,11 +31,21 @@ public class Mute extends BukkitCommand {
 		super(plugin, "mute");
 	}
 
+	public static void sendMutedError(Log logger, CommandSender sender, UserChatData userData) {
+		UserFlagData muteData = userData.getFlagData("muted");
+		String expiry = muteData.hasExpiry() ? StringUtil.format(" until {{0}}", EXPIRE_FORMAT.format(new Date(muteData.getExpires()))) : "";
+		String server = muteData.isGlobal() ? "" : StringUtil.format(" in {{0}}", muteData.getServerName());
+		logger.error(sender, "You are {0}muted{1}{2}.", (muteData.isGlobal() ? "" : "globally "), server, expiry);
+	}
+
 	@Override
 	public void onCommand(CommandSender sender, String alias, String[] args) throws SQLException {
 		if (args.length >= 1 && args.length <= 3) {
+			BungeeHelper bungeeHelper = NiftyBukkit.getBungeeHelper();
 			String playerName = args[0];
 			MojangProfile profile;
+			long expires = args.length >= 2 ? TimeUtil.getDateTime(args[1]) : 0;
+			String server = "*";
 
 			if (isConsole(playerName)) {
 				this.getLog().error(sender, "You cannot mute the console!");
@@ -51,10 +63,6 @@ public class Mute extends BukkitCommand {
 				this.getLog().error(sender, "You cannot mute yourself!");
 				return;
 			}
-
-			long expires = args.length >= 2 ? TimeUtil.getDateTime(args[1]) : 0;
-			String server = "*";
-			BungeeHelper bungeeHelper = NiftyBukkit.getBungeeHelper();
 
 			if (bungeeHelper.isOnline()) {
 				server = bungeeHelper.getServerName();

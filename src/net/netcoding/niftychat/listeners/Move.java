@@ -1,7 +1,5 @@
 package net.netcoding.niftychat.listeners;
 
-import java.sql.SQLException;
-
 import net.netcoding.niftybukkit.NiftyBukkit;
 import net.netcoding.niftybukkit.minecraft.BukkitListener;
 import net.netcoding.niftybukkit.mojang.MojangProfile;
@@ -31,12 +29,8 @@ public class Move extends BukkitListener {
 		UserChatData userData = UserChatData.getCache(profile.getUniqueId());
 
 		if (userData != null) {
-			try {
-				userData.updateDisplayName();
-				userData.updateTabListName();
-			} catch (SQLException ex) {
-				this.getLog().console(ex);
-			}
+			userData.updateDisplayName();
+			userData.updateTabListName();
 		}
 	}
 

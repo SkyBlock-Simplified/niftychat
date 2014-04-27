@@ -119,7 +119,7 @@ public class Chat extends BukkitListener {
 		event.setMessage(message);
 	}
 
-	@EventHandler
+	@EventHandler(priority = EventPriority.LOW)
 	public void onPlayerChat(AsyncPlayerChatEvent event) {
 		if (event.isCancelled()) return;
 		Player player = event.getPlayer();
@@ -139,7 +139,7 @@ public class Chat extends BukkitListener {
 		String teamSuffix = team != null ? team.getSuffix() : "";
 
 		synchronized (this) {
-			event.setFormat(StringUtil.format(format, userData.getDisplayName(), event.getMessage(), group, world, world.substring(0, 1).toUpperCase(), teamName, teamPrefix, teamSuffix));
+			event.setFormat(StringUtil.format(format, group, world, world.substring(0, 1).toUpperCase(), teamName, teamPrefix, teamSuffix));
 		}
 	}
 

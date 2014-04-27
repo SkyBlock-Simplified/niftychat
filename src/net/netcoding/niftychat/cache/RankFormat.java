@@ -118,21 +118,24 @@ public class RankFormat {
 			value = RegexUtil.replaceColor(_default, RegexUtil.REPLACE_ALL_PATTERN);
 		}
 
-		value = value.replace("{displayname}", "{0}");
-		value = value.replace("{d}", "{0}");
-		value = value.replace("{msg}", "{1}");
-		value = value.replace("{m}", "{1}");
-		value = value.replace("{group}", "{2}");
-		value = value.replace("{g}", "{2}");
-		value = value.replace("{world}", "{3}");
-		value = value.replace("{w}", "{3}");
-		value = value.replace("{worldletter}", "{4}");
-		value = value.replace("{wl}", "{4}");
-		value = value.replace("{team}", "{5}");
-		value = value.replace("{teamprefix}", "{6}");
-		value = value.replace("{tp}", "{7}");
-		value = value.replace("{teamsuffix}", "{6}");
-		value = value.replace("{ts}", "{7}");
+		value = value.replace("{displayname}", "%1$s");
+		value = value.replace("{name}", "%1$s");
+		value = value.replace("{d}", "%1$s");
+		value = value.replace("{message}", "%2$s");
+		value = value.replace("{msg}", "%2$s");
+		value = value.replace("{m}", "%2$s");
+		value = value.replace("{group}", "{0}");
+		value = value.replace("{g}", "{0}");
+		value = value.replace("{world}", "{1}");
+		value = value.replace("{w}", "{1}");
+		value = value.replace("{worldletter}", "{2}");
+		value = value.replace("{wl}", "{2}");
+		value = value.replace("{team}", "{3}");
+		value = value.replace("{t}", "{3}");
+		value = value.replace("{teamprefix}", "{4}");
+		value = value.replace("{tp}", "{4}");
+		value = value.replace("{teamsuffix}", "{5}");
+		value = value.replace("{ts}", "{5}");
 		value = value.replaceAll("[ ]{2,}", " ");
 
 		this.format = value;

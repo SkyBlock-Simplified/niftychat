@@ -53,7 +53,7 @@ permissions:
               niftychat.chat.bypass.censor:
                 description: Allows you to bypass the badword censor in chat
               niftychat.chat.bypass.move:
-                description: Allows you to talk without moving on first join
+                description: Allows you to chat without moving on first join
               niftychat.chat.bypass.repeat:
                 description: Allows you to submit the same message in chat
               niftychat.chat.bypass.url:
@@ -73,6 +73,34 @@ permissions:
             description: Allows you to view rank format, prefix and suffix
       niftychat.join.fullserver:
         description: Allows you to join the server even when it is full
+      niftychat.message.*:
+        description: Allows you to bypass all private chat restrictions
+        children:
+          niftychat.message:
+            description: Allows you to send private messages players
+          niftychat.message.bypass.*:
+            description: Allows you to bypass all private chat filtering
+            children:
+              niftychat.message.bypass.advertise:
+                description: Allows you to put IP addresses and websites with ports in private chat
+              niftychat.message.bypass.caps:
+                description: Allows you to use CAPS in private chat
+              niftychat.message.bypass.censor:
+                description: Allows you to bypass the badword censor in private chat
+              niftychat.message.bypass.move:
+                description: Allows you to private chat without moving on first join
+              niftychat.message.bypass.repeat:
+                description: Allows you to submit the same message in private chat
+              niftychat.message.bypass.url:
+                description: Allows you to put websites without ports in private chat
+          niftychat.message.color:
+            description: Allows you to use colors in private chat
+          niftychat.message.format:
+            description: Allows you to use formatting in private chat
+          niftychat.message.global:
+            description: Allows you to send private messages to players across servers
+          niftychat.message.magic:
+            description: Allows you to use magic in private chat
       niftychat.mute:
         description: Allows you to mute players
       niftychat.nick.*:

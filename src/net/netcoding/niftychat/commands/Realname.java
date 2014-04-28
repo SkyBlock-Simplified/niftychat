@@ -23,6 +23,7 @@ public class Realname extends BukkitCommand {
 
 	public Realname(NiftyChat plugin) {
 		super(plugin, "realname");
+		this.setMaximumArgsLength(1);
 	}
 
 	@Override

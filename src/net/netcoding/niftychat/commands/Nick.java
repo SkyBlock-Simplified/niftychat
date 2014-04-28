@@ -27,131 +27,132 @@ public class Nick extends BukkitTabCommand {
 
 	public Nick(NiftyChat plugin) {
 		super(plugin, "nick");
+		this.setMaximumArgsLength(2);
 	}
 
 	@Override
 	public void onCommand(CommandSender sender, String alias, String[] args) throws Exception, Exception {
-		if ((isConsole(sender)) && args.length < 2)
-			this.getLog().error(sender, "The nickname command requires a player name when used by the console!");
-		else if (args.length >= 1 && args.length <= 2) {
-			String playerName = (args.length == 2 ? args[0] : sender.getName());
-			String nick = (args.length == 2 ? args[1] : args[0]);
-			String your = (sender.getName() == playerName ? ChatColor.GRAY + "You" : playerName);
-			String has = (sender.getName() == playerName ? "have" : "has");
-			String _nick = nick.toLowerCase();
-			boolean off = _nick.matches("^off|clear$");
-			boolean rev = _nick.matches("^revoke|disable$");
-			boolean ena = _nick.matches("^grant|allow|enable$");
-			MojangProfile profile;
+		if (isConsole(sender) && args.length < 2) {
+			this.getLog().error(sender, "You must pass a player name when changing the nickname of a player from console!");
+			return;
+		}
 
-			try {
-				profile = NiftyBukkit.getMojangRepository().searchByUsername(playerName)[0];
-			} catch (ProfileNotFoundException pnfe) {
-				this.getLog().error(sender, "Unable to locate the uuid of {{0}}!", playerName);
+		String playerName = (args.length == 2 ? args[0] : sender.getName());
+		String nick = (args.length == 2 ? args[1] : args[0]);
+		String your = (sender.getName() == playerName ? ChatColor.GRAY + "You" : playerName);
+		String has = (sender.getName() == playerName ? "have" : "has");
+		String _nick = nick.toLowerCase();
+		boolean off = _nick.matches("^off|clear$");
+		boolean rev = _nick.matches("^revoke|disable$");
+		boolean ena = _nick.matches("^grant|allow|enable$");
+		MojangProfile profile;
+
+		try {
+			profile = NiftyBukkit.getMojangRepository().searchByUsername(playerName)[0];
+		} catch (ProfileNotFoundException pnfe) {
+			this.getLog().error(sender, "Unable to locate the uuid of {{0}}!", playerName);
+			return;
+		}
+
+		if (off) {
+			if (!playerName.equalsIgnoreCase(sender.getName())) {
+				if (!this.hasPermissions(sender, "nick", "clear")) {
+					this.getLog().error(sender, "You do not have access to clear other players nicknames!");
+					return;
+				}
+			}
+
+			nick = null;
+		} else if (rev || ena) {
+			if (!this.hasPermissions(sender, "nick", "revoke")) {
+				this.getLog().error(sender, "You do not have access to grant/revoke players nicknames!");
+				return;
+			}
+		} else {
+			if (!playerName.equalsIgnoreCase(sender.getName())) {
+				if (!this.hasPermissions(sender, "nick", "other")) {
+					this.getLog().error(sender, "You do not have access to change other players nicknames!");
+					return;
+				}
+			}
+
+			String noColorNick  = RegexUtil.strip(nick, RegexUtil.REPLACE_ALL_PATTERN);
+			String strippedNick = RegexUtil.strip(noColorNick, RegexUtil.INVALID_NICKNAME_CHARZ);
+
+			if (strippedNick != noColorNick) {
+				this.getLog().error(sender, "Nicknames can only contain letters, numbers and underscores!");
 				return;
 			}
 
-			if (off) {
-				if (!playerName.equalsIgnoreCase(sender.getName())) {
-					if (!this.hasPermissions(sender, "nick", "clear")) {
-						this.getLog().error(sender, "You do not have access to clear other players nicknames!");
-						return;
-					}
-				}
+			if (!this.hasPermissions(sender, "nick", "length")) {
+				int minChars = 3;
+				int maxChars = 16;
 
-				nick = null;
-			} else if (rev || ena) {
-				if (!this.hasPermissions(sender, "nick", "revoke")) {
-					this.getLog().error(sender, "You do not have access to grant/revoke players nicknames!");
-					return;
-				}
-			} else {
-				if (!playerName.equalsIgnoreCase(sender.getName())) {
-					if (!this.hasPermissions(sender, "nick", "other")) {
-						this.getLog().error(sender, "You do not have access to change other players nicknames!");
-						return;
-					}
-				}
-
-				String noColorNick  = RegexUtil.strip(nick, RegexUtil.REPLACE_ALL_PATTERN);
-				String strippedNick = RegexUtil.strip(noColorNick, RegexUtil.INVALID_NICKNAME_CHARZ);
-
-				if (strippedNick != noColorNick) {
-					this.getLog().error(sender, "Nicknames can only contain letters, numbers and underscores!");
+				if (strippedNick.length() < minChars) {
+					this.getLog().error(sender, "Nicknames must contain at least {{0}} letters!", minChars);
 					return;
 				}
 
-				if (!this.hasPermissions(sender, "nick", "length")) {
-					int minChars = 3;
-					int maxChars = 16;
-
-					if (strippedNick.length() < minChars) {
-						this.getLog().error(sender, "Nicknames must contain at least {{0}} letters!", minChars);
-						return;
-					}
-
-					if (strippedNick.length() > maxChars) {
-						this.getLog().error(sender, "Nicknames can only be 16 characters long!", minChars);
-						return;
-					}
-				}
-
-				if (RegexUtil.replaceColor(nick, RegexUtil.REPLACE_COLOR_PATTERN) != nick) {
-					if (!this.hasPermissions(sender, false, "nick", "color")) {
-						this.getLog().error(sender, "You do not have access to use color in nicknames!");
-						return;
-					}
-				}
-
-				if (RegexUtil.replaceColor(nick, RegexUtil.REPLACE_MAGIC_PATTERN) != nick) {
-					if (!this.hasPermissions(sender, false, "nick", "magic")) {
-						this.getLog().error(sender, "You do not have access to use magic nicknames!");
-						return;
-					}
-				}
-
-				if (RegexUtil.replaceColor(nick, RegexUtil.REPLACE_FORMAT_PATTERN) != nick) {
-					if (!this.hasPermissions(sender, false, "nick", "format")) {
-						this.getLog().error(sender, "You do not have access to use formatting in nicknames!");
-						return;
-					}
-				}
-
-				boolean taken = Cache.MySQL.query(StringUtil.format("SELECT * FROM `{0}` WHERE LOWER(`ufnick`) = LOWER(?) AND `uuid` <> ?;", Config.USER_TABLE), new ResultCallback<Boolean>() {
-					@Override
-					public Boolean handle(ResultSet result) throws SQLException {
-						return result.next();
-					}
-				}, strippedNick, profile.getUniqueId());
-
-				if (taken) {
-					this.getLog().error(sender, "The nickname {{0}} is already taken!", nick);
+				if (strippedNick.length() > maxChars) {
+					this.getLog().error(sender, "Nicknames can only be 16 characters long!", minChars);
 					return;
 				}
 			}
 
-			if (rev) {
-				//User.disableNick(user);
-			} else if (ena) {
-				//User.enableNick(user);
-			} else {
-				try {
-					String _ufnick = null;
-					if (nick != null) _ufnick = RegexUtil.replaceColor(nick, RegexUtil.REPLACE_ALL_PATTERN);
-
-					if (Cache.MySQL.update(StringUtil.format("UPDATE `{0}` SET `nick` = ?, `ufnick` = ? WHERE `uuid` = ?;", Config.USER_TABLE), nick, _ufnick, profile.getUniqueId())) {
-						if (off)
-							this.getLog().message(sender, "{{0}} now {1} no nickname.", your, has);
-						else
-							this.getLog().message(sender, "{{0}} now {1} the nickname {{2}}.", your, has, RegexUtil.replaceColor(nick, RegexUtil.REPLACE_COLOR_PATTERN));
-					} else
-						this.getLog().error(sender, "Player {{0}} not found!", playerName);
-				} catch (Exception ex) {
-					this.getLog().error(sender, "Unable to set nickname {{0}} for {{1}}.", ex, nick, playerName);
+			if (RegexUtil.replaceColor(nick, RegexUtil.REPLACE_COLOR_PATTERN) != nick) {
+				if (!this.hasPermissions(sender, false, "nick", "color")) {
+					this.getLog().error(sender, "You do not have access to use color in nicknames!");
+					return;
 				}
 			}
-		} else
-			this.showUsage(sender);
+
+			if (RegexUtil.replaceColor(nick, RegexUtil.REPLACE_MAGIC_PATTERN) != nick) {
+				if (!this.hasPermissions(sender, false, "nick", "magic")) {
+					this.getLog().error(sender, "You do not have access to use magic nicknames!");
+					return;
+				}
+			}
+
+			if (RegexUtil.replaceColor(nick, RegexUtil.REPLACE_FORMAT_PATTERN) != nick) {
+				if (!this.hasPermissions(sender, false, "nick", "format")) {
+					this.getLog().error(sender, "You do not have access to use formatting in nicknames!");
+					return;
+				}
+			}
+
+			boolean taken = Cache.MySQL.query(StringUtil.format("SELECT * FROM `{0}` WHERE LOWER(`ufnick`) = LOWER(?) AND `uuid` <> ?;", Config.USER_TABLE), new ResultCallback<Boolean>() {
+				@Override
+				public Boolean handle(ResultSet result) throws SQLException {
+					return result.next();
+				}
+			}, strippedNick, profile.getUniqueId());
+
+			if (taken) {
+				this.getLog().error(sender, "The nickname {{0}} is already taken!", nick);
+				return;
+			}
+		}
+
+		if (rev) {
+			//User.disableNick(user);
+		} else if (ena) {
+			//User.enableNick(user);
+		} else {
+			try {
+				String _ufnick = null;
+				if (nick != null) _ufnick = RegexUtil.replaceColor(nick, RegexUtil.REPLACE_ALL_PATTERN);
+
+				if (Cache.MySQL.update(StringUtil.format("UPDATE `{0}` SET `nick` = ?, `ufnick` = ? WHERE `uuid` = ?;", Config.USER_TABLE), nick, _ufnick, profile.getUniqueId())) {
+					if (off)
+						this.getLog().message(sender, "{{0}} now {1} no nickname.", your, has);
+					else
+						this.getLog().message(sender, "{{0}} now {1} the nickname {{2}}.", your, has, RegexUtil.replaceColor(nick, RegexUtil.REPLACE_COLOR_PATTERN));
+				} else
+					this.getLog().error(sender, "Player {{0}} not found!", playerName);
+			} catch (Exception ex) {
+				this.getLog().error(sender, "Unable to set nickname {{0}} for {{1}}.", ex, nick, playerName);
+			}
+		}
 	}
 
 	@Override

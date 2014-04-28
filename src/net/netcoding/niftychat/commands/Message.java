@@ -60,80 +60,77 @@ public class Message extends BukkitCommand {
 
 	@Override
 	public void onCommand(CommandSender sender, String alias, String[] args) throws Exception {
-		if (args.length >= 1) {
-			Player player = (Player)sender;
-			String playerName = args[0];
-			MojangProfile profile;
-			boolean reply = alias.matches("^r(?:eply)?$");
-			String message = StringUtil.implode(" ", args, reply ? 0 : 1);
-			boolean sent = false;
-			MojangProfile senderprofile = NiftyBukkit.getMojangRepository().searchByExactPlayer(player);
-			UserChatData senderData = UserChatData.getCache(senderprofile.getUniqueId());
+		Player player = (Player)sender;
+		String playerName = args[0];
+		MojangProfile profile;
+		boolean reply = alias.matches("^r(?:eply)?$");
+		String message = StringUtil.implode(" ", args, reply ? 0 : 1);
+		boolean sent = false;
+		MojangProfile senderprofile = NiftyBukkit.getMojangRepository().searchByExactPlayer(player);
+		UserChatData senderData = UserChatData.getCache(senderprofile.getUniqueId());
 
-			if (reply) {
-				MojangProfile lastMessenger = senderData.getLastMessenger();
+		if (reply) {
+			MojangProfile lastMessenger = senderData.getLastMessenger();
 
-				if (lastMessenger != null) {
-					playerName = lastMessenger.getName();
-				} else {
-					this.getLog().error(sender, "You have no one to reply to!");
-					return;
-				}
+			if (lastMessenger != null) {
+				playerName = lastMessenger.getName();
 			} else {
-				if (args.length <= 1) {
-					this.showUsage(sender);
-					return;
-				}
-			}
-
-			if (Chat.check(this, player, message)) {
-				message = Chat.filter(this, player, "message", message);
-				message = Chat.format(this, player, "message", message);
-			} else
-				return;
-
-			if (isConsole(playerName)) {
-				this.getLog().error(sender, "You cannot message the console!");
+				this.getLog().error(sender, "You have no one to reply to!");
 				return;
 			}
-
-			try {
-				profile = NiftyBukkit.getMojangRepository().searchByUsername(playerName)[0];
-			} catch (ProfileNotFoundException pnfe) {
-				this.getLog().error(sender, "Unable to locate the uuid of {{0}}!", playerName);
+		} else {
+			if (args.length <= 1) {
+				this.showUsage(sender);
 				return;
 			}
+		}
 
-			if (!Cache.chatHelper.isOnline()) {
-				if (send(this, sender.getName(), profile.getName(), message, false)) {
-					UserChatData receiverData = UserChatData.getCache(profile.getUniqueId());
-
-					if (receiverData != null) {
-						this.getLog().message(receiverData.getPlayer(), message);
-						sent = true;
-					}
-				}
-			} else {
-				if (Cache.chatHelper.isPlayerOnline(profile)) {
-					BungeeServer server = Cache.chatHelper.getPlayerServer(profile);
-
-					if (!server.equals(Cache.chatHelper.getServer())) {
-						if (!this.hasPermissions(sender, "message", "global")) {
-							this.getLog().error(sender, "You cannot send messages across servers!");
-							return;
-						}
-					}
-
-					if (send(this, sender.getName(), profile.getName(), message, false)) {
-						Cache.chatHelper.forward(player, server.getName(), Config.CHAT_CHANNEL, "Message", sender.getName(), profile.getName(), message);
-						sent = true;
-					}
-				}
-			}
-
-			if (!sent) this.getLog().error(sender, "Unable to locate {{0}}!", profile.getName());
+		if (Chat.check(this, player, message)) {
+			message = Chat.filter(this, player, "message", message);
+			message = Chat.format(this, player, "message", message);
 		} else
-			this.showUsage(sender);
+			return;
+
+		if (isConsole(playerName)) {
+			this.getLog().error(sender, "You cannot message the console!");
+			return;
+		}
+
+		try {
+			profile = NiftyBukkit.getMojangRepository().searchByUsername(playerName)[0];
+		} catch (ProfileNotFoundException pnfe) {
+			this.getLog().error(sender, "Unable to locate the uuid of {{0}}!", playerName);
+			return;
+		}
+
+		if (!Cache.chatHelper.isOnline()) {
+			if (send(this, sender.getName(), profile.getName(), message, false)) {
+				UserChatData receiverData = UserChatData.getCache(profile.getUniqueId());
+
+				if (receiverData != null) {
+					this.getLog().message(receiverData.getPlayer(), message);
+					sent = true;
+				}
+			}
+		} else {
+			if (Cache.chatHelper.isPlayerOnline(profile)) {
+				BungeeServer server = Cache.chatHelper.getPlayerServer(profile);
+
+				if (!server.equals(Cache.chatHelper.getServer())) {
+					if (!this.hasPermissions(sender, "message", "global")) {
+						this.getLog().error(sender, "You cannot send messages across servers!");
+						return;
+					}
+				}
+
+				if (send(this, sender.getName(), profile.getName(), message, false)) {
+					Cache.chatHelper.forward(player, server.getName(), Config.CHAT_CHANNEL, "Message", sender.getName(), profile.getName(), message);
+					sent = true;
+				}
+			}
+		}
+
+		if (!sent) this.getLog().error(sender, "Unable to locate {{0}}!", profile.getName());
 	}
 
 }

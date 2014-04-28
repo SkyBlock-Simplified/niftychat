@@ -44,8 +44,8 @@ public class Message extends BukkitCommand {
 			}
 
 			if (senderData.getName().equalsIgnoreCase(receiverData.getName())) {
-				//helper.getLog().error(senderData.getPlayer(), "You cannot message yourself!");
-				//return false;
+				helper.getLog().error(senderData.getPlayer(), "You cannot message yourself!");
+				return false;
 			}
 		}
 

@@ -104,29 +104,32 @@ public class Message extends BukkitCommand {
 				return;
 			}
 
-			if (send(this, sender.getName(), profile.getName(), message, false)) {
-				if (!Cache.chatHelper.isOnline()) {
+			if (!Cache.chatHelper.isOnline()) {
+				if (send(this, sender.getName(), profile.getName(), message, false)) {
 					UserChatData receiverData = UserChatData.getCache(profile.getUniqueId());
 
 					if (receiverData != null) {
 						this.getLog().message(receiverData.getPlayer(), message);
 						sent = true;
 					}
-				} else {
-					try {
-						if (Cache.chatHelper.isPlayerOnline(profile)) {
-							BungeeServer server = Cache.chatHelper.getPlayerServer(profile);
-							Cache.chatHelper.forward(player, server.getName(), Config.CHAT_CHANNEL, "Message", sender.getName(), profile.getName(), message);
-							sent = true;
+				}
+			} else {
+				if (Cache.chatHelper.isPlayerOnline(profile)) {
+					BungeeServer server = Cache.chatHelper.getPlayerServer(profile);
+
+					if (!server.equals(Cache.chatHelper.getServer())) {
+						if (!this.hasPermissions(sender, "message", "global")) {
+							this.getLog().error(sender, "You cannot send messages across servers!");
+							return;
 						}
-					} catch (Exception ex) {
-						this.getLog().error(sender, ex.getMessage());
-						return;
+					}
+
+					if (send(this, sender.getName(), profile.getName(), message, false)) {
+						Cache.chatHelper.forward(player, server.getName(), Config.CHAT_CHANNEL, "Message", sender.getName(), profile.getName(), message);
+						sent = true;
 					}
 				}
-
-			} else
-				sent = false;
+			}
 
 			if (!sent) this.getLog().error(sender, "Unable to locate {{0}}!", profile.getName());
 		} else

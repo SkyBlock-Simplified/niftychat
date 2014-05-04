@@ -22,6 +22,8 @@ public class Message extends BukkitCommand {
 	public Message(JavaPlugin plugin) {
 		super(plugin, "message");
 		this.setPlayerOnly();
+		this.editUsage(0, "reply", "[message]");
+		this.editUsage(0, "r", "[message]");
 	}
 
 	public static boolean send(BukkitHelper helper, String senderName, String receiverName, String message, boolean isReceiving) {
@@ -130,7 +132,7 @@ public class Message extends BukkitCommand {
 			}
 		}
 
-		if (!sent) this.getLog().error(sender, "Unable to locate {{0}}!", profile.getName());
+		if (!sent && !sender.getName().equals(profile.getName())) this.getLog().error(sender, "Unable to locate {{0}}!", profile.getName());
 	}
 
 }

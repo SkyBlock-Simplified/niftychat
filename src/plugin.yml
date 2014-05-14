@@ -31,7 +31,7 @@ commands:
   vanish:
     description: Vanish from other players
     usage: /<command> <player> [server]
-    aliases: [unvanish, globalvanish, globalunvanish, gvanish, gunvanish, gv, guv, v, uv]
+    aliases: [unvanish, globalvanish, globalunvanish, gvanish, gunvanish, gv, gunv, v, unv]
 
 permissions:
   niftychat.*:

@@ -28,6 +28,10 @@ commands:
     description: Find a players realname by nickname
     usage: /<command> <nick>
     aliases: rn
+  socialspy:
+    description: Spy on private messages from players
+    usage: /<command> <player> [server]
+    aliases: [spy, ss]
   vanish:
     description: Vanish from other players
     usage: /<command> <player> [server]
@@ -108,7 +112,7 @@ permissions:
       niftychat.mute:
         description: Allows you to mute players
       niftychat.nick.*:
-        description: Allows you to access all nicknames features and commands
+        description: Allows you to access all nicknames features
         children:
           niftychat.nick:
             description: Allows you to set your nickname
@@ -126,3 +130,19 @@ permissions:
             description: Allows you to set nicknames with formatting
       niftychat.realname:
         description: Allows you to find a players realname by nickname
+      niftychat.socialspy.*:
+        description: Allows you to access all socialspy features
+        children:
+          niftychat.socialspy:
+            description: Allows you to run the socialspy command
+          niftychat.socialspy.global:
+            description: Allows you to globally spy on players private messages
+      niftychat.vanish.*:
+        description: Allows you to access all vanish features
+        children:
+          niftychat.vanish:
+            description: Allows you to run the vanish command
+          niftychat.vanish.global:
+            description: Allows you to vanish from all servers
+          niftychat.vanish.others:
+            description: Allows you to vanish other players

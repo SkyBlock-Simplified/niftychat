@@ -54,7 +54,6 @@ public class NiftyChat extends BukkitPlugin {
 		new Vanish(this);
 
 		this.getLog().console("Registering Listeners");
-		//Cache.ghosts = new GhostBusters(this);
 		new Chat(this);
 		new Disconnect(this);
 		new Login(this);

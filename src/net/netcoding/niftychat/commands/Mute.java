@@ -12,6 +12,7 @@ import net.netcoding.niftybukkit.util.StringUtil;
 import net.netcoding.niftybukkit.util.TimeUtil;
 import net.netcoding.niftychat.NiftyChat;
 import net.netcoding.niftychat.cache.Cache;
+import net.netcoding.niftychat.cache.Config;
 import net.netcoding.niftychat.cache.UserChatData;
 import net.netcoding.niftychat.cache.UserFlagData;
 
@@ -69,7 +70,12 @@ public class Mute extends BukkitCommand {
 
 		UserChatData userData = UserChatData.getCache(profile.getUniqueId());
 		userData = userData == null ? new UserChatData(this.getPlugin(), profile) : userData;
-		server = userData.resetNonGlobalFlagData("muted", alias, server);
+
+		if (Config.isGlobalCommand(alias, server)) {
+			server = "*";
+			userData.resetNonGlobalFlagData("muted");
+		}
+
 		boolean isMuted = userData.getFlagData("muted").getValue();
 		if (alias.matches("^g(lobal)?un[\\w]+")) isMuted = true;
 		if (isMuted) expires = 0;

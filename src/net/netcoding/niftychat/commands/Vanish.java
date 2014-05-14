@@ -6,6 +6,7 @@ import net.netcoding.niftybukkit.mojang.MojangProfile;
 import net.netcoding.niftybukkit.mojang.exceptions.ProfileNotFoundException;
 import net.netcoding.niftybukkit.util.StringUtil;
 import net.netcoding.niftychat.cache.Cache;
+import net.netcoding.niftychat.cache.Config;
 import net.netcoding.niftychat.cache.UserChatData;
 
 import org.bukkit.ChatColor;
@@ -26,7 +27,7 @@ public class Vanish extends BukkitCommand {
 		String server = "*";
 		String playerName = args.length == 0 ? sender.getName() : args[0];
 
-		if (isConsole(sender) && args.length != 1) {
+		if (isConsole(sender) && args.length == 0) {
 			this.getLog().error(sender, "You must provide a player name when vanishing a player from console!");
 			return;
 		}
@@ -56,7 +57,12 @@ public class Vanish extends BukkitCommand {
 
 		UserChatData userData = UserChatData.getCache(profile.getUniqueId());
 		userData = userData == null ? new UserChatData(this.getPlugin(), profile) : userData;
-		server = userData.resetNonGlobalFlagData("vanished", alias, server);
+
+		if (Config.isGlobalCommand(alias, server)) {
+			server = "*";
+			userData.resetNonGlobalFlagData("vanished");
+		}
+
 		boolean isVanished = userData.getFlagData("vanished").getValue();
 		if (alias.matches("^g(lobal)?un[\\w]+")) isVanished = true;
 		userData.updateFlagData("vanished", isVanished, server, 0);

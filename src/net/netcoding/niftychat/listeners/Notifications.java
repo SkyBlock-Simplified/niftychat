@@ -32,7 +32,7 @@ public class Notifications implements DatabaseListener {
 						if (result.next()) {
 							UserChatData userData = UserChatData.getCache(UUID.fromString(result.getString("uuid")));
 
-							if (userData != null) {
+							if (userData.getPlayer() != null) {
 								userData.updateDisplayName();
 								userData.updateTabListName();
 							}
@@ -122,6 +122,7 @@ public class Notifications implements DatabaseListener {
 								flagMatch.setServer(server);
 								flagMatch.setSubmitted(_submitted);
 								flagMatch.setValue(result.getBoolean("value"));
+								userData.applyFlagData(flag, false);
 							}
 						}
 

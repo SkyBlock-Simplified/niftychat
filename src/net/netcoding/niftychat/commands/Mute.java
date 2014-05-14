@@ -77,7 +77,7 @@ public class Mute extends BukkitCommand {
 		String serverMsg = server.equals("*") ? "" : StringUtil.format(" in {{0}}", server);
 		String expireMsg = (!isMuted && expires != 0) ? StringUtil.format(" until {{0}}", EXPIRE_FORMAT.format(new Date(expires))) : "";
 		String receiveMsg = "You are {{0}}{1}muted{2}{3}.";
-		String sendMsg = "{{0}} {1}{2}muted{3}{4}.";
+		String sendMsg = "{{0}} is {{1}}{2}muted{3}{4}.";
 
 		if (!sender.getName().equalsIgnoreCase(profile.getName()))
 			this.getLog().message(sender, sendMsg, profile.getName(), (!server.equals("*") ? "" : "globally "), (!isMuted ? "" : "un"), serverMsg, expireMsg);

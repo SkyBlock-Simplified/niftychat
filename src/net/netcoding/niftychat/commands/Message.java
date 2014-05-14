@@ -40,7 +40,7 @@ public class Message extends BukkitCommand {
 		if (isReceiving)
 			sendHere = receiverData;
 		else {
-			if (senderData.isMuted() && !helper.hasPermissions(senderData.getPlayer(), "mute", "roar")) {
+			if (senderData.getFlagData("muted").getValue() && !helper.hasPermissions(senderData.getPlayer(), "mute", "roar")) {
 				Mute.sendMutedError(helper.getLog(), senderData.getPlayer(), senderData);
 				return false;
 			}

@@ -31,6 +31,7 @@ public class Move extends BukkitListener {
 		if (userData != null) {
 			userData.updateDisplayName();
 			userData.updateTabListName();
+			userData.applyFlagData("vanished", true);
 		}
 	}
 

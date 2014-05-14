@@ -53,4 +53,8 @@ public class Config extends net.netcoding.niftybukkit.yaml.Config {
 		return this.schema;
 	}
 
+	public static boolean isGlobalCommand(String alias, String server) {
+		return alias.matches("^g(lobal)?(un)?[\\w]+") || server.matches("^global|all|\\*$");
+	}
+
 }

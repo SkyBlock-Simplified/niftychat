@@ -74,7 +74,7 @@ public class Mute extends BukkitCommand {
 		if (alias.matches("^g(lobal)?un[\\w]+")) isMuted = true;
 		if (isMuted) expires = 0;
 		userData.updateFlagData("muted", isMuted, server, expires);
-		String serverMsg = server.equals("*") ? "" : StringUtil.format(" in {{0}}", server);
+		String serverMsg = server.equals("*") ? "" : StringUtil.format(" in the {{0}} server", server);
 		String expireMsg = (!isMuted && expires != 0) ? StringUtil.format(" until {{0}}", EXPIRE_FORMAT.format(new Date(expires))) : "";
 		String receiveMsg = "You are {{0}}{1}muted{2}{3}.";
 		String sendMsg = "{{0}} is {{1}}{2}muted{3}{4}.";

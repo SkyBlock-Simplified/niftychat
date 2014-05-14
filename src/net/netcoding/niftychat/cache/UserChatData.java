@@ -250,7 +250,11 @@ public class UserChatData extends BukkitHelper {
 	}
 
 	public boolean resetNonGlobalFlagData(String flag) throws SQLException {
-		return Cache.MySQL.update(StringUtil.format("DELETE FROM `{0}` WHERE `uuid` = ? AND `flag` = ? AND `server` <> ?;", Config.USER_FLAGS_TABLE), this.getUniqueId(), flag, "*");
+		return this.resetFlagData(flag, "*");
+	}
+
+	public boolean resetFlagData(String flag, String notServer) throws SQLException {
+		return Cache.MySQL.update(StringUtil.format("DELETE FROM `{0}` WHERE `uuid` = ? AND `flag` = ? AND `server` <> ?;", Config.USER_FLAGS_TABLE), this.getUniqueId(), flag, notServer);
 	}
 
 	public void setLastMessenger(MojangProfile profile) {

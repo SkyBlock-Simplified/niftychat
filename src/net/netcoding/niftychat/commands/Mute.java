@@ -71,13 +71,13 @@ public class Mute extends BukkitCommand {
 		userData = userData == null ? new UserChatData(this.getPlugin(), profile) : userData;
 		server = userData.resetNonGlobalFlagData("muted", alias, server);
 		boolean isMuted = userData.getFlagData("muted").getValue();
-		if (alias.matches("^unmute|globalunmute|gunmute$")) isMuted = true;
+		if (alias.matches("^g(lobal)?un[\\w]+")) isMuted = true;
 		if (isMuted) expires = 0;
 		userData.updateFlagData("muted", isMuted, server, expires);
 		String serverMsg = server.equals("*") ? "" : StringUtil.format(" in {{0}}", server);
 		String expireMsg = (!isMuted && expires != 0) ? StringUtil.format(" until {{0}}", EXPIRE_FORMAT.format(new Date(expires))) : "";
 		String receiveMsg = "You are {{0}}{1}muted{2}{3}.";
-		String sendMsg = "{{0}} {{1}}{2}muted{3}{4}.";
+		String sendMsg = "{{0}} {1}{2}muted{3}{4}.";
 
 		if (!sender.getName().equalsIgnoreCase(profile.getName()))
 			this.getLog().message(sender, sendMsg, profile.getName(), (!server.equals("*") ? "" : "globally "), (!isMuted ? "" : "un"), serverMsg, expireMsg);

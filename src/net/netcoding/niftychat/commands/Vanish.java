@@ -53,11 +53,11 @@ public class Vanish extends BukkitCommand {
 		userData = userData == null ? new UserChatData(this.getPlugin(), profile) : userData;
 		server = userData.resetNonGlobalFlagData("vanished", alias, server);
 		boolean isVanished = userData.getFlagData("vanished").getValue();
-		if (alias.matches("^globalunvanish|gunvanish|unvanish$")) isVanished = true;
+		if (alias.matches("^g(lobal)?(un)?[\\w]+")) isVanished = true;
 		userData.updateFlagData("vanished", isVanished, server, 0);
 		String serverMsg = server.equals("*") ? "" : StringUtil.format(" in {{0}}", server);
 		String receiveMsg = "You are {{0}}{1}vanished{2}.";
-		String sendMsg = "{{0}} {{1}}{2}vanished{3}.";
+		String sendMsg = "{{0}} {1}{2}vanished{3}.";
 
 		if (!sender.getName().equalsIgnoreCase(profile.getName()))
 			this.getLog().message(sender, sendMsg, profile.getName(), (!server.equals("*") ? "" : "globally "), (!isVanished ? "" : "un"), serverMsg);

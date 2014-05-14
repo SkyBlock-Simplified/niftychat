@@ -250,10 +250,9 @@ public class UserChatData extends BukkitHelper {
 	}
 
 	public String resetNonGlobalFlagData(String flag, String alias, String server) throws SQLException {
-		System.out.println("alias is: " + alias + " - global: " + (alias.matches("^g(lobal)?(un)?[\\w]+") ? "yes" : "no"));
 		if (alias.matches("^g(lobal)?(un)?[\\w]+") || server.matches("^global|all|\\*$")) {
 			server = "*";
-			Cache.MySQL.update(StringUtil.format("DELETE FROM `{0}` WHERE `uuid` = ? AND `flag` = ? AND `server` <> ''*'';", Config.USER_FLAGS_TABLE), this.getUniqueId(), flag);
+			Cache.MySQL.update(StringUtil.format("DELETE FROM `{0}` WHERE `uuid` = ? AND `flag` = ? AND `server` <> ?;", Config.USER_FLAGS_TABLE), this.getUniqueId(), flag, "*");
 		}
 
 		return server;

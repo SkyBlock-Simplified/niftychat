@@ -44,7 +44,7 @@ public class Chat extends BukkitListener {
 			return false;
 		}
 
-		if (userData.isMuted() && !helper.hasPermissions(player, "mute", "roar")) {
+		if (userData.getFlagData("muted").getValue() && !helper.hasPermissions(player, "mute", "roar")) {
 			Mute.sendMutedError(helper.getLog(), player, userData);
 			return false;
 		}

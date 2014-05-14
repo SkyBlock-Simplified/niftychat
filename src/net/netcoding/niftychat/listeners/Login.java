@@ -41,12 +41,11 @@ public class Login extends BukkitListener {
 
 			if (userData.hasPermissions("chat", "bypass", "move"))
 				userData.setMoved();
+
+			userData.applyFlagData("vanished", true);
 		} catch (Exception ex) {
 			this.getLog().console(ex);
 		}
-
-		//if (this.hasPermissions(player, "vanish", "see"))
-		//	Cache.ghosts.add(player);
 	}
 
 }

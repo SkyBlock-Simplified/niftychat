@@ -88,7 +88,11 @@ public class Notifications implements DatabaseListener {
 			if (!event.equals(TriggerEvent.INSERT)) {
 				Map<String, Object> data = databaseNotification.getDeletedData();
 				UserChatData userData = UserChatData.getCache(UUID.fromString((String)data.get("uuid")));
-				if (userData != null) userData.reloadFlagData();
+
+				if (userData != null) {
+					userData.reloadFlagData();
+					userData.applyFlagData((String)data.get("flag"), false);
+				}
 			}
 
 			if (!event.equals(TriggerEvent.DELETE)) {

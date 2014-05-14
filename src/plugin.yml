@@ -28,6 +28,10 @@ commands:
     description: Find a players realname by nickname
     usage: /<command> <nick>
     aliases: rn
+  vanish:
+    description: Vanish from other players
+    usage: /<command> <player> [server]
+    aliases: [unvanish, globalvanish, globalunvanish, gvanish, gunvanish, gv, guv, v, uv]
 
 permissions:
   niftychat.*:

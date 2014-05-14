@@ -12,7 +12,6 @@ import net.netcoding.niftybukkit.util.StringUtil;
 import net.netcoding.niftybukkit.util.TimeUtil;
 import net.netcoding.niftychat.NiftyChat;
 import net.netcoding.niftychat.cache.Cache;
-import net.netcoding.niftychat.cache.Config;
 import net.netcoding.niftychat.cache.UserChatData;
 import net.netcoding.niftychat.cache.UserFlagData;
 
@@ -22,8 +21,6 @@ import org.bukkit.command.CommandSender;
 public class Mute extends BukkitCommand {
 
 	public static final transient SimpleDateFormat EXPIRE_FORMAT = new SimpleDateFormat("MMM dd, yyyy h:mm:ss a z");
-
-	public static final transient SimpleDateFormat SQL_FORMAT = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
 
 	public Mute(NiftyChat plugin) {
 		super(plugin, "mute");
@@ -49,6 +46,15 @@ public class Mute extends BukkitCommand {
 			return;
 		}
 
+		if (Cache.chatHelper.isOnline()) {
+			server = Cache.chatHelper.getServerName();
+
+			if ((args.length == 2 && expires == 0) || args.length == 3) {
+				if (Cache.chatHelper.getServer(args[args.length - 1]) != null)
+					server = args[args.length - 1];
+			}
+		}
+
 		try {
 			profile = NiftyBukkit.getMojangRepository().searchByUsername(playerName)[0];
 		} catch (ProfileNotFoundException pnfe) {
@@ -61,32 +67,17 @@ public class Mute extends BukkitCommand {
 			return;
 		}
 
-		if (Cache.chatHelper.isOnline()) {
-			server = Cache.chatHelper.getServerName();
-
-			if ((args.length == 2 && expires == 0) || args.length == 3) {
-				if (Cache.chatHelper.getServer(args[args.length - 1]) != null)
-					server = args[args.length - 1];
-			}
-		}
-
-		if (alias.matches("^globalmute|globalunmute|gmute|gunmute$") || server.matches("^global|all|\\*$")) {
-			server = "*";
-			Cache.MySQL.update(StringUtil.format("DELETE FROM `{0}` WHERE `uuid` = ? AND `flag` = ? AND `server` <> ?;", Config.USER_FLAGS_TABLE), profile.getUniqueId(), "muted", "*");
-		}
-
 		UserChatData userData = UserChatData.getCache(profile.getUniqueId());
 		userData = userData == null ? new UserChatData(this.getPlugin(), profile) : userData;
-		boolean isMuted = userData.isMuted();
+		server = userData.resetNonGlobalFlagData("muted", alias, server);
+		boolean isMuted = userData.getFlagData("muted").getValue();
 		if (alias.matches("^unmute|globalunmute|gunmute$")) isMuted = true;
 		if (isMuted) expires = 0;
-		if (expires != 0) expires += System.currentTimeMillis();
-		String sqlFormat = SQL_FORMAT.format(new Date(expires));
-		Cache.MySQL.update(StringUtil.format("INSERT INTO `{0}` (`uuid`, `flag`, `value`, `server`, `_expires`) VALUES (?, ?, ?, ?, ?) ON DUPLICATE KEY UPDATE `value` = ?, `_expires` = ?;", Config.USER_FLAGS_TABLE), profile.getUniqueId(), "muted", !isMuted, server, (expires == 0 ? null : sqlFormat), !isMuted, (expires == 0 ? null : sqlFormat));
+		userData.updateFlagData("muted", isMuted, server, expires);
 		String serverMsg = server.equals("*") ? "" : StringUtil.format(" in {{0}}", server);
 		String expireMsg = (!isMuted && expires != 0) ? StringUtil.format(" until {{0}}", EXPIRE_FORMAT.format(new Date(expires))) : "";
 		String receiveMsg = "You are {{0}}{1}muted{2}{3}.";
-		String sendMsg = "{{0}} {{1}}{2}muted{3}{4}";
+		String sendMsg = "{{0}} {{1}}{2}muted{3}{4}.";
 
 		if (!sender.getName().equalsIgnoreCase(profile.getName()))
 			this.getLog().message(sender, sendMsg, profile.getName(), (!server.equals("*") ? "" : "globally "), (!isMuted ? "" : "un"), serverMsg, expireMsg);

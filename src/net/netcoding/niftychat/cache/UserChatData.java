@@ -4,6 +4,7 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Timestamp;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 import java.util.UUID;
 
@@ -14,6 +15,7 @@ import net.netcoding.niftybukkit.minecraft.BungeeHelper;
 import net.netcoding.niftybukkit.mojang.MojangProfile;
 import net.netcoding.niftybukkit.util.RegexUtil;
 import net.netcoding.niftybukkit.util.StringUtil;
+import net.netcoding.niftybukkit.util.TimeUtil;
 import net.netcoding.niftybukkit.util.concurrent.ConcurrentSet;
 import net.netcoding.niftyranks.cache.UserRankData;
 
@@ -48,12 +50,45 @@ public class UserChatData extends BukkitHelper {
 		this.flagData.add(flagData);
 	}
 
+	public void applyFlagData(final String flag, final boolean login) {
+		if (this.getPlayer() == null) return;
+		final boolean flagValue = this.getFlagData(flag).getValue();
+		final UUID thisUniqueId = this.getUniqueId();
+
+		if ("vanished".equals(flag)) {
+			this.getPlugin().getServer().getScheduler().runTask(this.getPlugin(), new Runnable() {
+				@Override
+				public void run() {
+					for (UserChatData userData : getCache()) {
+						if (!userData.getUniqueId().equals(thisUniqueId)) {
+							if (flagValue && !userData.hasPermissions("vanish", "see"))
+								userData.getPlayer().hidePlayer(getPlayer());
+							else
+								userData.getPlayer().showPlayer(getPlayer());
+						}
+					}
+
+					if (login) {
+						for (UserChatData userData : getCache()) {
+							if (!userData.getUniqueId().equals(thisUniqueId)) {
+								if (userData.getFlagData(flag).getValue() && !hasPermissions("vanish", "see"))
+									getPlayer().hidePlayer(userData.getPlayer());
+								else
+									getPlayer().showPlayer(userData.getPlayer());
+							}
+						}
+					}
+				}
+			});
+		}
+	}
+
 	public static ConcurrentSet<UserChatData> getCache() {
 		return cache;
 	}
 
 	public static UserChatData getCache(UUID uuid) {
-		for (UserChatData data : cache) {
+		for (UserChatData data : getCache()) {
 			if (uuid.equals(data.getUniqueId()))
 				return data;
 		}
@@ -69,7 +104,7 @@ public class UserChatData extends BukkitHelper {
 		UserChatData userData = getCache(this.getUniqueId());
 
 		if (!fetch && userData != null) {
-			if (userData.getPlayer() != null)
+			if (userData != null)
 				return userData.getPlayer().getDisplayName();
 		}
 
@@ -179,14 +214,6 @@ public class UserChatData extends BukkitHelper {
 		return false;
 	}
 
-	public boolean isMuted() {
-		return this.getFlagData("muted").getValue();
-	}
-
-	public boolean isVanished() {
-		return this.getFlagData("vanished").getValue();
-	}
-
 	public static void removeCache(UUID uuid) {
 		for (UserChatData data : cache) {
 			if (data.getUniqueId().equals(uuid))
@@ -222,6 +249,16 @@ public class UserChatData extends BukkitHelper {
 		}
 	}
 
+	public String resetNonGlobalFlagData(String flag, String alias, String server) throws SQLException {
+		System.out.println("alias is: " + alias + " - global: " + (alias.matches("^g(lobal)?(un)?[\\w]+") ? "yes" : "no"));
+		if (alias.matches("^g(lobal)?(un)?[\\w]+") || server.matches("^global|all|\\*$")) {
+			server = "*";
+			Cache.MySQL.update(StringUtil.format("DELETE FROM `{0}` WHERE `uuid` = ? AND `flag` = ? AND `server` <> ''*'';", Config.USER_FLAGS_TABLE), this.getUniqueId(), flag);
+		}
+
+		return server;
+	}
+
 	public void setLastMessenger(MojangProfile profile) {
 		this.lastMessenger = profile;
 	}
@@ -238,6 +275,12 @@ public class UserChatData extends BukkitHelper {
 		String displayName = this.getDisplayName(true);
 		this.getPlayer().setDisplayName(displayName);
 		this.getPlayer().setCustomName(displayName);
+	}
+
+	public boolean updateFlagData(String flag, boolean value, String server, long expires) throws SQLException {
+		if (expires > 0) expires += System.currentTimeMillis();
+		String sqlFormat = expires > 0 ? TimeUtil.SQL_FORMAT.format(new Date(expires)) : null;
+		return Cache.MySQL.update(StringUtil.format("INSERT INTO `{0}` (`uuid`, `flag`, `value`, `server`, `_expires`) VALUES (?, ?, ?, ?, ?) ON DUPLICATE KEY UPDATE `value` = ?, `_expires` = ?;", Config.USER_FLAGS_TABLE), this.getUniqueId(), flag, !value, server, sqlFormat, !value, sqlFormat);
 	}
 
 	public void updateTabListName() {

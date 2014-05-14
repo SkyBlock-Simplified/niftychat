@@ -49,6 +49,11 @@ public class Vanish extends BukkitCommand {
 			return;
 		}
 
+		if (!sender.getName().equals(profile.getName()) && !this.hasPermissions(sender, "vanish", "others")) {
+			this.getLog().error(sender, "You are not allowed to vanish other players!");
+			return;
+		}
+
 		UserChatData userData = UserChatData.getCache(profile.getUniqueId());
 		userData = userData == null ? new UserChatData(this.getPlugin(), profile) : userData;
 		server = userData.resetNonGlobalFlagData("vanished", alias, server);

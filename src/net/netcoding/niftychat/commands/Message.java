@@ -34,19 +34,18 @@ public class Message extends BukkitCommand {
 		MojangProfile receiverProfile = NiftyBukkit.getMojangRepository().searchByExactUsername(receiverName);
 		UserChatData receiverData = UserChatData.getCache(receiverProfile.getUniqueId());
 		receiverData = receiverData == null ? new UserChatData(helper.getPlugin(), receiverProfile) : receiverData;
-
 		UserChatData sendHere = senderData;
+
+		if (receiverData.getFlagData("vanished").getValue() && !senderData.hasPermissions("vanish", "interact")) {
+			helper.getLog().error(senderData.getPlayer(), "Unable to locate {{0}}!", receiverData.getName());
+			return false;
+		}
 
 		if (isReceiving)
 			sendHere = receiverData;
 		else {
 			if (senderData.getFlagData("muted").getValue() && !helper.hasPermissions(senderData.getPlayer(), "mute", "roar")) {
 				Mute.sendMutedError(helper.getLog(), senderData.getPlayer(), senderData);
-				return false;
-			}
-
-			if (senderData.getName().equalsIgnoreCase(receiverData.getName())) {
-				helper.getLog().error(senderData.getPlayer(), "You cannot message yourself!");
 				return false;
 			}
 		}
@@ -57,6 +56,8 @@ public class Message extends BukkitCommand {
 			return true;
 		}
 
+
+		helper.getLog().error(senderData.getPlayer(), "Unable to locate {{0}}!", receiverData.getName());
 		return false;
 	}
 
@@ -67,7 +68,6 @@ public class Message extends BukkitCommand {
 		MojangProfile profile;
 		boolean reply = alias.matches("^r(?:eply)?$");
 		String message = StringUtil.implode(" ", args, reply ? 0 : 1);
-		boolean sent = false;
 		MojangProfile senderprofile = NiftyBukkit.getMojangRepository().searchByExactPlayer(player);
 		UserChatData senderData = UserChatData.getCache(senderprofile.getUniqueId());
 
@@ -105,14 +105,15 @@ public class Message extends BukkitCommand {
 			return;
 		}
 
+		if (sender.getName().equals(profile.getName())) {
+			this.getLog().error(sender, "You cannot message yourself!");
+			return;
+		}
+
 		if (!Cache.chatHelper.isOnline()) {
 			if (send(this, sender.getName(), profile.getName(), message, false)) {
 				UserChatData receiverData = UserChatData.getCache(profile.getUniqueId());
-
-				if (receiverData != null) {
-					this.getLog().message(receiverData.getPlayer(), message);
-					sent = true;
-				}
+				this.getLog().message(receiverData.getPlayer(), message);
 			}
 		} else {
 			if (Cache.chatHelper.isPlayerOnline(profile)) {
@@ -125,14 +126,10 @@ public class Message extends BukkitCommand {
 					}
 				}
 
-				if (send(this, sender.getName(), profile.getName(), message, false)) {
+				if (send(this, sender.getName(), profile.getName(), message, false))
 					Cache.chatHelper.forward(player, server.getName(), Config.CHAT_CHANNEL, "Message", sender.getName(), profile.getName(), message);
-					sent = true;
-				}
 			}
 		}
-
-		if (!sent && !sender.getName().equals(profile.getName())) this.getLog().error(sender, "Unable to locate {{0}}!", profile.getName());
 	}
 
 }

@@ -61,7 +61,7 @@ public class SocialSpy extends BukkitCommand {
 
 		if (Config.isGlobalCommand(alias, server)) userData.resetNonGlobalFlagData("spying");
 		boolean isSpying = userData.getFlagData("spying").getValue();
-		if (alias.matches("^g(lobal)?un[\\w]+")) isSpying = true;
+		if (alias.matches("^g?(lobal)?un[\\w]+")) isSpying = true;
 		userData.updateFlagData("spying", isSpying, server, 0);
 		String serverMsg = server.equals("*") ? "" : StringUtil.format(" in the {{0}} server", server);
 		String receiveMsg = "You are {{0}}{1}spying{2}.";

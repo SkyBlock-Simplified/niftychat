@@ -64,7 +64,7 @@ public class Vanish extends BukkitCommand {
 		}
 
 		boolean isVanished = userData.getFlagData("vanished").getValue();
-		if (alias.matches("^g(lobal)?un[\\w]+")) isVanished = true;
+		if (alias.matches("^g?(lobal)?un[\\w]+")) isVanished = true;
 		userData.updateFlagData("vanished", isVanished, server, 0);
 		String serverMsg = server.equals("*") ? "" : StringUtil.format(" in the {{0}} server", server);
 		String receiveMsg = "You are {{0}}{1}vanished{2}.";

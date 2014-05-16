@@ -183,7 +183,7 @@ public class UserChatData extends BukkitHelper {
 	}
 
 	public Player getPlayer() {
-		return BukkitHelper.findPlayer(this.getName());
+		return findPlayer(this.getName());
 	}
 
 	public UserRankData getRankData() {

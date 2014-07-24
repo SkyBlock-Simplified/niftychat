@@ -43,6 +43,11 @@ public class Vanish extends BukkitCommand {
 			}
 		}
 
+		if (isConsole(playerName)) {
+			this.getLog().error(sender, "You cannot vanish the console!");
+			return;
+		}
+
 		try {
 			profile = NiftyBukkit.getMojangRepository().searchByUsername(playerName)[0];
 		} catch (ProfileNotFoundException pnfe) {

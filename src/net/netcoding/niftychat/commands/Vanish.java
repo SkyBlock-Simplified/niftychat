@@ -5,7 +5,6 @@ import net.netcoding.niftybukkit.minecraft.BukkitCommand;
 import net.netcoding.niftybukkit.mojang.MojangProfile;
 import net.netcoding.niftybukkit.mojang.exceptions.ProfileNotFoundException;
 import net.netcoding.niftybukkit.util.StringUtil;
-import net.netcoding.niftychat.cache.Cache;
 import net.netcoding.niftychat.cache.Config;
 import net.netcoding.niftychat.cache.UserChatData;
 
@@ -32,11 +31,11 @@ public class Vanish extends BukkitCommand {
 			return;
 		}
 
-		if (Cache.chatHelper.isOnline()) {
-			server = Cache.chatHelper.getServerName();
+		if (NiftyBukkit.getBungeeHelper().isOnline()) {
+			server = NiftyBukkit.getBungeeHelper().getServerName();
 
 			if (args.length > 0) {
-				if (Cache.chatHelper.getServer(args[args.length - 1]) != null) {
+				if (NiftyBukkit.getBungeeHelper().getServer(args[args.length - 1]) != null) {
 					server = args[args.length - 1];
 					if (args.length == 1) playerName = sender.getName();
 				}
@@ -78,12 +77,12 @@ public class Vanish extends BukkitCommand {
 		if (!sender.getName().equalsIgnoreCase(profile.getName()))
 			this.getLog().message(sender, sendMsg, profile.getName(), (!server.equals("*") ? "" : "globally "), (!isVanished ? "" : "un"), serverMsg);
 
-		if (!Cache.chatHelper.isOnline()) {
+		if (!NiftyBukkit.getBungeeHelper().isOnline()) {
 			if (userData.getPlayer() != null)
 				this.getLog().message(userData.getPlayer(), receiveMsg, "", (!isVanished ? "" : "un"), "");
 		} else {
-			if (isConsole(sender) && Cache.chatHelper.getServer().getPlayerCount() == 0) return;
-			Cache.chatHelper.message(profile, ChatColor.GRAY + StringUtil.format(receiveMsg, (!server.equals("*") ? "" : "globally "), (!isVanished ? "" : "un"), serverMsg));
+			if (isConsole(sender) && NiftyBukkit.getBungeeHelper().getServer().getPlayerCount() == 0) return;
+			NiftyBukkit.getBungeeHelper().message(profile, ChatColor.GRAY + StringUtil.format(receiveMsg, (!server.equals("*") ? "" : "globally "), (!isVanished ? "" : "un"), serverMsg));
 		}
 	}
 

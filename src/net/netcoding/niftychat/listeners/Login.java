@@ -22,7 +22,7 @@ public class Login extends BukkitListener {
 
 	@EventHandler
 	public void onBungeeLoaded(BungeeLoadedEvent event) {
-		/*Cache.chatHelper = */new BungeeHelper(this.getPlugin(), new MessageReceived(this.getPlugin()), true);
+		new BungeeHelper(this.getPlugin(), new MessageReceived(this.getPlugin()), true);
 		new BungeeHelper(this.getPlugin(), new SpyMessageReceived(this.getPlugin()), true);
 	}
 
@@ -45,9 +45,8 @@ public class Login extends BukkitListener {
 
 			if (userData.hasPermissions("vanish"))
 				userData.applyFlagData("vanished", true);
-			else {
+			else
 				userData.resetFlagData("vanished", "");
-			}
 		} catch (Exception ex) {
 			this.getLog().console(ex);
 		}

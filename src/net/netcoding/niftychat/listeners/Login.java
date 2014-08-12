@@ -22,7 +22,8 @@ public class Login extends BukkitListener {
 
 	@EventHandler
 	public void onBungeeLoaded(BungeeLoadedEvent event) {
-		Cache.chatHelper = new BungeeHelper(this.getPlugin(), new MessageReceived(this.getPlugin()), true);
+		/*Cache.chatHelper = */new BungeeHelper(this.getPlugin(), new MessageReceived(this.getPlugin()), true);
+		new BungeeHelper(this.getPlugin(), new SpyMessageReceived(this.getPlugin()), true);
 	}
 
 	@EventHandler

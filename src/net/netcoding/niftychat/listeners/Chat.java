@@ -139,7 +139,7 @@ public class Chat extends BukkitListener {
 		String teamSuffix = team != null ? team.getSuffix() : "";
 
 		synchronized (this) {
-			event.setFormat(StringUtil.format(format, group, world, world.substring(0, 1).toUpperCase(), teamName, teamPrefix, teamSuffix));
+			event.setFormat(StringUtil.format((format + rankInfo.getMessage()), group, world, world.substring(0, 1).toUpperCase(), teamName, teamPrefix, teamSuffix));
 		}
 	}
 

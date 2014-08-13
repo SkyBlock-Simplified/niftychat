@@ -50,7 +50,6 @@ public class Message extends BukkitCommand {
 					}, "spying");
 
 					for (MojangProfile spy : spies) {
-
 						if (!NiftyBukkit.getBungeeHelper().isOnline()) {
 							UserChatData spyData = UserChatData.getCache(spy.getUniqueId());
 							spyData = spyData == null ? new UserChatData(helper.getPlugin(), spy) : spyData;

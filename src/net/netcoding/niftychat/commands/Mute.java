@@ -11,7 +11,6 @@ import net.netcoding.niftybukkit.mojang.exceptions.ProfileNotFoundException;
 import net.netcoding.niftybukkit.util.StringUtil;
 import net.netcoding.niftybukkit.util.TimeUtil;
 import net.netcoding.niftychat.NiftyChat;
-import net.netcoding.niftychat.cache.Cache;
 import net.netcoding.niftychat.cache.Config;
 import net.netcoding.niftychat.cache.UserChatData;
 import net.netcoding.niftychat.cache.UserFlagData;
@@ -47,11 +46,11 @@ public class Mute extends BukkitCommand {
 			return;
 		}
 
-		if (Cache.chatHelper.isOnline()) {
-			server = Cache.chatHelper.getServerName();
+		if (NiftyBukkit.getBungeeHelper().isOnline()) {
+			server = NiftyBukkit.getBungeeHelper().getServerName();
 
 			if ((args.length == 2 && expires == 0) || args.length == 3) {
-				if (Cache.chatHelper.getServer(args[args.length - 1]) != null)
+				if (NiftyBukkit.getBungeeHelper().getServer(args[args.length - 1]) != null)
 					server = args[args.length - 1];
 			}
 		}
@@ -88,12 +87,12 @@ public class Mute extends BukkitCommand {
 		if (!sender.getName().equalsIgnoreCase(profile.getName()))
 			this.getLog().message(sender, sendMsg, profile.getName(), (!server.equals("*") ? "" : "globally "), (!isMuted ? "" : "un"), serverMsg, expireMsg);
 
-		if (!Cache.chatHelper.isOnline()) {
+		if (!NiftyBukkit.getBungeeHelper().isOnline()) {
 			if (userData.getPlayer() != null)
 				this.getLog().message(userData.getPlayer(), receiveMsg, "", (!isMuted ? "" : "un"), "", expireMsg);
 		} else {
-			if (isConsole(sender) && Cache.chatHelper.getServer().getPlayerCount() == 0) return;
-			Cache.chatHelper.message(profile, ChatColor.GRAY + StringUtil.format(receiveMsg, (!server.equals("*") ? "" : "globally "), (!isMuted ? "" : "un"), serverMsg, expireMsg));
+			if (isConsole(sender) && NiftyBukkit.getBungeeHelper().getServer().getPlayerCount() == 0) return;
+			NiftyBukkit.getBungeeHelper().message(profile, ChatColor.GRAY + StringUtil.format(receiveMsg, (!server.equals("*") ? "" : "globally "), (!isMuted ? "" : "un"), serverMsg, expireMsg));
 		}
 	}
 

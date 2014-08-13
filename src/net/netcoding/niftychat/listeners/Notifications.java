@@ -65,10 +65,11 @@ public class Notifications implements DatabaseListener {
 						if (result.next()) {
 							String rank = result.getString("rank");
 							RankFormat rankData = RankFormat.getCache(rank);
-							rankData.setFormat(result.getString("format"));
 							rankData.setGroup(result.getString("group"));
 							rankData.setPrefix(result.getString("prefix"));
 							rankData.setSuffix(result.getString("suffix"));
+							rankData.setMessage(result.getString("message"));
+							rankData.setFormat(result.getString("format"));
 
 							for (UserChatData userData : UserChatData.getCache()) {
 								if (userData.getRankData().getPrimaryRank().equalsIgnoreCase(rank)) {

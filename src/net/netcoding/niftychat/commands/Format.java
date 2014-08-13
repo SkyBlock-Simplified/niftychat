@@ -58,7 +58,7 @@ public class Format extends BukkitCommand {
 				}
 			} else
 				this.showUsage(sender);
-		} else if (action.matches("^prefix|suffix|format|group$")) {
+		} else if (action.matches("^prefix|suffix|format|group|message$")) {
 			if (!net.netcoding.niftyranks.cache.Cache.ranks.contains(rank)) {
 				this.getLog().error(sender, "The rank {{0}} does not exist!", rank);
 				return;

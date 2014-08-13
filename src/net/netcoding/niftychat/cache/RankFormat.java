@@ -26,9 +26,10 @@ public class RankFormat {
 	public RankFormat(String rank, String group, String format, String prefix, String suffix, String message) {
 		this.rank = rank;
 		this.setGroup(group);
-		this.setFormat(format);
+		this.setMessage(message);
 		this.setPrefix(prefix);
 		this.setSuffix(suffix);
+		this.setFormat(format);
 		cache.add(this);
 	}
 
@@ -129,9 +130,9 @@ public class RankFormat {
 		value = value.replace("{displayname}", "%1$s");
 		value = value.replace("{name}", "%1$s");
 		value = value.replace("{d}", "%1$s");
-		value = value.replace("{message}", "%2$s");
-		value = value.replace("{msg}", "%2$s");
-		value = value.replace("{m}", "%2$s");
+		value = value.replace("{message}", (this.getMessage() + "%2$s"));
+		value = value.replace("{msg}", (this.getMessage() + "%2$s"));
+		value = value.replace("{m}", (this.getMessage() + "%2$s"));
 		value = value.replace("{group}", "{0}");
 		value = value.replace("{g}", "{0}");
 		value = value.replace("{world}", "{1}");
@@ -151,10 +152,10 @@ public class RankFormat {
 		value = value.replace("{s}", "{0}");
 		value = value.replace("{receiver}", "{1}");
 		value = value.replace("{r}", "{1}");
-		value = value.replace("{privatemessage}", "{2}");
-		value = value.replace("{privatemsg}", "{2}");
-		value = value.replace("{pmessage}", "{2}");
-		value = value.replace("{pmsg}", "{2}");
+		value = value.replace("{privatemessage}", (this.getMessage() + "{2}"));
+		value = value.replace("{privatemsg}", (this.getMessage() + "{2}"));
+		value = value.replace("{pmessage}", (this.getMessage() + "{2}"));
+		value = value.replace("{pmsg}", (this.getMessage() + "{2}"));
 
 		this.format = value;
 	}

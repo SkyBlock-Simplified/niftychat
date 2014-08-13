@@ -78,8 +78,8 @@ public class NiftyChat extends BukkitPlugin {
 			Cache.MySQL.createTable(Config.USER_TABLE, "`uuid` VARCHAR(37) NOT NULL PRIMARY KEY, `nick` VARCHAR(255), `ufnick` VARCHAR(16) UNIQUE");
 			Cache.MySQL.createTable(Config.USER_FLAGS_TABLE, StringUtil.format("`uuid` VARCHAR(37) NOT NULL, `flag` VARCHAR(50) NOT NULL, `value` BIT(1) NOT NULL, `server` VARCHAR(100) NOT NULL, `_submitted` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP, `_expires` TIMESTAMP NULL, PRIMARY KEY (`uuid`, `flag`, `server`), FOREIGN KEY (`uuid`) REFERENCES `{0}`(`uuid`) ON DELETE CASCADE", Config.USER_TABLE));
 			Cache.MySQL.createTable(Config.SERVER_FLAGS_TABLE, "`server` VARCHAR(100) NOT NULL, `flag` VARCHAR(50) NOT NULL, `value` BIT(1) NOT NULL, PRIMARY KEY (`server`, `flag`)");
-			Cache.MySQL.update(StringUtil.format("INSERT IGNORE INTO `{0}` (`rank`, `prefix`, `message`, `format`) VALUES (?, ?, ?, ?);", Config.FORMAT_TABLE), "default", "&7", "&7", "{displayname} &8> {msg}");
-			Cache.MySQL.update(StringUtil.format("INSERT IGNORE INTO `{0}` (`rank`, `prefix`, `message`, `format`) VALUES (?, ?, ?, ?);", Config.FORMAT_TABLE), "message", "&7", "&7", "{sender} &8> {receiver} &8> {msg}");
+			Cache.MySQL.update(StringUtil.format("INSERT IGNORE INTO `{0}` (`rank`, `prefix`, `message`, `format`) VALUES (?, ?, ?, ?);", Config.FORMAT_TABLE), "default", "&7", "&7", "{displayname} &8>&r {msg}");
+			Cache.MySQL.update(StringUtil.format("INSERT IGNORE INTO `{0}` (`rank`, `prefix`, `message`, `format`) VALUES (?, ?, ?, ?);", Config.FORMAT_TABLE), "message", "&7", "&7", "{sender} &8->&r {receiver} &8>&r {pmsg}");
 			return true;
 		} catch (Exception ex) {
 			this.getLog().console(ex);

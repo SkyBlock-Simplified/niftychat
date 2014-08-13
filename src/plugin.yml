@@ -13,6 +13,9 @@ commands:
   format:
     description: Manage chat formatting
     usage: /<command> <group|format|prefix|suffix> <rank> [value]
+  glist2:
+    description: Show all servers with player counts and names
+    usage: /<command>
   message:
     description: Send a message to another player
     usage: /<command> <player> <message>
@@ -31,7 +34,7 @@ commands:
   socialspy:
     description: Spy on private messages from players
     usage: /<command> <player> [server]
-    aliases: [spy, ss]
+    aliases: [spy, unsocialspy, unspy, globalsocialspy, globalspy, gsocialspy, gspy, globalunsocialspy, globalunspy, gunsocialspy, gunspy]
   vanish:
     description: Vanish from other players
     usage: /<command> <player> [server]

@@ -39,27 +39,27 @@ public class Message extends BukkitCommand {
 			@Override
 			public void run() {
 				try {
-					RankFormat message = RankFormat.getCache("message");
-					List<MojangProfile> spies = Cache.MySQL.query(StringUtil.format("SELECT `uuid` FROM `{0}` WHERE `flag` = ?;", Config.USER_FLAGS_TABLE), new ResultCallback<List<MojangProfile>>() {
+					RankFormat format = RankFormat.getCache("message");
+					List<MojangProfile> spies = Cache.MySQL.query(StringUtil.format("SELECT `uuid` FROM `{0}` WHERE `flag` = ? AND `value` = ?;", Config.USER_FLAGS_TABLE), new ResultCallback<List<MojangProfile>>() {
 						@Override
 						public List<MojangProfile> handle(ResultSet result) throws SQLException {
 							List<MojangProfile> profiles = new ArrayList<>();
 							while (result.next()) profiles.add(NiftyBukkit.getMojangRepository().searchByExactUUID(UUID.fromString(result.getString("uuid"))));
 							return profiles;
 						}
-					}, "spying");
+					}, "spying", true);
 
 					for (MojangProfile spy : spies) {
-						//if (!spy.getUniqueId().equals(senderData.getUniqueId()) && !spy.getUniqueId().equals(receiverData.getUniqueId())) {
+						if (!spy.getUniqueId().equals(senderData.getUniqueId()) && !spy.getUniqueId().equals(receiverData.getUniqueId())) {
 							if (!NiftyBukkit.getBungeeHelper().isOnline()) {
 								UserChatData spyData = UserChatData.getCache(spy.getUniqueId());
 								spyData = spyData == null ? new UserChatData(helper.getPlugin(), spy) : spyData;
-								if (spyData.getPlayer() != null) helper.getLog().message(spyData.getPlayer(), message.getFormat(), senderData.getDisplayName(), receiverData.getDisplayName(), message);
+								if (spyData.getPlayer() != null) helper.getLog().message(spyData.getPlayer(), format.getFormat(), senderData.getDisplayName(), receiverData.getDisplayName(), format);
 							} else {
 								BungeeServer server = NiftyBukkit.getBungeeHelper().getPlayerServer(NiftyBukkit.getMojangRepository().searchByExactUUID(spy.getUniqueId()));
 								if (server != null) NiftyBukkit.getBungeeHelper().forward(findPlayer(receiverData.getName()), server.getName(), Config.CHAT_CHANNEL, "SpyMessage", senderData.getName(), receiverData.getName(), spy.getName(), message);
 							}	
-						//}
+						}
 					}
 				} catch (Exception ex) {
 					helper.getLog().console(ex);
@@ -85,7 +85,17 @@ public class Message extends BukkitCommand {
 		recipientData = recipientData == null ? new UserChatData(helper.getPlugin(), recipientProfile) : recipientData;
 
 		if (recipientProfile.equals(senderProfile)) { // Sending
-			if (receiverData.getPlayer() == null) {
+			boolean receiverOnline = true;
+
+			if (!NiftyBukkit.getBungeeHelper().isOnline()) {
+				if (receiverData.getPlayer() == null)
+					receiverOnline = false;
+			} else {
+				if (NiftyBukkit.getBungeeHelper().getPlayerServer(receiverProfile) == null)
+					receiverOnline = false;
+			}
+
+			if (!receiverOnline) {
 				helper.getLog().error(senderData.getPlayer(), "Unable to locate {{0}}!", receiverData.getName());
 				return false;
 			}
@@ -101,9 +111,9 @@ public class Message extends BukkitCommand {
 			}
 		} else if (recipientProfile.equals(receiverProfile)) { // Receiving
 			receiverData.setLastMessenger(senderProfile);
-			//notifySpies(helper, senderData, receiverData, message);
-		} else if (!recipientProfile.equals(receiverProfile)) { // Spying
-			if (senderData.getFlagData("vanished").getValue() && !helper.hasPermissions(recipientData.getPlayer(), "vanish", "spy"))
+			notifySpies(helper, senderData, receiverData, message);
+		} else { // Spying
+			if ((senderData.getFlagData("vanished").getValue() || receiverData.getFlagData("vanished").getValue()) && !helper.hasPermissions(recipientData.getPlayer(), "vanish", "spy"))
 				return false;
 		}
 
@@ -111,6 +121,7 @@ public class Message extends BukkitCommand {
 		String senderDisplayName = recipientProfile.equals(senderProfile) ? RegexUtil.replaceColor("&7me", RegexUtil.REPLACE_ALL_PATTERN) : senderData.getDisplayName();
 		String receiverDisplayName = recipientProfile.equals(receiverProfile) ? RegexUtil.replaceColor("&7me", RegexUtil.REPLACE_ALL_PATTERN) : receiverData.getDisplayName();
 		helper.getLog().message(recipientData.getPlayer(), format.getFormat(), senderDisplayName, receiverDisplayName, message);
+		if (recipientProfile.equals(senderProfile)) helper.getLog().console(format.getFormat(), senderData.getDisplayName(), receiverData.getDisplayName(), message);
 		return true;
 	}
 

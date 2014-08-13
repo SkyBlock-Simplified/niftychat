@@ -35,10 +35,11 @@ public class SocialSpy extends BukkitCommand {
 			server = NiftyBukkit.getBungeeHelper().getServerName();
 
 			if (args.length > 0) {
-				if (NiftyBukkit.getBungeeHelper().getServer(args[args.length - 1]) != null) {
+				if (NiftyBukkit.getBungeeHelper().getServer(args[args.length - 1]) != null)
 					server = args[args.length - 1];
-					if (args.length == 1) playerName = sender.getName();
-				}
+
+				if (args.length == 1)
+					playerName = sender.getName();
 			}
 		}
 

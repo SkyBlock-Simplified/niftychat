@@ -31,7 +31,7 @@ public class Format extends BukkitCommand {
 
 		if (action.matches("^create|delete$")) {
 			if (args.length >= 2) {
-				if (hasPermissions(sender, "format", "manage")) {
+				if (this.hasPermissions(sender, "format", "manage")) {
 					String group = args.length >= 3 ? args[2] : "";
 
 					if (args.length >= 4) {
@@ -45,8 +45,14 @@ public class Format extends BukkitCommand {
 						} catch (MySQLIntegrityConstraintViolationException ex) {
 							this.getLog().error(sender, "The format entry for {{0}} already exists!", rank);
 						}
-					} else
-						Cache.MySQL.update(StringUtil.format("DELETE FROM `{0}` WHERE `rank` = ?;", Config.FORMAT_TABLE), rank);
+					} else {
+						if (!rank.matches("^default|message$"))
+							Cache.MySQL.update(StringUtil.format("DELETE FROM `{0}` WHERE `rank` = ?;", Config.FORMAT_TABLE), rank);
+						else {
+							this.getLog().error(sender, "You cannot delete the {{0}} format!", rank);
+							return;
+						}
+					}
 
 					this.getLog().message(sender, "The format entry for {{0}} has been {1}d.", rank, action);
 				}
@@ -59,7 +65,7 @@ public class Format extends BukkitCommand {
 			}
 
 			if (args.length == 2) {
-				if (hasPermissions(sender, "format", "view")) {
+				if (this.hasPermissions(sender, "format", "view")) {
 					String result = Cache.MySQL.query(StringUtil.format("SELECT `{0}` FROM `{1}` WHERE `rank` = ?;", action, Config.FORMAT_TABLE), new ResultCallback<String>() {
 						@Override
 						public String handle(ResultSet result) throws SQLException {
@@ -73,7 +79,7 @@ public class Format extends BukkitCommand {
 					this.getLog().message(sender, "The {0} for {{1}} is {{2}}.", action, rank, result);
 				}
 			} else {
-				if (hasPermissions(sender, "format", "manage")) {
+				if (this.hasPermissions(sender, "format", "manage")) {
 					format = StringUtil.implode(" ", args, 2);
 
 					if (Cache.MySQL.update(StringUtil.format("UPDATE `{0}` SET `{1}` = ? WHERE `rank` = ?;", Config.FORMAT_TABLE, action), format, rank))

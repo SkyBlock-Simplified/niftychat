@@ -17,12 +17,13 @@ public class RankFormat {
 	private String format;
 	private String prefix;
 	private String suffix;
+	private String message;
 
 	public RankFormat(String rank, String group, String format) {
-		this(rank, group, format, "", "");
+		this(rank, group, format, "", "", "");
 	}
 
-	public RankFormat(String rank, String group, String format, String prefix, String suffix) {
+	public RankFormat(String rank, String group, String format, String prefix, String suffix, String message) {
 		this.rank = rank;
 		this.setGroup(group);
 		this.setFormat(format);
@@ -57,6 +58,10 @@ public class RankFormat {
 		return this.format;
 	}
 
+	public String getMessage() {
+		return this.message;
+	}
+
 	public String getPrefix() {
 		return this.prefix;
 	}
@@ -83,10 +88,12 @@ public class RankFormat {
 						if (StringUtil.isEmpty(prefix)) prefix = null;
 						String suffix = result.getString("suffix");
 						if (StringUtil.isEmpty(suffix)) suffix = null;
+						String message = result.getString("message");
+						if (StringUtil.isEmpty(message)) message = null;
 						String format = result.getString("format");
 						if (result.wasNull()) format = null;
 
-						new RankFormat(rank, group, format, prefix, suffix);
+						new RankFormat(rank, group, format, prefix, suffix, message);
 					}
 
 					return null;
@@ -109,7 +116,7 @@ public class RankFormat {
 	}
 
 	public void setFormat(String value) {
-		String _default = "{displayname}&f: &7{msg}";
+		String _default = "{displayname} &8>&r {msg}";
 		if (StringUtil.isEmpty(value)) value = _default;
 
 		try {
@@ -118,6 +125,7 @@ public class RankFormat {
 			value = RegexUtil.replaceColor(_default, RegexUtil.REPLACE_ALL_PATTERN);
 		}
 
+		// Standard
 		value = value.replace("{displayname}", "%1$s");
 		value = value.replace("{name}", "%1$s");
 		value = value.replace("{d}", "%1$s");
@@ -138,7 +146,21 @@ public class RankFormat {
 		value = value.replace("{ts}", "{5}");
 		value = value.replaceAll("[ ]{2,}", " ");
 
+		// Private
+		value = value.replace("{sender}", "{0}");
+		value = value.replace("{s}", "{0}");
+		value = value.replace("{receiver}", "{1}");
+		value = value.replace("{r}", "{1}");
+		value = value.replace("{privatemessage}", "{2}");
+		value = value.replace("{privatemsg}", "{2}");
+		value = value.replace("{pmessage}", "{2}");
+		value = value.replace("{pmsg}", "{2}");
+
 		this.format = value;
+	}
+
+	public void setMessage(String value) {
+		this.message = StringUtil.isEmpty(value) ? "" : RegexUtil.replaceColor(value, RegexUtil.REPLACE_ALL_PATTERN);
 	}
 
 	public void setPrefix(String value) {

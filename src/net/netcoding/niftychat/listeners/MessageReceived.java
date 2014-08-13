@@ -32,6 +32,12 @@ public class MessageReceived extends BukkitHelper implements BungeeListener {
 			String receiverName = fwData.readUTF();
 			String msg = fwData.readUTF();
 			Message.send(this, senderName, receiverName, receiverName, msg);
+		} else if (action.equals("SpyMessage")) {
+			String senderName = fwData.readUTF();
+			String receiverName = fwData.readUTF();
+			String spyName = fwData.readUTF();
+			String msg = fwData.readUTF();
+			Message.send(this, senderName, receiverName, spyName, msg);
 		}
 	}
 

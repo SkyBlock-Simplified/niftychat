@@ -14,8 +14,8 @@ import org.bukkit.plugin.java.JavaPlugin;
 
 public class SocialSpy extends BukkitCommand {
 
-	public SocialSpy(JavaPlugin plugin, String command) {
-		super(plugin, command);
+	public SocialSpy(JavaPlugin plugin) {
+		super(plugin, "socialspy");
 		this.setMinimumArgsLength(0);
 		this.setMaximumArgsLength(2);
 	}

@@ -9,8 +9,19 @@ import net.netcoding.niftychat.cache.Cache;
 import net.netcoding.niftychat.cache.CensorData;
 import net.netcoding.niftychat.cache.Config;
 import net.netcoding.niftychat.cache.RankFormat;
-import net.netcoding.niftychat.commands.*;
-import net.netcoding.niftychat.listeners.*;
+import net.netcoding.niftychat.commands.Censor;
+import net.netcoding.niftychat.commands.Format;
+import net.netcoding.niftychat.commands.Message;
+import net.netcoding.niftychat.commands.Mute;
+import net.netcoding.niftychat.commands.Nick;
+import net.netcoding.niftychat.commands.Realname;
+import net.netcoding.niftychat.commands.SocialSpy;
+import net.netcoding.niftychat.commands.Vanish;
+import net.netcoding.niftychat.listeners.Chat;
+import net.netcoding.niftychat.listeners.Disconnect;
+import net.netcoding.niftychat.listeners.Login;
+import net.netcoding.niftychat.listeners.Move;
+import net.netcoding.niftychat.listeners.Notifications;
 
 public class NiftyChat extends BukkitPlugin {
 
@@ -52,6 +63,7 @@ public class NiftyChat extends BukkitPlugin {
 		new Nick(this);
 		new Realname(this);
 		new Vanish(this);
+		new SocialSpy(this);
 
 		this.getLog().console("Registering Listeners");
 		new Chat(this);

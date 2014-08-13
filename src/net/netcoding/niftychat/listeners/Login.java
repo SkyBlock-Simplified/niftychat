@@ -22,8 +22,8 @@ public class Login extends BukkitListener {
 
 	@EventHandler
 	public void onBungeeLoaded(BungeeLoadedEvent event) {
-		new BungeeHelper(this.getPlugin(), new MessageReceived(this.getPlugin()), true);
-		new BungeeHelper(this.getPlugin(), new SpyMessageReceived(this.getPlugin()), true);
+		new BungeeHelper(this.getPlugin(), "Message", new MessageReceived(this.getPlugin()), true);
+		new BungeeHelper(this.getPlugin(), "SpyMessage", new SpyMessageReceived(this.getPlugin()), true);
 	}
 
 	@EventHandler

@@ -104,8 +104,12 @@ public class UserChatData extends BukkitHelper {
 		UserChatData userData = getCache(this.getUniqueId());
 
 		if (!fetch && userData != null) {
-			if (userData != null)
-				return userData.getPlayer().getDisplayName();
+			if (userData != null) {
+				if (userData.getPlayer() != null)
+					return userData.getPlayer().getDisplayName();
+				else
+					return this.getName();
+			}
 		}
 
 		try {

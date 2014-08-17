@@ -32,7 +32,7 @@ public class Notifications implements DatabaseListener {
 						if (result.next()) {
 							UserChatData userData = UserChatData.getCache(UUID.fromString(result.getString("uuid")));
 
-							if (userData.getPlayer() != null) {
+							if (userData != null) {
 								userData.updateDisplayName();
 								userData.updateTabListName();
 							}

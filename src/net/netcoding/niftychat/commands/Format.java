@@ -79,7 +79,7 @@ public class Format extends BukkitCommand {
 					this.getLog().message(sender, "The {0} for {{1}} is {{2}}.", action, rank, result);
 				}
 			} else {
-				if (this.hasPermissions(sender, "format", "manage")) {
+				if (this.hasPermissions(sender, "format", "edit")) {
 					format = StringUtil.implode(" ", args, 2);
 
 					if (Cache.MySQL.update(StringUtil.format("UPDATE `{0}` SET `{1}` = ? WHERE `rank` = ?;", Config.FORMAT_TABLE, action), format, rank))

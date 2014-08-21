@@ -20,9 +20,6 @@ public class Disconnect extends BukkitListener {
 	private void playerDisconnect(Player player) {
 		MojangProfile profile = NiftyBukkit.getMojangRepository().searchByExactPlayer(player);
 		UserChatData.removeCache(profile.getUniqueId());
-
-		//if (Cache.ghosts.hasPlayer(player))
-		//	Cache.ghosts.remove(player);
 	}
 
 	@EventHandler

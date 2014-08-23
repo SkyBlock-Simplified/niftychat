@@ -12,6 +12,7 @@ import net.netcoding.niftybukkit.NiftyBukkit;
 import net.netcoding.niftybukkit.database.ResultCallback;
 import net.netcoding.niftybukkit.minecraft.BukkitHelper;
 import net.netcoding.niftybukkit.minecraft.BungeeHelper;
+import net.netcoding.niftybukkit.minecraft.BungeeServer;
 import net.netcoding.niftybukkit.mojang.MojangProfile;
 import net.netcoding.niftybukkit.util.RegexUtil;
 import net.netcoding.niftybukkit.util.StringUtil;
@@ -157,9 +158,14 @@ public class UserChatData extends BukkitHelper {
 	}
 
 	public UserFlagData getFlagData(String flag) {
+		return this.getFlagData(flag, "");
+	}
+
+	public UserFlagData getFlagData(String flag, String server) {
 		List<UserFlagData> flagDatas = this.getAllFlagData(flag);
 		BungeeHelper bungeeHelper = NiftyBukkit.getBungeeHelper();
 		UserFlagData found = new UserFlagData(flag);
+		BungeeServer bungeeServer = StringUtil.isEmpty(server) || server.equals("*") ? bungeeHelper.getServer() : bungeeHelper.getServer(server);
 
 		for (UserFlagData flagData : flagDatas) {
 			if (flagData.getValue()) {
@@ -167,7 +173,7 @@ public class UserChatData extends BukkitHelper {
 					found = flagData;
 					break;
 				} else if (bungeeHelper.isOnline()) {
-					if (bungeeHelper.getServer().equals(flagData.getServer())) {
+					if (bungeeServer.equals(flagData.getServer())) {
 						found = flagData;
 						break;
 					}

@@ -54,7 +54,7 @@ public class SocialSpy extends BukkitCommand {
 			return;
 		}
 
-		if (!sender.getName().equals(profile.getName()) && !this.hasPermissions(sender, "vanish", "others")) {
+		if (!sender.getName().equals(profile.getName()) && !this.hasPermissions(sender, "socialspy", "others")) {
 			this.getLog().error(sender, "You are not allowed to socialspy other players!");
 			return;
 		}
@@ -69,7 +69,7 @@ public class SocialSpy extends BukkitCommand {
 		}
 
 		if (Config.isGlobalCommand(alias, server)) userData.resetNonGlobalFlagData("spying");
-		boolean isSpying = userData.getFlagData("spying").getValue();
+		boolean isSpying = userData.getFlagData("spying", server).getValue();
 		if (alias.matches("^g?(lobal)?un[\\w]+")) isSpying = true;
 		userData.updateFlagData("spying", isSpying, server, 0);
 		String serverMsg = server.equals("*") ? "" : StringUtil.format(" in the {{0}} server", server);

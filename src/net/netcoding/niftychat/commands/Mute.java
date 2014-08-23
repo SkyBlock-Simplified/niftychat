@@ -75,7 +75,7 @@ public class Mute extends BukkitCommand {
 			userData.resetNonGlobalFlagData("muted");
 		}
 
-		boolean isMuted = userData.getFlagData("muted").getValue();
+		boolean isMuted = userData.getFlagData("muted", server).getValue();
 		if (alias.matches("^g?(lobal)?un[\\w]+")) isMuted = true;
 		if (isMuted) expires = 0;
 		userData.updateFlagData("muted", isMuted, server, expires);

@@ -67,7 +67,7 @@ public class Vanish extends BukkitCommand {
 			userData.resetNonGlobalFlagData("vanished");
 		}
 
-		boolean isVanished = userData.getFlagData("vanished").getValue();
+		boolean isVanished = userData.getFlagData("vanished", server).getValue();
 		if (alias.matches("^g?(lobal)?un[\\w]+")) isVanished = true;
 		userData.updateFlagData("vanished", isVanished, server, 0);
 		String serverMsg = server.equals("*") ? "" : StringUtil.format(" in the {{0}} server", server);

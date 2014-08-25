@@ -12,6 +12,7 @@ import net.netcoding.niftybukkit.util.RegexUtil;
 import net.netcoding.niftybukkit.util.StringUtil;
 import net.netcoding.niftychat.cache.UserChatData;
 
+import org.bukkit.ChatColor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.java.JavaPlugin;
@@ -80,7 +81,7 @@ public class GList extends BukkitCommand {
 			if (nameList.size() > 0) output.add(StringUtil.implode("&r, ", nameList));
 		} else {
 			List<BungeeServer> servers = new ArrayList<>(NiftyBukkit.getBungeeHelper().getServers());
-			totalPlayers = NiftyBukkit.getBungeeHelper().getPlayerCount();
+			totalPlayers = NiftyBukkit.getBungeeHelper().getPlayerCount("ALL");
 			maxPlayers = NiftyBukkit.getBungeeHelper().getMaxPlayers();
 
 			for (BungeeServer server : servers) {
@@ -107,15 +108,14 @@ public class GList extends BukkitCommand {
 						}
 
 						names += StringUtil.implode("&r, ", nameList);
+						output.add(StringUtil.format("&8{0} &7({{1}})&f: &7{2}", server.getName(), serverPlayers, names));
 					}
-
-					output.add(StringUtil.format("&8{0} &7({{1}})&f: &7{2}", server.getName(), serverPlayers, names));
 				}
 			}
 		}
 
 		output.add("");
-		output.add(StringUtil.format("Players&f: {{0}} &8/ {{1}}", totalPlayers, maxPlayers));
+		output.add(StringUtil.format("{{0}}Players&f: {{0}} &8/ {{1}}", ChatColor.RESET, totalPlayers, maxPlayers));
 		this.getLog().message(sender, RegexUtil.replaceColor(StringUtil.implode("\n", output), RegexUtil.REPLACE_ALL_PATTERN));
 	}
 

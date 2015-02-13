@@ -26,6 +26,7 @@ public class GList extends BukkitCommand {
 		this.editUsage(0, "gonline", "[server]");
 	}
 
+	@SuppressWarnings("deprecation")
 	@Override
 	public void onCommand(CommandSender sender, String alias, String[] args) throws Exception {
 		UserChatData senderData = isConsole(sender) ? null : UserChatData.getCache(NiftyBukkit.getMojangRepository().searchByExactPlayer((Player)sender).getUniqueId());
@@ -82,7 +83,7 @@ public class GList extends BukkitCommand {
 		} else {
 			List<BungeeServer> servers = new ArrayList<>(NiftyBukkit.getBungeeHelper().getServers());
 			totalPlayers = NiftyBukkit.getBungeeHelper().getPlayerCount("ALL");
-			maxPlayers = NiftyBukkit.getBungeeHelper().getMaxPlayers();
+			maxPlayers = NiftyBukkit.getBungeeHelper().getMaxPlayers("ALL");
 
 			for (BungeeServer server : servers) {
 				if (server.isOnline()) {
@@ -115,7 +116,7 @@ public class GList extends BukkitCommand {
 		}
 
 		output.add("");
-		output.add(StringUtil.format("{{0}}Players&f: {{0}} &8/ {{1}}", ChatColor.RESET, totalPlayers, maxPlayers));
+		output.add(StringUtil.format("{{0}}Players&f: {{1}} &8/ {{2}}", ChatColor.RESET, totalPlayers, maxPlayers));
 		this.getLog().message(sender, RegexUtil.replaceColor(StringUtil.implode("\n", output), RegexUtil.REPLACE_ALL_PATTERN));
 	}
 

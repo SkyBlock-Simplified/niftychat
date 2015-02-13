@@ -56,8 +56,10 @@ public class Message extends BukkitCommand {
 								spyData = spyData == null ? new UserChatData(helper.getPlugin(), spy) : spyData;
 								if (spyData.getPlayer() != null) helper.getLog().message(spyData.getPlayer(), format.getFormat(), senderData.getDisplayName(), receiverData.getDisplayName(), format);
 							} else {
-								BungeeServer server = NiftyBukkit.getBungeeHelper().getPlayerServer(NiftyBukkit.getMojangRepository().searchByExactUUID(spy.getUniqueId()));
-								if (server != null) NiftyBukkit.getBungeeHelper().forward(findPlayer(receiverData.getName()), server.getName(), Config.CHAT_CHANNEL, "SpyMessage", senderData.getName(), receiverData.getName(), spy.getName(), message);
+								try {
+									BungeeServer server = NiftyBukkit.getBungeeHelper().getPlayerServer(NiftyBukkit.getMojangRepository().searchByExactUUID(spy.getUniqueId()));
+									NiftyBukkit.getBungeeHelper().forward(findPlayer(receiverData.getName()), server.getName(), Config.CHAT_CHANNEL, "SpyMessage", senderData.getName(), receiverData.getName(), spy.getName(), message);
+								} catch (Exception ex) { }
 							}	
 						}
 					}

@@ -19,6 +19,13 @@ public class Format extends BukkitCommand {
 
 	public Format(NiftyChat plugin) {
 		super(plugin, "format");
+		this.editUsage(1, "prefix", "<rank> [prefix]");
+		this.editUsage(1, "suffix", "<rank> [suffix]");
+		this.editUsage(1, "format", "<rank> [format]");
+		this.editUsage(1, "group", "<rank> [group]");
+		this.editUsage(1, "message", "<rank> [message]");
+		this.editUsage(1, "create", "<rank> [group] [format]");
+		this.editUsage(1, "delete", "<rank> [group] [format]");
 		this.setMinimumArgsLength(2);
 	}
 

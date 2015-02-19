@@ -38,7 +38,7 @@ public class UserChatData extends BukkitHelper {
 	private List<UserFlagData> flagData;
 
 	public UserChatData(JavaPlugin plugin, Player player) {
-		this(plugin, NiftyBukkit.getMojangRepository().searchByExactPlayer(player));
+		this(plugin, NiftyBukkit.getMojangRepository().searchByPlayer(player));
 		cache.add(this);
 	}
 

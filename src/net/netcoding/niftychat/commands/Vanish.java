@@ -48,7 +48,7 @@ public class Vanish extends BukkitCommand {
 		}
 
 		try {
-			profile = NiftyBukkit.getMojangRepository().searchByUsername(playerName)[0];
+			profile = NiftyBukkit.getMojangRepository().searchByUsername(playerName);
 		} catch (ProfileNotFoundException pnfe) {
 			this.getLog().error(sender, "Unable to locate the uuid of {{0}}!", playerName);
 			return;

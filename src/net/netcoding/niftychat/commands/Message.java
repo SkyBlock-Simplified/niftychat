@@ -72,17 +72,17 @@ public class Message extends BukkitCommand {
 
 	public static boolean send(final BukkitHelper helper, String senderName, String receiverName, String recipientName, String message) {
 		// Message sender
-		MojangProfile senderProfile = NiftyBukkit.getMojangRepository().searchByExactUsername(senderName);
+		MojangProfile senderProfile = NiftyBukkit.getMojangRepository().searchByUsername(senderName);
 		UserChatData senderData = UserChatData.getCache(senderProfile.getUniqueId());
 		senderData = senderData == null ? new UserChatData(helper.getPlugin(), senderProfile) : senderData;
 
 		// Message receiver
-		MojangProfile receiverProfile = NiftyBukkit.getMojangRepository().searchByExactUsername(receiverName);
+		MojangProfile receiverProfile = NiftyBukkit.getMojangRepository().searchByUsername(receiverName);
 		UserChatData receiverData = UserChatData.getCache(receiverProfile.getUniqueId());
 		receiverData = receiverData == null ? new UserChatData(helper.getPlugin(), receiverProfile) : receiverData;
 
 		// Where message is sent
-		MojangProfile recipientProfile = NiftyBukkit.getMojangRepository().searchByExactUsername(recipientName);
+		MojangProfile recipientProfile = NiftyBukkit.getMojangRepository().searchByUsername(recipientName);
 		UserChatData recipientData = UserChatData.getCache(recipientProfile.getUniqueId());
 		recipientData = recipientData == null ? new UserChatData(helper.getPlugin(), recipientProfile) : recipientData;
 
@@ -134,7 +134,7 @@ public class Message extends BukkitCommand {
 		MojangProfile profile;
 		boolean reply = alias.matches("^r(?:eply)?$");
 		String message = StringUtil.implode(" ", args, reply ? 0 : 1);
-		MojangProfile senderprofile = NiftyBukkit.getMojangRepository().searchByExactPlayer(player);
+		MojangProfile senderprofile = NiftyBukkit.getMojangRepository().searchByPlayer(player);
 		UserChatData senderData = UserChatData.getCache(senderprofile.getUniqueId());
 
 		if (reply) {
@@ -165,7 +165,7 @@ public class Message extends BukkitCommand {
 		}
 
 		try {
-			profile = NiftyBukkit.getMojangRepository().searchByUsername(playerName)[0];
+			profile = NiftyBukkit.getMojangRepository().searchByUsername(playerName);
 		} catch (ProfileNotFoundException pnfe) {
 			this.getLog().error(sender, "Unable to locate the uuid of {{0}}!", playerName);
 			return;

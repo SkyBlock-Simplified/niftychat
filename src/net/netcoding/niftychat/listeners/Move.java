@@ -18,7 +18,8 @@ public class Move extends BukkitListener {
 
 	@EventHandler
 	public void onPlayerMove(final PlayerMoveEvent event) {
-		MojangProfile profile = NiftyBukkit.getMojangRepository().searchByExactPlayer(event.getPlayer());
+		// TODO: Speed up
+		MojangProfile profile = NiftyBukkit.getMojangRepository().searchByPlayer(event.getPlayer());
 		UserChatData userData = UserChatData.getCache(profile.getUniqueId());
 		if (userData != null) userData.setMoved();
 	}
@@ -30,7 +31,7 @@ public class Move extends BukkitListener {
 		if (userData != null) {
 			userData.updateDisplayName();
 			userData.updateTabListName();
-			userData.applyFlagData("vanished", true);
+			userData.applyFlagData("vanished", false);
 		}
 	}
 

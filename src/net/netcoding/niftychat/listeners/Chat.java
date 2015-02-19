@@ -28,7 +28,7 @@ public class Chat extends BukkitListener {
 	}
 
 	public static boolean check(BukkitHelper helper, Player player, String message) {
-		MojangProfile profile = NiftyBukkit.getMojangRepository().searchByExactPlayer(player);
+		MojangProfile profile = NiftyBukkit.getMojangRepository().searchByPlayer(player);
 		UserChatData userData = UserChatData.getCache(profile.getUniqueId());
 		String stripMessage = RegexUtil.strip(message, RegexUtil.REPLACE_ALL_PATTERN);
 
@@ -123,7 +123,7 @@ public class Chat extends BukkitListener {
 	public void onPlayerChat(AsyncPlayerChatEvent event) {
 		if (event.isCancelled()) return;
 		Player player = event.getPlayer();
-		MojangProfile profile = NiftyBukkit.getMojangRepository().searchByExactPlayer(player);
+		MojangProfile profile = NiftyBukkit.getMojangRepository().searchByPlayer(player);
 		UserChatData userData = UserChatData.getCache(profile.getUniqueId());
 
 		String rank = userData.getRankData().getPrimaryRank();

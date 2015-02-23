@@ -45,12 +45,10 @@ public class Login extends BukkitListener {
 			if (!userData.hasPermissions("socialspy"))
 				userData.resetFlagData("spying", "");
 
-			if (!userData.hasPermissions("vanish"))
-				//userData.applyFlagData("vanished", true);
-			//else
+			if (userData.hasPermissions("vanish"))
+				userData.applyFlagData("vanished", true);
+			else
 				userData.resetFlagData("vanished", "");
-
-			userData.applyFlagData("vanished", true);
 		} catch (Exception ex) {
 			this.getLog().console(ex);
 		}

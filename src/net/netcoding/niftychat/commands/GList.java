@@ -69,7 +69,7 @@ public class GList extends BukkitCommand {
 					userData = userData == null ? new UserChatData(this.getPlugin(), profile) : userData;
 
 					if (userData.getFlagData("vanished", (selected == null ? "*" : selected.getName())).getValue()) {
-						if ((isPlayer(sender) && userData.getUniqueId().equals(senderData.getUniqueId())) || this.hasPermissions(sender, "vanish", "see"))
+						if ((isPlayer(sender) && userData.equals(senderData)) || this.hasPermissions(sender, "vanish", "see"))
 							nameList.add(StringUtil.format("{{0}}{1}", "*", userData.getDisplayName()));
 						else
 							totalPlayers--;
@@ -98,7 +98,7 @@ public class GList extends BukkitCommand {
 							userData = userData == null ? new UserChatData(this.getPlugin(), profile) : userData;
 
 							if (userData.getFlagData("vanished", server.getName()).getValue()) {
-								if ((isPlayer(sender) && userData.getUniqueId().equals(senderData.getUniqueId())) || this.hasPermissions(sender, "vanish", "see"))
+								if ((isPlayer(sender) && userData.equals(senderData)) || this.hasPermissions(sender, "vanish", "see"))
 									nameList.add(StringUtil.format("{{0}}{1}", "*", userData.getDisplayName()));
 								else {
 									serverPlayers--;

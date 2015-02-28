@@ -54,12 +54,10 @@ public class Message extends BukkitCommand {
 							if (!NiftyBukkit.getBungeeHelper().isOnline()) {
 								UserChatData spyData = UserChatData.getCache(spy.getUniqueId());
 								spyData = spyData == null ? new UserChatData(helper.getPlugin(), spy) : spyData;
-								if (spyData.getPlayer() != null) helper.getLog().message(spyData.getPlayer(), format.getFormat(), senderData.getDisplayName(), receiverData.getDisplayName(), format);
+								if (spyData.getOfflinePlayer().isOnline()) helper.getLog().message(spyData.getOfflinePlayer().getPlayer(), format.getFormat(), senderData.getDisplayName(), receiverData.getDisplayName(), format);
 							} else {
-								try {
-									BungeeServer server = NiftyBukkit.getBungeeHelper().getPlayerServer(NiftyBukkit.getMojangRepository().searchByExactUUID(spy.getUniqueId()));
-									NiftyBukkit.getBungeeHelper().forward(findPlayer(receiverData.getName()), server.getName(), Config.CHAT_CHANNEL, "SpyMessage", senderData.getName(), receiverData.getName(), spy.getName(), message);
-								} catch (Exception ex) { }
+								if (NiftyBukkit.getBungeeHelper().isPlayerOnline(spy))
+									NiftyBukkit.getBungeeHelper().forward(findPlayer(receiverData.getName()), NiftyBukkit.getBungeeHelper().getPlayerServer(spy).getName(), Config.CHAT_CHANNEL, "SpyMessage", senderData.getName(), receiverData.getName(), spy.getName(), message);
 							}	
 						}
 					}
@@ -89,40 +87,37 @@ public class Message extends BukkitCommand {
 		if (recipientProfile.equals(senderProfile)) { // Sending
 			boolean receiverOnline = true;
 
-			if (!NiftyBukkit.getBungeeHelper().isOnline()) {
-				if (receiverData.getPlayer() == null)
-					receiverOnline = false;
-			} else {
-				if (NiftyBukkit.getBungeeHelper().getPlayerServer(receiverProfile) == null)
-					receiverOnline = false;
-			}
+			if (!NiftyBukkit.getBungeeHelper().isOnline())
+				receiverOnline = receiverData.isOnline();
+			else
+				receiverOnline = NiftyBukkit.getBungeeHelper().isPlayerOnline(receiverProfile);
 
 			if (!receiverOnline) {
-				helper.getLog().error(senderData.getPlayer(), "Unable to locate {{0}}!", receiverData.getName());
+				helper.getLog().error(senderData.getOfflinePlayer().getPlayer(), "Unable to locate {{0}}!", receiverData.getName());
 				return false;
 			}
 
-			if (senderData.getFlagData("muted").getValue() && !helper.hasPermissions(senderData.getPlayer(), "mute", "roar")) {
-				Mute.sendMutedError(helper.getLog(), senderData.getPlayer(), senderData);
+			if (senderData.getFlagData("muted").getValue() && !helper.hasPermissions(senderData.getOfflinePlayer().getPlayer(), "mute", "roar")) {
+				Mute.sendMutedError(helper.getLog(), senderData.getOfflinePlayer().getPlayer(), senderData);
 				return false;
 			}
 
 			if (receiverData.getFlagData("vanished").getValue() && !senderData.hasPermissions("vanish", "interact")) {
-				helper.getLog().error(senderData.getPlayer(), "Unable to locate {{0}}!", receiverData.getName());
+				helper.getLog().error(senderData.getOfflinePlayer().getPlayer(), "Unable to locate {{0}}!", receiverData.getName());
 				return false;
 			}
 		} else if (recipientProfile.equals(receiverProfile)) { // Receiving
 			receiverData.setLastMessenger(senderProfile);
 			notifySpies(helper, senderData, receiverData, message);
 		} else { // Spying
-			if ((senderData.getFlagData("vanished").getValue() || receiverData.getFlagData("vanished").getValue()) && !helper.hasPermissions(recipientData.getPlayer(), "vanish", "spy"))
+			if ((senderData.getFlagData("vanished").getValue() || receiverData.getFlagData("vanished").getValue()) && !helper.hasPermissions(recipientData.getOfflinePlayer().getPlayer(), "vanish", "spy"))
 				return false;
 		}
 
 		RankFormat format = RankFormat.getCache("message");
 		String senderDisplayName = recipientProfile.equals(senderProfile) ? RegexUtil.replaceColor("&7me", RegexUtil.REPLACE_ALL_PATTERN) : senderData.getDisplayName();
 		String receiverDisplayName = recipientProfile.equals(receiverProfile) ? RegexUtil.replaceColor("&7me", RegexUtil.REPLACE_ALL_PATTERN) : receiverData.getDisplayName();
-		helper.getLog().message(recipientData.getPlayer(), format.getFormat(), senderDisplayName, receiverDisplayName, message);
+		helper.getLog().message(recipientData.getOfflinePlayer().getPlayer(), format.getFormat(), senderDisplayName, receiverDisplayName, message);
 		if (recipientProfile.equals(senderProfile)) helper.getLog().console(format.getFormat(), senderData.getDisplayName(), receiverData.getDisplayName(), message);
 		return true;
 	}

@@ -18,17 +18,20 @@ public class Move extends BukkitListener {
 
 	@EventHandler
 	public void onPlayerMove(final PlayerMoveEvent event) {
-		// TODO: Speed up
 		MojangProfile profile = NiftyBukkit.getMojangRepository().searchByPlayer(event.getPlayer());
 		UserChatData userData = UserChatData.getCache(profile.getUniqueId());
-		if (userData != null) userData.setMoved();
+
+		if (userData.isOnline())
+			userData.setMoved();
+		else
+			this.getLog().console(profile.getName() + " moved without being here!");
 	}
 
 	@EventHandler
 	public void onRankChangeEvent(RankChangeEvent event) {
 		UserChatData userData = UserChatData.getCache(event.getUniqueId());
 
-		if (userData != null) {
+		if (userData.isOnline()) {
 			userData.updateDisplayName();
 			userData.updateTabListName();
 			userData.applyFlagData("vanished", false);

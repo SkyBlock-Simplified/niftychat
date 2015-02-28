@@ -88,8 +88,8 @@ public class Mute extends BukkitCommand {
 			this.getLog().message(sender, sendMsg, profile.getName(), (!server.equals("*") ? "" : "globally "), (!isMuted ? "" : "un"), serverMsg, expireMsg);
 
 		if (!NiftyBukkit.getBungeeHelper().isOnline()) {
-			if (userData.getPlayer() != null)
-				this.getLog().message(userData.getPlayer(), receiveMsg, "", (!isMuted ? "" : "un"), "", expireMsg);
+			if (userData.isOnline())
+				this.getLog().message(userData.getOfflinePlayer().getPlayer(), receiveMsg, "", (!isMuted ? "" : "un"), "", expireMsg);
 		} else {
 			if (isConsole(sender) && NiftyBukkit.getBungeeHelper().getServer().getPlayerCount() == 0) return;
 			NiftyBukkit.getBungeeHelper().message(profile, ChatColor.GRAY + StringUtil.format(receiveMsg, (!server.equals("*") ? "" : "globally "), (!isMuted ? "" : "un"), serverMsg, expireMsg));

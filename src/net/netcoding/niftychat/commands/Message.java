@@ -50,14 +50,13 @@ public class Message extends BukkitCommand {
 					}, "spying", true);
 
 					for (MojangProfile spy : spies) {
-						if (!spy.getUniqueId().equals(senderData.getUniqueId()) && !spy.getUniqueId().equals(receiverData.getUniqueId())) {
+						if (!spy.getUniqueId().equals(senderData.getProfile().getUniqueId()) && !spy.getUniqueId().equals(receiverData.getProfile().getUniqueId())) {
 							if (!NiftyBukkit.getBungeeHelper().isOnline()) {
 								UserChatData spyData = UserChatData.getCache(spy.getUniqueId());
-								spyData = spyData == null ? new UserChatData(helper.getPlugin(), spy) : spyData;
 								if (spyData.getOfflinePlayer().isOnline()) helper.getLog().message(spyData.getOfflinePlayer().getPlayer(), format.getFormat(), senderData.getDisplayName(), receiverData.getDisplayName(), format);
 							} else {
 								if (NiftyBukkit.getBungeeHelper().isPlayerOnline(spy))
-									NiftyBukkit.getBungeeHelper().forward(findPlayer(receiverData.getName()), NiftyBukkit.getBungeeHelper().getPlayerServer(spy).getName(), Config.CHAT_CHANNEL, "SpyMessage", senderData.getName(), receiverData.getName(), spy.getName(), message);
+									NiftyBukkit.getBungeeHelper().forward(findPlayer(receiverData.getProfile().getName()), NiftyBukkit.getBungeeHelper().getPlayerServer(spy).getName(), Config.CHAT_CHANNEL, "SpyMessage", senderData.getProfile().getName(), receiverData.getProfile().getName(), spy.getName(), message);
 							}	
 						}
 					}
@@ -72,17 +71,14 @@ public class Message extends BukkitCommand {
 		// Message sender
 		MojangProfile senderProfile = NiftyBukkit.getMojangRepository().searchByUsername(senderName);
 		UserChatData senderData = UserChatData.getCache(senderProfile.getUniqueId());
-		senderData = senderData == null ? new UserChatData(helper.getPlugin(), senderProfile) : senderData;
 
 		// Message receiver
 		MojangProfile receiverProfile = NiftyBukkit.getMojangRepository().searchByUsername(receiverName);
 		UserChatData receiverData = UserChatData.getCache(receiverProfile.getUniqueId());
-		receiverData = receiverData == null ? new UserChatData(helper.getPlugin(), receiverProfile) : receiverData;
 
 		// Where message is sent
 		MojangProfile recipientProfile = NiftyBukkit.getMojangRepository().searchByUsername(recipientName);
 		UserChatData recipientData = UserChatData.getCache(recipientProfile.getUniqueId());
-		recipientData = recipientData == null ? new UserChatData(helper.getPlugin(), recipientProfile) : recipientData;
 
 		if (recipientProfile.equals(senderProfile)) { // Sending
 			boolean receiverOnline = true;
@@ -93,7 +89,7 @@ public class Message extends BukkitCommand {
 				receiverOnline = NiftyBukkit.getBungeeHelper().isPlayerOnline(receiverProfile);
 
 			if (!receiverOnline) {
-				helper.getLog().error(senderData.getOfflinePlayer().getPlayer(), "Unable to locate {{0}}!", receiverData.getName());
+				helper.getLog().error(senderData.getOfflinePlayer().getPlayer(), "Unable to locate {{0}}!", receiverData.getProfile().getName());
 				return false;
 			}
 
@@ -103,7 +99,7 @@ public class Message extends BukkitCommand {
 			}
 
 			if (receiverData.getFlagData("vanished").getValue() && !senderData.hasPermissions("vanish", "interact")) {
-				helper.getLog().error(senderData.getOfflinePlayer().getPlayer(), "Unable to locate {{0}}!", receiverData.getName());
+				helper.getLog().error(senderData.getOfflinePlayer().getPlayer(), "Unable to locate {{0}}!", receiverData.getProfile().getName());
 				return false;
 			}
 		} else if (recipientProfile.equals(receiverProfile)) { // Receiving

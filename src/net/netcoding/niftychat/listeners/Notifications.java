@@ -32,7 +32,7 @@ public class Notifications implements DatabaseListener {
 						if (result.next()) {
 							UserChatData userData = UserChatData.getCache(UUID.fromString(result.getString("uuid")));
 
-							if (userData != null) {
+							if (userData.isOnline()) {
 								userData.updateDisplayName();
 								userData.updateTabListName();
 							}
@@ -90,7 +90,7 @@ public class Notifications implements DatabaseListener {
 				Map<String, Object> data = databaseNotification.getDeletedData();
 				UserChatData userData = UserChatData.getCache(UUID.fromString((String)data.get("uuid")));
 
-				if (userData != null) {
+				if (userData.isOnline()) {
 					userData.reloadFlagData();
 					userData.applyFlagData((String)data.get("flag"), false);
 				}
@@ -103,7 +103,7 @@ public class Notifications implements DatabaseListener {
 						if (result.next()) {
 							UserChatData userData = UserChatData.getCache(UUID.fromString(result.getString("uuid")));
 
-							if (userData != null) {
+							if (userData.isOnline()) {
 								String flag = result.getString("flag");
 								List<UserFlagData> flagDatas = userData.getAllFlagData(flag);
 								String server = result.getString("server");

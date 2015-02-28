@@ -29,7 +29,7 @@ public class GList extends BukkitCommand {
 	@SuppressWarnings("deprecation")
 	@Override
 	public void onCommand(CommandSender sender, String alias, String[] args) throws Exception {
-		UserChatData senderData = isConsole(sender) ? null : UserChatData.getCache(NiftyBukkit.getMojangRepository().searchByExactPlayer((Player)sender).getUniqueId());
+		UserChatData senderData = isConsole(sender) ? null : UserChatData.getCache(NiftyBukkit.getMojangRepository().searchByPlayer((Player)sender).getUniqueId());
 		List<String> output = new ArrayList<>();
 		int totalPlayers = this.getPlugin().getServer().getOnlinePlayers().length;
 		int maxPlayers = this.getPlugin().getServer().getMaxPlayers();
@@ -52,7 +52,7 @@ public class GList extends BukkitCommand {
 
 			if (!NiftyBukkit.getBungeeHelper().isOnline()) {
 				for (Player player : this.getPlugin().getServer().getOnlinePlayers())
-					profiles.add(NiftyBukkit.getMojangRepository().searchByExactPlayer(player));
+					profiles.add(NiftyBukkit.getMojangRepository().searchByPlayer(player));
 			} else {
 				if (selected != null) {
 					profiles.addAll(selected.getPlayerList());
@@ -66,7 +66,6 @@ public class GList extends BukkitCommand {
 			if (profiles.size() > 0) {
 				for (MojangProfile profile : profiles) {
 					UserChatData userData = UserChatData.getCache(profile.getUniqueId());
-					userData = userData == null ? new UserChatData(this.getPlugin(), profile) : userData;
 
 					if (userData.getFlagData("vanished", (selected == null ? "*" : selected.getName())).getValue()) {
 						if ((isPlayer(sender) && userData.equals(senderData)) || this.hasPermissions(sender, "vanish", "see"))
@@ -95,7 +94,6 @@ public class GList extends BukkitCommand {
 
 						for (MojangProfile profile : server.getPlayerList()) {
 							UserChatData userData = UserChatData.getCache(profile.getUniqueId());
-							userData = userData == null ? new UserChatData(this.getPlugin(), profile) : userData;
 
 							if (userData.getFlagData("vanished", server.getName()).getValue()) {
 								if ((isPlayer(sender) && userData.equals(senderData)) || this.hasPermissions(sender, "vanish", "see"))

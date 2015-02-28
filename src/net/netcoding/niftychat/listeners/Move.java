@@ -29,7 +29,7 @@ public class Move extends BukkitListener {
 
 	@EventHandler
 	public void onRankChangeEvent(RankChangeEvent event) {
-		UserChatData userData = UserChatData.getCache(event.getUniqueId());
+		UserChatData userData = UserChatData.getCache(event.getProfile().getUniqueId());
 
 		if (userData.isOnline()) {
 			userData.updateDisplayName();

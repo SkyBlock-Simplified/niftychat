@@ -37,18 +37,6 @@ public class Nick extends BukkitTabCommand {
 			return;
 		}
 
-		if (args[0].equalsIgnoreCase("c")) {
-			String n = args[1];
-			MojangProfile p;
-			try {
-				p = NiftyBukkit.getMojangRepository().searchByUsername(n);
-				this.getLog().message(sender, "The uuid of {{0}} is {{1}}", p.getName(), p.getUniqueId());
-			} catch (ProfileNotFoundException pnfe) {
-				this.getLog().error(sender, "Unable to locate the uuid of {{0}}!", pnfe, n);
-			}
-			return;
-		}
-
 		String playerName = (args.length == 2 ? args[0] : sender.getName());
 		String nick = (args.length == 2 ? args[1] : args[0]);
 		String your = (sender.getName() == playerName ? ChatColor.GRAY + "You" : playerName);

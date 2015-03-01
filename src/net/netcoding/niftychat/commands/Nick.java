@@ -5,7 +5,7 @@ import java.sql.SQLException;
 import java.util.List;
 
 import net.netcoding.niftybukkit.NiftyBukkit;
-import net.netcoding.niftybukkit.database.ResultCallback;
+import net.netcoding.niftybukkit.database.factory.ResultCallback;
 import net.netcoding.niftybukkit.minecraft.BukkitTabCommand;
 import net.netcoding.niftybukkit.mojang.MojangProfile;
 import net.netcoding.niftybukkit.mojang.exceptions.ProfileNotFoundException;

@@ -3,7 +3,7 @@ package net.netcoding.niftychat.cache;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 
-import net.netcoding.niftybukkit.database.ResultCallback;
+import net.netcoding.niftybukkit.database.factory.ResultCallback;
 import net.netcoding.niftybukkit.util.RegexUtil;
 import net.netcoding.niftybukkit.util.StringUtil;
 import net.netcoding.niftybukkit.util.concurrent.ConcurrentSet;

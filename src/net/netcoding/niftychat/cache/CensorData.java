@@ -4,7 +4,7 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.regex.Pattern;
 
-import net.netcoding.niftybukkit.database.ResultCallback;
+import net.netcoding.niftybukkit.database.factory.ResultCallback;
 import net.netcoding.niftybukkit.util.StringUtil;
 import net.netcoding.niftybukkit.util.concurrent.ConcurrentSet;
 

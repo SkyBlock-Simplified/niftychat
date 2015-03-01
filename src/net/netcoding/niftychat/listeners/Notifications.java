@@ -8,10 +8,10 @@ import java.util.Map;
 import java.util.UUID;
 
 import net.netcoding.niftybukkit.NiftyBukkit;
-import net.netcoding.niftybukkit.database.DatabaseListener;
-import net.netcoding.niftybukkit.database.DatabaseNotification;
-import net.netcoding.niftybukkit.database.ResultCallback;
-import net.netcoding.niftybukkit.database.TriggerEvent;
+import net.netcoding.niftybukkit.database.factory.ResultCallback;
+import net.netcoding.niftybukkit.database.notifications.DatabaseListener;
+import net.netcoding.niftybukkit.database.notifications.DatabaseNotification;
+import net.netcoding.niftybukkit.database.notifications.TriggerEvent;
 import net.netcoding.niftychat.cache.CensorData;
 import net.netcoding.niftychat.cache.Config;
 import net.netcoding.niftychat.cache.RankFormat;

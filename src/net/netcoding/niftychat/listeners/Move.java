@@ -19,7 +19,7 @@ public class Move extends BukkitListener {
 	@EventHandler
 	public void onPlayerMove(final PlayerMoveEvent event) {
 		MojangProfile profile = NiftyBukkit.getMojangRepository().searchByPlayer(event.getPlayer());
-		UserChatData userData = UserChatData.getCache(profile.getUniqueId());
+		UserChatData userData = UserChatData.getCache(profile);
 
 		if (userData.isOnline())
 			userData.setMoved();
@@ -29,7 +29,7 @@ public class Move extends BukkitListener {
 
 	@EventHandler
 	public void onRankChangeEvent(RankChangeEvent event) {
-		UserChatData userData = UserChatData.getCache(event.getProfile().getUniqueId());
+		UserChatData userData = UserChatData.getCache(event.getProfile());
 
 		if (userData.isOnline()) {
 			userData.updateDisplayName();

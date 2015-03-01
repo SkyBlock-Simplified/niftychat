@@ -29,7 +29,7 @@ public class Chat extends BukkitListener {
 
 	public static boolean check(BukkitHelper helper, Player player, String message) {
 		MojangProfile profile = NiftyBukkit.getMojangRepository().searchByPlayer(player);
-		UserChatData userData = UserChatData.getCache(profile.getUniqueId());
+		UserChatData userData = UserChatData.getCache(profile);
 		String stripMessage = RegexUtil.strip(message, RegexUtil.REPLACE_ALL_PATTERN);
 
 		if (StringUtil.isEmpty(stripMessage)) return false;
@@ -124,7 +124,7 @@ public class Chat extends BukkitListener {
 		if (event.isCancelled()) return;
 		Player player = event.getPlayer();
 		MojangProfile profile = NiftyBukkit.getMojangRepository().searchByPlayer(player);
-		UserChatData userData = UserChatData.getCache(profile.getUniqueId());
+		UserChatData userData = UserChatData.getCache(profile);
 
 		String rank = userData.getRankData().getPrimaryRank();
 		RankFormat rankInfo = RankFormat.getCache(rank);

@@ -7,6 +7,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 
+import net.netcoding.niftybukkit.NiftyBukkit;
 import net.netcoding.niftybukkit.database.DatabaseListener;
 import net.netcoding.niftybukkit.database.DatabaseNotification;
 import net.netcoding.niftybukkit.database.ResultCallback;
@@ -30,7 +31,8 @@ public class Notifications implements DatabaseListener {
 					@Override
 					public Void handle(ResultSet result) throws SQLException {
 						if (result.next()) {
-							UserChatData userData = UserChatData.getCache(UUID.fromString(result.getString("uuid")));
+							UUID uuid = UUID.fromString(result.getString("uuid"));
+							UserChatData userData = UserChatData.getCache(NiftyBukkit.getMojangRepository().searchByExactUUID(uuid));
 
 							if (userData.isOnline()) {
 								userData.updateDisplayName();
@@ -88,7 +90,8 @@ public class Notifications implements DatabaseListener {
 		else if (table.equals(Config.USER_FLAGS_TABLE)) {
 			if (!event.equals(TriggerEvent.INSERT)) {
 				Map<String, Object> data = databaseNotification.getDeletedData();
-				UserChatData userData = UserChatData.getCache(UUID.fromString((String)data.get("uuid")));
+				UUID uuid = UUID.fromString((String)data.get("uuid"));
+				UserChatData userData = UserChatData.getCache(NiftyBukkit.getMojangRepository().searchByExactUUID(uuid));
 
 				if (userData.isOnline()) {
 					userData.reloadFlagData();
@@ -101,7 +104,8 @@ public class Notifications implements DatabaseListener {
 					@Override
 					public Void handle(ResultSet result) throws SQLException {
 						if (result.next()) {
-							UserChatData userData = UserChatData.getCache(UUID.fromString(result.getString("uuid")));
+							UUID uuid = UUID.fromString(result.getString("uuid"));
+							UserChatData userData = UserChatData.getCache(NiftyBukkit.getMojangRepository().searchByExactUUID(uuid));
 
 							if (userData.isOnline()) {
 								String flag = result.getString("flag");

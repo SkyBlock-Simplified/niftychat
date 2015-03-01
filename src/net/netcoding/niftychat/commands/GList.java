@@ -29,7 +29,7 @@ public class GList extends BukkitCommand {
 	@SuppressWarnings("deprecation")
 	@Override
 	public void onCommand(CommandSender sender, String alias, String[] args) throws Exception {
-		UserChatData senderData = isConsole(sender) ? null : UserChatData.getCache(NiftyBukkit.getMojangRepository().searchByPlayer((Player)sender).getUniqueId());
+		UserChatData senderData = isConsole(sender) ? null : UserChatData.getCache(NiftyBukkit.getMojangRepository().searchByPlayer((Player)sender));
 		List<String> output = new ArrayList<>();
 		int totalPlayers = this.getPlugin().getServer().getOnlinePlayers().length;
 		int maxPlayers = this.getPlugin().getServer().getMaxPlayers();
@@ -65,7 +65,7 @@ public class GList extends BukkitCommand {
 
 			if (profiles.size() > 0) {
 				for (MojangProfile profile : profiles) {
-					UserChatData userData = UserChatData.getCache(profile.getUniqueId());
+					UserChatData userData = UserChatData.getCache(profile);
 
 					if (userData.getFlagData("vanished", (selected == null ? "*" : selected.getName())).getValue()) {
 						if ((isPlayer(sender) && userData.equals(senderData)) || this.hasPermissions(sender, "vanish", "see"))
@@ -80,11 +80,10 @@ public class GList extends BukkitCommand {
 
 			if (nameList.size() > 0) output.add(StringUtil.implode("&r, ", nameList));
 		} else {
-			List<BungeeServer> servers = new ArrayList<>(NiftyBukkit.getBungeeHelper().getServers());
 			totalPlayers = NiftyBukkit.getBungeeHelper().getPlayerCount("ALL");
 			maxPlayers = NiftyBukkit.getBungeeHelper().getMaxPlayers("ALL");
 
-			for (BungeeServer server : servers) {
+			for (BungeeServer server : NiftyBukkit.getBungeeHelper().getServers()) {
 				if (server.isOnline()) {
 					String names = "";
 					int serverPlayers = server.getPlayerCount();
@@ -93,7 +92,7 @@ public class GList extends BukkitCommand {
 						List<String> nameList = new ArrayList<>();
 
 						for (MojangProfile profile : server.getPlayerList()) {
-							UserChatData userData = UserChatData.getCache(profile.getUniqueId());
+							UserChatData userData = UserChatData.getCache(profile);
 
 							if (userData.getFlagData("vanished", server.getName()).getValue()) {
 								if ((isPlayer(sender) && userData.equals(senderData)) || this.hasPermissions(sender, "vanish", "see"))

@@ -52,7 +52,7 @@ public class Message extends BukkitCommand {
 					for (MojangProfile spy : spies) {
 						if (!spy.getUniqueId().equals(senderData.getProfile().getUniqueId()) && !spy.getUniqueId().equals(receiverData.getProfile().getUniqueId())) {
 							if (!NiftyBukkit.getBungeeHelper().isOnline()) {
-								UserChatData spyData = UserChatData.getCache(spy.getUniqueId());
+								UserChatData spyData = UserChatData.getCache(spy);
 								if (spyData.getOfflinePlayer().isOnline()) helper.getLog().message(spyData.getOfflinePlayer().getPlayer(), format.getFormat(), senderData.getDisplayName(), receiverData.getDisplayName(), format);
 							} else {
 								if (NiftyBukkit.getBungeeHelper().isPlayerOnline(spy))
@@ -70,15 +70,15 @@ public class Message extends BukkitCommand {
 	public static boolean send(final BukkitHelper helper, String senderName, String receiverName, String recipientName, String message) {
 		// Message sender
 		MojangProfile senderProfile = NiftyBukkit.getMojangRepository().searchByUsername(senderName);
-		UserChatData senderData = UserChatData.getCache(senderProfile.getUniqueId());
+		UserChatData senderData = UserChatData.getCache(senderProfile);
 
 		// Message receiver
 		MojangProfile receiverProfile = NiftyBukkit.getMojangRepository().searchByUsername(receiverName);
-		UserChatData receiverData = UserChatData.getCache(receiverProfile.getUniqueId());
+		UserChatData receiverData = UserChatData.getCache(receiverProfile);
 
 		// Where message is sent
 		MojangProfile recipientProfile = NiftyBukkit.getMojangRepository().searchByUsername(recipientName);
-		UserChatData recipientData = UserChatData.getCache(recipientProfile.getUniqueId());
+		UserChatData recipientData = UserChatData.getCache(recipientProfile);
 
 		if (recipientProfile.equals(senderProfile)) { // Sending
 			boolean receiverOnline = true;
@@ -126,7 +126,7 @@ public class Message extends BukkitCommand {
 		boolean reply = alias.matches("^r(?:eply)?$");
 		String message = StringUtil.implode(" ", args, reply ? 0 : 1);
 		MojangProfile senderprofile = NiftyBukkit.getMojangRepository().searchByPlayer(player);
-		UserChatData senderData = UserChatData.getCache(senderprofile.getUniqueId());
+		UserChatData senderData = UserChatData.getCache(senderprofile);
 
 		if (reply) {
 			MojangProfile lastMessenger = senderData.getLastMessenger();

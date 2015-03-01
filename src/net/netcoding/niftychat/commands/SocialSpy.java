@@ -59,7 +59,7 @@ public class SocialSpy extends BukkitCommand {
 			return;
 		}
 
-		UserChatData userData = UserChatData.getCache(profile.getUniqueId());
+		UserChatData userData = UserChatData.getCache(profile);
 		if (Config.isGlobalCommand(alias, server)) server = "*";
 
 		if (server.equals("*") && !this.hasPermissions(sender, "socialspy", "global")) {

@@ -1,6 +1,6 @@
 name: NiftyChat
-version: 1.2.6
-website: http://netcoding.net/
+version: 1.2.7
+website: https://netcoding.net/
 author: Brian Graham
 
 main: net.netcoding.niftychat.NiftyChat

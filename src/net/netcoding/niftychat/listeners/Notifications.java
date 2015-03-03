@@ -21,7 +21,7 @@ import net.netcoding.niftychat.cache.UserFlagData;
 public class Notifications implements DatabaseListener {
 
 	@Override
-	public void onDatabaseNotification(DatabaseNotification databaseNotification) throws SQLException {
+	public void onDatabaseNotification(final DatabaseNotification databaseNotification) throws SQLException {
 		TriggerEvent event = databaseNotification.getEvent();
 		String table = databaseNotification.getTable();
 
@@ -95,7 +95,7 @@ public class Notifications implements DatabaseListener {
 
 				if (userData.isOnline()) {
 					userData.reloadFlagData();
-					userData.applyFlagData((String)data.get("flag"), false);
+					userData.applyFlagData((String)data.get("flag"));
 				}
 			}
 
@@ -131,7 +131,7 @@ public class Notifications implements DatabaseListener {
 								flagMatch.setServer(server);
 								flagMatch.setSubmitted(_submitted);
 								flagMatch.setValue(result.getBoolean("value"));
-								userData.applyFlagData(flag, false);
+								userData.applyFlagData(flag);
 							}
 						}
 

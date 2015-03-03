@@ -1,5 +1,6 @@
 package net.netcoding.niftychat.listeners;
 
+import net.netcoding.niftybukkit.NiftyBukkit;
 import net.netcoding.niftybukkit.minecraft.BukkitListener;
 import net.netcoding.niftychat.NiftyChat;
 import net.netcoding.niftychat.cache.UserChatData;
@@ -16,7 +17,7 @@ public class Disconnect extends BukkitListener {
 	}
 
 	private void playerDisconnect(Player player) {
-		UserChatData.removeCache(player.getUniqueId());
+		UserChatData.removeCache(NiftyBukkit.getMojangRepository().searchByExactUUID(player.getUniqueId()));
 	}
 
 	@EventHandler

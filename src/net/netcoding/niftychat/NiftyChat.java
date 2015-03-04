@@ -47,10 +47,10 @@ public class NiftyChat extends BukkitPlugin {
 
 		try {
 			Cache.notifications = new Notifications();
-			Cache.MySQL.addDatabaseListener(Config.FORMAT_TABLE, Cache.notifications);
-			Cache.MySQL.addDatabaseListener(Config.CENSOR_TABLE, Cache.notifications);
-			Cache.MySQL.addDatabaseListener(Config.USER_TABLE, Cache.notifications);
-			Cache.MySQL.addDatabaseListener(Config.USER_FLAGS_TABLE, Cache.notifications);
+			Cache.MySQL.addListener(Config.FORMAT_TABLE, Cache.notifications);
+			Cache.MySQL.addListener(Config.CENSOR_TABLE, Cache.notifications);
+			Cache.MySQL.addListener(Config.USER_TABLE, Cache.notifications);
+			Cache.MySQL.addListener(Config.USER_FLAGS_TABLE, Cache.notifications);
 		} catch (Exception ex) {
 			this.getLog().console(ex);
 			return;
@@ -82,7 +82,7 @@ public class NiftyChat extends BukkitPlugin {
 
 	@Override
 	public void onDisable() {
-		Cache.MySQL.stopListening();
+		Cache.MySQL.removeListeners();
 	}
 
 	private boolean setupTables() {

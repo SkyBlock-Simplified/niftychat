@@ -10,11 +10,24 @@ import net.netcoding.niftychat.cache.Cache;
 import net.netcoding.niftychat.cache.Config;
 import net.netcoding.niftychat.cache.UserChatData;
 
+import org.bukkit.Bukkit;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.player.PlayerJoinEvent;
+import org.bukkit.plugin.Plugin;
 
 public class Login extends BukkitListener {
+
+	private static boolean usingPEX = false;
+
+	static {
+		Plugin plugin = Bukkit.getServer().getPluginManager().getPlugin("PermissionsEx");
+
+		if (plugin != null) {
+			if (plugin.isEnabled())
+				usingPEX = true;
+		}
+	}
 
 	public Login(NiftyChat plugin) {
 		super(plugin);
@@ -39,16 +52,19 @@ public class Login extends BukkitListener {
 			userData.updateDisplayName();
 			userData.updateTabListName();
 
-			if (userData.hasPermissions("chat", "bypass", "move"))
+			if (!usingPEX) {
+				if (userData.hasPermissions("chat", "bypass", "move"))
+					userData.setMoved();
+
+				if (!userData.hasPermissions("socialspy"))
+					userData.resetFlagData("spying", "");
+
+				if (!userData.hasPermissions("vanish"))
+					userData.resetFlagData("vanished", "");
+			} else
 				userData.setMoved();
 
-			if (!userData.hasPermissions("socialspy"))
-				userData.resetFlagData("spying", "");
-
-			if (userData.hasPermissions("vanish"))
-				userData.applyFlagData("vanished", true);
-			else
-				userData.resetFlagData("vanished", "");
+			userData.applyFlagData("vanished");
 		} catch (Exception ex) {
 			this.getLog().console(ex);
 		}

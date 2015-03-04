@@ -20,11 +20,7 @@ public class Move extends BukkitListener {
 	public void onPlayerMove(final PlayerMoveEvent event) {
 		MojangProfile profile = NiftyBukkit.getMojangRepository().searchByPlayer(event.getPlayer());
 		UserChatData userData = UserChatData.getCache(profile);
-
-		if (userData.isOnline())
-			userData.setMoved();
-		else
-			this.getLog().console(profile.getName() + " moved without being here!");
+		if (userData.isOnline()) userData.setMoved();
 	}
 
 	@EventHandler
@@ -34,7 +30,7 @@ public class Move extends BukkitListener {
 		if (userData.isOnline()) {
 			userData.updateDisplayName();
 			userData.updateTabListName();
-			userData.applyFlagData("vanished", false);
+			userData.applyFlagData("vanished");
 		}
 	}
 

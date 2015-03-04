@@ -5,44 +5,41 @@ import java.sql.SQLException;
 import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.HashSet;
 import java.util.List;
-import java.util.UUID;
 
 import net.netcoding.niftybukkit.NiftyBukkit;
-import net.netcoding.niftybukkit.database.ResultCallback;
+import net.netcoding.niftybukkit.database.factory.ResultCallback;
 import net.netcoding.niftybukkit.minecraft.BukkitHelper;
 import net.netcoding.niftybukkit.minecraft.BungeeHelper;
 import net.netcoding.niftybukkit.minecraft.BungeeServer;
 import net.netcoding.niftybukkit.mojang.MojangProfile;
+import net.netcoding.niftybukkit.util.ListUtil;
 import net.netcoding.niftybukkit.util.RegexUtil;
 import net.netcoding.niftybukkit.util.StringUtil;
 import net.netcoding.niftybukkit.util.TimeUtil;
 import net.netcoding.niftybukkit.util.concurrent.ConcurrentSet;
+import net.netcoding.niftychat.NiftyChat;
 import net.netcoding.niftyranks.cache.UserRankData;
 
-import org.bukkit.entity.Player;
+import org.bukkit.OfflinePlayer;
 import org.bukkit.plugin.java.JavaPlugin;
 
 public class UserChatData extends BukkitHelper {
 
 	private static final transient ConcurrentSet<UserChatData> cache = new ConcurrentSet<>();
-
 	private MojangProfile profile;
-
 	private String lastMessage;
-
 	private MojangProfile lastMessenger;
-
 	private boolean hasMoved = false;
+	private HashSet<UserFlagData> flagData = new HashSet<>();
 
-	private List<UserFlagData> flagData;
-
-	public UserChatData(JavaPlugin plugin, Player player) {
-		this(plugin, NiftyBukkit.getMojangRepository().searchByPlayer(player));
+	public UserChatData(JavaPlugin plugin, OfflinePlayer oplayer) {
+		this(plugin, NiftyBukkit.getMojangRepository().searchByPlayer(oplayer));
 		cache.add(this);
 	}
 
-	public UserChatData(JavaPlugin plugin, MojangProfile profile) {
+	private UserChatData(JavaPlugin plugin, MojangProfile profile) {
 		super(plugin);
 		this.profile = profile;
 	}
@@ -51,33 +48,26 @@ public class UserChatData extends BukkitHelper {
 		this.flagData.add(flagData);
 	}
 
-	public void applyFlagData(final String flag, final boolean login) {
-		if (this.getPlayer() == null) return;
+	public void applyFlagData(final String flag) {
+		if (!this.isOnline()) return;
 		final boolean flagValue = this.getFlagData(flag).getValue();
-		final UUID thisUniqueId = this.getUniqueId();
 
 		if ("vanished".equals(flag)) {
 			this.getPlugin().getServer().getScheduler().runTask(this.getPlugin(), new Runnable() {
 				@Override
 				public void run() {
 					for (UserChatData userData : getCache()) {
-						if (!userData.getUniqueId().equals(thisUniqueId)) {
-							if (flagValue && !userData.hasPermissions("vanish", "see"))
-								userData.getPlayer().hidePlayer(getPlayer());
-							else
-								userData.getPlayer().showPlayer(getPlayer());
-						}
-					}
+						if (userData.getProfile().equals(getProfile())) continue;
 
-					if (login) {
-						for (UserChatData userData : getCache()) {
-							if (!userData.getUniqueId().equals(thisUniqueId)) {
-								if (userData.getFlagData(flag).getValue() && !hasPermissions("vanish", "see"))
-									getPlayer().hidePlayer(userData.getPlayer());
-								else
-									getPlayer().showPlayer(userData.getPlayer());
-							}
-						}
+						if (flagValue && !userData.hasPermissions("vanish", "see"))
+							userData.getOfflinePlayer().getPlayer().hidePlayer(getOfflinePlayer().getPlayer());
+						else
+							userData.getOfflinePlayer().getPlayer().showPlayer(getOfflinePlayer().getPlayer());
+
+						if (userData.getFlagData(flag).getValue() && !hasPermissions("vanish", "see"))
+							getOfflinePlayer().getPlayer().hidePlayer(userData.getOfflinePlayer().getPlayer());
+						else
+							getOfflinePlayer().getPlayer().showPlayer(userData.getOfflinePlayer().getPlayer());
 					}
 				}
 			});
@@ -88,36 +78,38 @@ public class UserChatData extends BukkitHelper {
 		return cache;
 	}
 
-	public static UserChatData getCache(UUID uuid) {
+	public static UserChatData getCache(MojangProfile profile) {
 		for (UserChatData data : getCache()) {
-			if (uuid.equals(data.getUniqueId()))
+			if (profile.equals(data.getProfile()))
 				return data;
 		}
 
-		return null;
+		return new UserChatData(NiftyChat.getPlugin(NiftyChat.class), profile);
+	}
+
+	@Override
+	public boolean equals(Object obj) {
+		if (this == obj) return true;
+		if (obj == null) return false;
+		if (this.getClass() != obj.getClass()) return false;
+		UserChatData userData = (UserChatData)obj;
+		return this.getProfile().equals(userData.getProfile());
 	}
 
 	public String getDisplayName() {
 		return this.getDisplayName(false);
 	}
 
-	public String getDisplayName(boolean fetch) {
-		UserChatData userData = getCache(this.getUniqueId());
-
-		if (!fetch && userData != null) {
-			if (userData != null) {
-				if (userData.getPlayer() != null)
-					return userData.getPlayer().getDisplayName();
-				else
-					return this.getName();
+	private String getDisplayName(boolean fetch) {
+		if (!fetch && this.isOnline())
+			return this.getOfflinePlayer().getPlayer().getDisplayName();
+		else {
+			try {
+				return _getDisplayName(this.profile);
+			} catch (SQLException ex) {
+				return this.getProfile().getName();
 			}
 		}
-
-		try {
-			return _getDisplayName(this.profile);
-		} catch (SQLException ex) { }
-
-		return this.getName();
 	}
 
 	private static String _getDisplayName(final MojangProfile profile) throws SQLException {
@@ -128,10 +120,7 @@ public class UserChatData extends BukkitHelper {
 				String rank = "default";
 
 				if (result.next()) {
-					displayName = profile.getName();
 					rank = UserRankData.getOfflineRanks(profile).get(0);
-					Player player = findPlayer(displayName);
-					if (player != null) displayName = player.getName();
 					String nick = result.getString("nick");
 					displayName = (result.wasNull() ? displayName : ("*" + RegexUtil.replaceColor(nick, RegexUtil.REPLACE_ALL_PATTERN)));
 				}
@@ -146,7 +135,7 @@ public class UserChatData extends BukkitHelper {
 	}
 
 	public List<UserFlagData> getAllFlagData(String flag) {
-		if (this.flagData == null) this.reloadFlagData();
+		if (ListUtil.isEmpty(this.flagData)) this.reloadFlagData();
 		List<UserFlagData> flagMatches = new ArrayList<>();
 
 		for (UserFlagData flagData : this.flagData) {
@@ -184,24 +173,20 @@ public class UserChatData extends BukkitHelper {
 		return found;
 	}
 
-	public String getName() {
-		return this.profile.getName();
-	}
-
 	public MojangProfile getLastMessenger() {
 		return this.lastMessenger;
 	}
 
-	public Player getPlayer() {
-		return this.getPlugin().getServer().getPlayer(this.getUniqueId());
+	public OfflinePlayer getOfflinePlayer() {
+		return this.getPlugin().getServer().getOfflinePlayer(this.getProfile().getUniqueId());
+	}
+
+	public MojangProfile getProfile() {
+		return this.profile;
 	}
 
 	public UserRankData getRankData() {
-		return UserRankData.getCache(this.profile.getUniqueId());
-	}
-
-	public UUID getUniqueId() {
-		return this.profile.getUniqueId();
+		return UserRankData.getCache(this.getProfile());
 	}
 
 	public boolean hasMoved() {
@@ -209,7 +194,7 @@ public class UserChatData extends BukkitHelper {
 	}
 
 	public boolean hasPermissions(String... permissions) {
-		return super.hasPermissions(this.getPlayer(), permissions);
+		return super.hasPermissions(this.getOfflinePlayer().getPlayer(), permissions);
 	}
 
 	public boolean hasRepeatedMessage(String message) {
@@ -224,18 +209,20 @@ public class UserChatData extends BukkitHelper {
 		return false;
 	}
 
-	public static void removeCache(UUID uuid) {
+	public boolean isOnline() {
+		return this.getOfflinePlayer().isOnline();
+	}
+
+	public static void removeCache(MojangProfile profile) {
 		for (UserChatData data : cache) {
-			if (data.getUniqueId().equals(uuid))
+			if (data.getProfile().equals(profile))
 				cache.remove(data);
 		}
 	}
 
 	public void reloadFlagData() {
 		try {
-			if (this.flagData == null) this.flagData = new ArrayList<>();
 			this.flagData.clear();
-
 			this.flagData.addAll(Cache.MySQL.query(StringUtil.format("SELECT * FROM `{0}` WHERE `uuid` = ?;", Config.USER_FLAGS_TABLE), new ResultCallback<List<UserFlagData>>() {
 				@Override
 				public List<UserFlagData> handle(ResultSet result) throws SQLException {
@@ -253,7 +240,7 @@ public class UserChatData extends BukkitHelper {
 
 					return flags;
 				}
-			}, this.getUniqueId()));
+			}, this.getProfile().getUniqueId()));
 		} catch (SQLException ex) {
 			this.getLog().console(ex);
 		}
@@ -264,7 +251,7 @@ public class UserChatData extends BukkitHelper {
 	}
 
 	public boolean resetFlagData(String flag, String notServer) throws SQLException {
-		return Cache.MySQL.update(StringUtil.format("DELETE FROM `{0}` WHERE `uuid` = ? AND `flag` = ? AND `server` <> ?;", Config.USER_FLAGS_TABLE), this.getUniqueId(), flag, notServer);
+		return Cache.MySQL.update(StringUtil.format("DELETE FROM `{0}` WHERE `uuid` = ? AND `flag` = ? AND `server` <> ?;", Config.USER_FLAGS_TABLE), this.getProfile().getUniqueId(), flag, notServer);
 	}
 
 	public void setLastMessenger(MojangProfile profile) {
@@ -281,20 +268,20 @@ public class UserChatData extends BukkitHelper {
 
 	public void updateDisplayName() {
 		String displayName = this.getDisplayName(true);
-		this.getPlayer().setDisplayName(displayName);
-		this.getPlayer().setCustomName(displayName);
+		this.getOfflinePlayer().getPlayer().setDisplayName(displayName);
+		this.getOfflinePlayer().getPlayer().setCustomName(displayName);
 	}
 
 	public boolean updateFlagData(String flag, boolean value, String server, long expires) throws SQLException {
 		if (expires > 0) expires += System.currentTimeMillis();
 		String sqlFormat = expires > 0 ? TimeUtil.SQL_FORMAT.format(new Date(expires)) : null;
-		return Cache.MySQL.update(StringUtil.format("INSERT INTO `{0}` (`uuid`, `flag`, `value`, `server`, `_expires`) VALUES (?, ?, ?, ?, ?) ON DUPLICATE KEY UPDATE `value` = ?, `_expires` = ?;", Config.USER_FLAGS_TABLE), this.getUniqueId(), flag, !value, server, sqlFormat, !value, sqlFormat);
+		return Cache.MySQL.update(StringUtil.format("INSERT INTO `{0}` (`uuid`, `flag`, `value`, `server`, `_expires`) VALUES (?, ?, ?, ?, ?) ON DUPLICATE KEY UPDATE `value` = ?, `_expires` = ?;", Config.USER_FLAGS_TABLE), this.getProfile().getUniqueId(), flag, !value, server, sqlFormat, !value, sqlFormat);
 	}
 
 	public void updateTabListName() {
 		String displayName = this.getDisplayName(true);
 		if (displayName.length() > 16) displayName = displayName.substring(0, 16);
-		this.getPlayer().setPlayerListName(displayName);
+		this.getOfflinePlayer().getPlayer().setPlayerListName(displayName);
 	}
 
 }

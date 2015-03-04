@@ -53,6 +53,10 @@ public class Config extends net.netcoding.niftybukkit.yaml.Config {
 		return this.schema;
 	}
 
+	public static boolean isForcedCommand(String alias) {
+		return alias.matches("^(g|global)?un[\\w]+");
+	}
+
 	public static boolean isGlobalCommand(String alias, String server) {
 		return alias.matches("^g(lobal)?(un)?[\\w]+") || server.matches("^global|all|\\*$");
 	}

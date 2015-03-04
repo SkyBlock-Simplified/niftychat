@@ -75,7 +75,7 @@ public class Mute extends BukkitCommand {
 		}
 
 		boolean isMuted = userData.getFlagData("muted", server).getValue();
-		if (alias.matches("^g?(lobal)?un[\\w]+")) isMuted = true;
+		if (Config.isForcedCommand(alias)) isMuted = true;
 		if (isMuted) expires = 0;
 		userData.updateFlagData("muted", isMuted, server, expires);
 		String serverMsg = server.equals("*") ? "" : StringUtil.format(" in the {{0}} server", server);

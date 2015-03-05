@@ -55,8 +55,8 @@ public class Message extends BukkitCommand {
 								UserChatData spyData = UserChatData.getCache(spy);
 								if (spyData.getOfflinePlayer().isOnline()) helper.getLog().message(spyData.getOfflinePlayer().getPlayer(), format.getFormat(), senderData.getDisplayName(), receiverData.getDisplayName(), format);
 							} else {
-								if (NiftyBukkit.getBungeeHelper().isPlayerOnline(spy))
-									NiftyBukkit.getBungeeHelper().forward(findPlayer(receiverData.getProfile().getName()), NiftyBukkit.getBungeeHelper().getPlayerServer(spy).getName(), Config.CHAT_CHANNEL, "SpyMessage", senderData.getProfile().getName(), receiverData.getProfile().getName(), spy.getName(), message);
+								if (spy.isOnline())
+									NiftyBukkit.getBungeeHelper().forward(receiverData.getProfile(), NiftyBukkit.getBungeeHelper().getPlayerServer(spy).getName(), Config.CHAT_CHANNEL, "SpyMessage", senderData.getProfile().getName(), receiverData.getProfile().getName(), spy.getName(), message);
 							}	
 						}
 					}
@@ -68,25 +68,12 @@ public class Message extends BukkitCommand {
 	}
 
 	public static boolean send(final BukkitHelper helper, String senderName, String receiverName, String recipientName, String message) {
-		// Message sender
-		MojangProfile senderProfile = NiftyBukkit.getMojangRepository().searchByUsername(senderName);
-		UserChatData senderData = UserChatData.getCache(senderProfile);
+		UserChatData senderData = UserChatData.getCache(NiftyBukkit.getMojangRepository().searchByUsername(senderName)); // Sender
+		UserChatData receiverData = UserChatData.getCache(NiftyBukkit.getMojangRepository().searchByUsername(receiverName)); // Receiver
+		UserChatData recipientData = UserChatData.getCache(NiftyBukkit.getMojangRepository().searchByUsername(recipientName)); // Sent
 
-		// Message receiver
-		MojangProfile receiverProfile = NiftyBukkit.getMojangRepository().searchByUsername(receiverName);
-		UserChatData receiverData = UserChatData.getCache(receiverProfile);
-
-		// Where message is sent
-		MojangProfile recipientProfile = NiftyBukkit.getMojangRepository().searchByUsername(recipientName);
-		UserChatData recipientData = UserChatData.getCache(recipientProfile);
-
-		if (recipientProfile.equals(senderProfile)) { // Sending
-			boolean receiverOnline = true;
-
-			if (!NiftyBukkit.getBungeeHelper().isOnline())
-				receiverOnline = receiverData.isOnline();
-			else
-				receiverOnline = NiftyBukkit.getBungeeHelper().isPlayerOnline(receiverProfile);
+		if (recipientData.getProfile().equals(senderData.getProfile())) { // Sending
+			boolean receiverOnline = NiftyBukkit.getBungeeHelper().isOnline() ? receiverData.getProfile().isOnline() : receiverData.isOnline();
 
 			if (!receiverOnline) {
 				helper.getLog().error(senderData.getOfflinePlayer().getPlayer(), "Unable to locate {{0}}!", receiverData.getProfile().getName());
@@ -102,8 +89,8 @@ public class Message extends BukkitCommand {
 				helper.getLog().error(senderData.getOfflinePlayer().getPlayer(), "Unable to locate {{0}}!", receiverData.getProfile().getName());
 				return false;
 			}
-		} else if (recipientProfile.equals(receiverProfile)) { // Receiving
-			receiverData.setLastMessenger(senderProfile);
+		} else if (recipientData.getProfile().equals(receiverData.getProfile())) { // Receiving
+			receiverData.setLastMessenger(senderData.getProfile());
 			notifySpies(helper, senderData, receiverData, message);
 		} else { // Spying
 			if ((senderData.getFlagData("vanished").getValue() || receiverData.getFlagData("vanished").getValue()) && !helper.hasPermissions(recipientData.getOfflinePlayer().getPlayer(), "vanish", "spy"))
@@ -111,10 +98,10 @@ public class Message extends BukkitCommand {
 		}
 
 		RankFormat format = RankFormat.getCache("message");
-		String senderDisplayName = recipientProfile.equals(senderProfile) ? RegexUtil.replaceColor("&7me", RegexUtil.REPLACE_ALL_PATTERN) : senderData.getDisplayName();
-		String receiverDisplayName = recipientProfile.equals(receiverProfile) ? RegexUtil.replaceColor("&7me", RegexUtil.REPLACE_ALL_PATTERN) : receiverData.getDisplayName();
+		String senderDisplayName = recipientData.getProfile().equals(senderData.getProfile()) ? RegexUtil.replaceColor("&7me", RegexUtil.REPLACE_ALL_PATTERN) : senderData.getDisplayName();
+		String receiverDisplayName = recipientData.getProfile().equals(receiverData.getProfile()) ? RegexUtil.replaceColor("&7me", RegexUtil.REPLACE_ALL_PATTERN) : receiverData.getDisplayName();
 		helper.getLog().message(recipientData.getOfflinePlayer().getPlayer(), format.getFormat(), senderDisplayName, receiverDisplayName, message);
-		if (recipientProfile.equals(senderProfile)) helper.getLog().console(format.getFormat(), senderData.getDisplayName(), receiverData.getDisplayName(), message);
+		if (recipientData.getProfile().equals(senderData.getProfile())) helper.getLog().console(format.getFormat(), senderData.getDisplayName(), receiverData.getDisplayName(), message);
 		return true;
 	}
 
@@ -182,7 +169,7 @@ public class Message extends BukkitCommand {
 				}
 
 				if (send(this, sender.getName(), profile.getName(), sender.getName(), message))
-					NiftyBukkit.getBungeeHelper().forward(player, server.getName(), Config.CHAT_CHANNEL, "Message", sender.getName(), profile.getName(), message);
+					NiftyBukkit.getBungeeHelper().forward(senderprofile, server.getName(), Config.CHAT_CHANNEL, "Message", sender.getName(), profile.getName(), message);
 			}
 		}
 	}

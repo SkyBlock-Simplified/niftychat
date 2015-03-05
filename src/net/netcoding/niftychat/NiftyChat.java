@@ -21,7 +21,7 @@ import net.netcoding.niftychat.commands.Vanish;
 import net.netcoding.niftychat.listeners.Chat;
 import net.netcoding.niftychat.listeners.Disconnect;
 import net.netcoding.niftychat.listeners.Login;
-import net.netcoding.niftychat.listeners.Move;
+import net.netcoding.niftychat.listeners.Misc;
 import net.netcoding.niftychat.listeners.Notifications;
 
 public class NiftyChat extends BukkitPlugin {
@@ -71,7 +71,7 @@ public class NiftyChat extends BukkitPlugin {
 		new Chat(this);
 		new Disconnect(this);
 		new Login(this);
-		new Move(this);
+		new Misc(this);
 
 		this.getLog().console("Loading Censor List");
 		CensorData.reload();

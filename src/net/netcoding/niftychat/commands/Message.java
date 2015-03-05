@@ -30,6 +30,7 @@ public class Message extends BukkitCommand {
 	public Message(JavaPlugin plugin) {
 		super(plugin, "message");
 		this.setPlayerOnly();
+		this.setHelpCheck(false);
 		this.editUsage(0, "reply", "[message]");
 		this.editUsage(0, "r", "[message]");
 	}

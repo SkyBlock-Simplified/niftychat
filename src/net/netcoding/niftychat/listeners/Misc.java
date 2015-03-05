@@ -3,6 +3,7 @@ package net.netcoding.niftychat.listeners;
 import net.netcoding.niftybukkit.NiftyBukkit;
 import net.netcoding.niftybukkit.minecraft.BukkitListener;
 import net.netcoding.niftybukkit.mojang.MojangProfile;
+import net.netcoding.niftybukkit.mojang.exceptions.ProfileNotFoundException;
 import net.netcoding.niftychat.NiftyChat;
 import net.netcoding.niftychat.cache.UserChatData;
 import net.netcoding.niftyranks.events.RankChangeEvent;
@@ -10,17 +11,21 @@ import net.netcoding.niftyranks.events.RankChangeEvent;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.player.PlayerMoveEvent;
 
-public class Move extends BukkitListener {
+public class Misc extends BukkitListener {
 
-	public Move(NiftyChat plugin) {
+	public Misc(NiftyChat plugin) {
 		super(plugin);
 	}
 
 	@EventHandler
 	public void onPlayerMove(final PlayerMoveEvent event) {
-		MojangProfile profile = NiftyBukkit.getMojangRepository().searchByPlayer(event.getPlayer());
-		UserChatData userData = UserChatData.getCache(profile);
-		if (userData.isOnline()) userData.setMoved();
+		try {
+			MojangProfile profile = NiftyBukkit.getMojangRepository().searchByPlayer(event.getPlayer());
+			UserChatData userData = UserChatData.getCache(profile);
+			if (userData.isOnline()) userData.setMoved();
+		} catch (ProfileNotFoundException pfne) {
+			// For whatever reason they could not be found
+		}
 	}
 
 	@EventHandler

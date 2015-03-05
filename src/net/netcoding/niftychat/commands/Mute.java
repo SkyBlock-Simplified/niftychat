@@ -58,7 +58,7 @@ public class Mute extends BukkitCommand {
 		try {
 			profile = NiftyBukkit.getMojangRepository().searchByUsername(playerName);
 		} catch (ProfileNotFoundException pnfe) {
-			this.getLog().error(sender, "Unable to locate the uuid of {{0}}!", playerName);
+			this.getLog().error(sender, "Unable to locate the profile of {{0}}!", playerName);
 			return;
 		}
 

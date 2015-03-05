@@ -39,7 +39,7 @@ public class Realname extends BukkitCommand {
 					try {
 						profile = NiftyBukkit.getMojangRepository().searchByExactUUID(UUID.fromString(result.getString("uuid")));
 					} catch (ProfileNotFoundException pnfe) {
-						getLog().error(sender, "Unable to locate the realname of {{0}}!", args[0]);
+						getLog().error(sender, "Unable to locate the profile of {{0}}!", args[0]);
 						return data;
 					}
 

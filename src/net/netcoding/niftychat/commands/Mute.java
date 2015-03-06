@@ -38,7 +38,7 @@ public class Mute extends BukkitCommand {
 	public void onCommand(CommandSender sender, String alias, String[] args) throws Exception {
 		String playerName = args[0];
 		MojangProfile profile;
-		long expires = args.length >= 2 ? TimeUtil.getDateTime(args[1]) : 0;
+		long expires = args.length >= 2 ? System.currentTimeMillis() + TimeUtil.getDateTime(args[1]) : 0;
 		String server = "*";
 
 		if (isConsole(playerName)) {

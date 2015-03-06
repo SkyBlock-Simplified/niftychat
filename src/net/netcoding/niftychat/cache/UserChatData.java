@@ -273,7 +273,6 @@ public class UserChatData extends BukkitHelper {
 	}
 
 	public boolean updateFlagData(String flag, boolean value, String server, long expires) throws SQLException {
-		if (expires > 0) expires += System.currentTimeMillis();
 		String sqlFormat = expires > 0 ? TimeUtil.SQL_FORMAT.format(new Date(expires)) : null;
 		return Cache.MySQL.update(StringUtil.format("INSERT INTO `{0}` (`uuid`, `flag`, `value`, `server`, `_expires`) VALUES (?, ?, ?, ?, ?) ON DUPLICATE KEY UPDATE `value` = ?, `_expires` = ?;", Config.USER_FLAGS_TABLE), this.getProfile().getUniqueId(), flag, !value, server, sqlFormat, !value, sqlFormat);
 	}

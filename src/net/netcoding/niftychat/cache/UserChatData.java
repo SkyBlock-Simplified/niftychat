@@ -34,14 +34,14 @@ public class UserChatData extends BukkitHelper {
 	private boolean hasMoved = false;
 	private HashSet<UserFlagData> flagData = new HashSet<>();
 
-	public UserChatData(JavaPlugin plugin, OfflinePlayer oplayer) {
-		this(plugin, NiftyBukkit.getMojangRepository().searchByPlayer(oplayer));
-		cache.add(this);
+	public UserChatData(JavaPlugin plugin, MojangProfile profile) {
+		this(plugin, profile, true);
 	}
 
-	private UserChatData(JavaPlugin plugin, MojangProfile profile) {
+	private UserChatData(JavaPlugin plugin, MojangProfile profile, boolean addToCache) {
 		super(plugin);
 		this.profile = profile;
+		if (addToCache) cache.add(this);
 	}
 
 	public void addFlagData(UserFlagData flagData) {
@@ -84,7 +84,7 @@ public class UserChatData extends BukkitHelper {
 				return data;
 		}
 
-		return new UserChatData(NiftyChat.getPlugin(NiftyChat.class), profile);
+		return new UserChatData(NiftyChat.getPlugin(NiftyChat.class), profile, false);
 	}
 
 	@Override

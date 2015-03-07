@@ -43,7 +43,11 @@ public class NiftyChat extends BukkitPlugin {
 		}
 
 		this.getLog().console("Updating MySQL Tables & Data");
-		if (!this.setupTables()) return;
+		if (!this.setupTables()) {
+			this.getLog().console("Unable to setup MySQL Tables & Data!");
+			this.setEnabled(false);
+			return;
+		}
 
 		try {
 			Cache.notifications = new Notifications();
@@ -53,6 +57,7 @@ public class NiftyChat extends BukkitPlugin {
 			Cache.MySQL.addListener(Config.USER_FLAGS_TABLE, Cache.notifications);
 		} catch (Exception ex) {
 			this.getLog().console(ex);
+			this.setEnabled(false);
 			return;
 		}
 

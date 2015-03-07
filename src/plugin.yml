@@ -133,8 +133,10 @@ permissions:
             description: Allows you to set your nickname
           niftychat.nick.clear:
             description: Allows you to clear player nicknames
+          niftychat.nick.grant:
+            description: Allows you to restore player access to changing their nick
           niftychat.nick.revoke:
-            description: Allows you to revoke or grant player access to the nick command
+            description: Allows you to revoke player access to changing their nick
           niftychat.nick.other:
             description: Allows you to set the nicknames of other players
           niftychat.nick.color:
@@ -161,3 +163,5 @@ permissions:
             description: Allows you to vanish from all servers
           niftychat.vanish.others:
             description: Allows you to vanish other players
+          niftychat.vanish.others:
+            description: Allows you to see vanished players

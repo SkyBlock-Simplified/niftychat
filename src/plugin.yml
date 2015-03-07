@@ -91,8 +91,6 @@ permissions:
             description: Allows you to create and delete rank formats
           niftychat.format.view:
             description: Allows you to view rank format, prefix and suffix
-      niftychat.join.fullserver:
-        description: Allows you to join the server even when it is full
       niftychat.message.*:
         description: Allows you to access all message features
         children:

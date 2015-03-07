@@ -46,8 +46,10 @@ permissions:
     description: Gives access to all plugin features and commands
     children:
       niftychat.censor.*:
-        description: Allows you to run all censor commands
+        description: Allows you to access all censor features
         children:
+          niftychat.censor:
+            description: Allows you to modify the censor
           niftychat.censor.list:
             description: Allows you to list censored words
           niftychat.censor.manage:
@@ -55,6 +57,8 @@ permissions:
       niftychat.chat.*:
         description: Allows you to bypass all chat restrictions
         children:
+          niftychat.chat:
+            description: Allows you to chat
           niftychat.chat.bypass.*:
             description: Allows you to bypass all chat filtering
             children:
@@ -77,8 +81,10 @@ permissions:
           niftychat.chat.magic:
             description: Allows you to use magic in chat
       niftychat.format.*:
-        description: Allows you to run all format commands
+        description: Allows you to access all format features
         children:
+          niftychat.format:
+            description: Allows you to edit chat formats
           niftychat.format.edit:
             description: Allows you to edit rank format, prefix, suffix and message
           niftychat.format.manage:
@@ -88,7 +94,7 @@ permissions:
       niftychat.join.fullserver:
         description: Allows you to join the server even when it is full
       niftychat.message.*:
-        description: Allows you to bypass all private chat restrictions
+        description: Allows you to access all message features
         children:
           niftychat.message:
             description: Allows you to send private messages players
@@ -115,8 +121,13 @@ permissions:
             description: Allows you to send private messages to players across servers
           niftychat.message.magic:
             description: Allows you to use magic in private chat
-      niftychat.mute:
-        description: Allows you to mute players
+      niftychat.mute.*:
+        description: Allows you to access to all mute features
+        children:
+          niftychat.mute:
+            description: Allows you to mute players
+          niftychat.mute.global:
+            description: Allows you to globally mute players
       niftychat.nick.*:
         description: Allows you to access all nicknames features
         children:

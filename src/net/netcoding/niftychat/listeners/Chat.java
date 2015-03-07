@@ -14,7 +14,6 @@ import net.netcoding.niftychat.cache.RankFormat;
 import net.netcoding.niftychat.cache.UserChatData;
 import net.netcoding.niftychat.commands.Mute;
 
-import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
@@ -132,7 +131,7 @@ public class Chat extends BukkitListener {
 		String group = rankInfo.getGroup();
 		group = (group == null ? rank : group);
 		String world = player.getWorld().getName();
-		Team team = player.getScoreboard().getPlayerTeam(Bukkit.getOfflinePlayer(profile.getUniqueId()));
+		Team team = player.getScoreboard().getPlayerTeam(profile.getOfflinePlayer());
 
 		String teamName = team != null ? team.getDisplayName() : "";
 		String teamPrefix = team != null ? team.getPrefix() : "";

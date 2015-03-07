@@ -10,6 +10,7 @@ import net.netcoding.niftybukkit.util.StringUtil;
 import net.netcoding.niftychat.NiftyChat;
 import net.netcoding.niftychat.cache.Cache;
 import net.netcoding.niftychat.cache.Config;
+import net.netcoding.niftyranks.cache.UserRankData;
 
 import org.bukkit.command.CommandSender;
 
@@ -66,7 +67,7 @@ public class Format extends BukkitCommand {
 			} else
 				this.showUsage(sender);
 		} else if (action.matches("^prefix|suffix|format|group|message$")) {
-			if (!rank.equalsIgnoreCase("message") && !net.netcoding.niftyranks.cache.Cache.ranks.contains(rank)) {
+			if (!rank.equalsIgnoreCase("message") && !UserRankData.rankExists(rank)) {
 				this.getLog().error(sender, "The rank {{0}} does not exist!", rank);
 				return;
 			}

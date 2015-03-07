@@ -55,6 +55,11 @@ public class Mute extends BukkitCommand {
 			}
 		}
 
+		if (isConsole(playerName)) {
+			this.getLog().error(sender, "You cannot mute the console!");
+			return;
+		}
+
 		try {
 			profile = NiftyBukkit.getMojangRepository().searchByUsername(playerName);
 		} catch (ProfileNotFoundException pnfe) {
@@ -72,6 +77,11 @@ public class Mute extends BukkitCommand {
 		if (Config.isGlobalCommand(alias, server)) {
 			server = "*";
 			userData.resetNonGlobalFlagData("muted");
+		}
+
+		if (server.equals("*") && !this.hasPermissions(sender, "mute", "global")) {
+			this.getLog().error(sender, "You are not allowed to globally mute players!");
+			return;
 		}
 
 		boolean isMuted = userData.getFlagData("muted", server).getValue();

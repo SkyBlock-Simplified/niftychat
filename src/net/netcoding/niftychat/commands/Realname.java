@@ -37,7 +37,7 @@ public class Realname extends BukkitCommand {
 					MojangProfile profile;
 
 					try {
-						profile = NiftyBukkit.getMojangRepository().searchByExactUUID(UUID.fromString(result.getString("uuid")));
+						profile = NiftyBukkit.getMojangRepository().searchByUniqueId(UUID.fromString(result.getString("uuid")));
 					} catch (ProfileNotFoundException pnfe) {
 						getLog().error(sender, "Unable to locate the profile of {{0}}!", args[0]);
 						return data;

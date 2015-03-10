@@ -32,7 +32,7 @@ public class Notifications implements DatabaseListener {
 					public Void handle(ResultSet result) throws SQLException {
 						if (result.next()) {
 							UUID uuid = UUID.fromString(result.getString("uuid"));
-							UserChatData userData = UserChatData.getCache(NiftyBukkit.getMojangRepository().searchByExactUUID(uuid));
+							UserChatData userData = UserChatData.getCache(NiftyBukkit.getMojangRepository().searchByUniqueId(uuid));
 
 							if (userData.isOnline()) {
 								userData.updateDisplayName();
@@ -91,7 +91,7 @@ public class Notifications implements DatabaseListener {
 			if (!event.equals(TriggerEvent.INSERT)) {
 				Map<String, Object> data = databaseNotification.getDeletedData();
 				UUID uuid = UUID.fromString((String)data.get("uuid"));
-				UserChatData userData = UserChatData.getCache(NiftyBukkit.getMojangRepository().searchByExactUUID(uuid));
+				UserChatData userData = UserChatData.getCache(NiftyBukkit.getMojangRepository().searchByUniqueId(uuid));
 
 				if (userData.isOnline()) {
 					userData.reloadFlagData();
@@ -105,7 +105,7 @@ public class Notifications implements DatabaseListener {
 					public Void handle(ResultSet result) throws SQLException {
 						if (result.next()) {
 							UUID uuid = UUID.fromString(result.getString("uuid"));
-							UserChatData userData = UserChatData.getCache(NiftyBukkit.getMojangRepository().searchByExactUUID(uuid));
+							UserChatData userData = UserChatData.getCache(NiftyBukkit.getMojangRepository().searchByUniqueId(uuid));
 
 							if (userData.isOnline()) {
 								String flag = result.getString("flag");

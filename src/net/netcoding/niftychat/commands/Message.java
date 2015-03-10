@@ -45,7 +45,7 @@ public class Message extends BukkitCommand {
 						@Override
 						public List<MojangProfile> handle(ResultSet result) throws SQLException {
 							List<MojangProfile> profiles = new ArrayList<>();
-							while (result.next()) profiles.add(NiftyBukkit.getMojangRepository().searchByExactUUID(UUID.fromString(result.getString("uuid"))));
+							while (result.next()) profiles.add(NiftyBukkit.getMojangRepository().searchByUniqueId(UUID.fromString(result.getString("uuid"))));
 							return profiles;
 						}
 					}, "spying", true);

@@ -17,7 +17,7 @@ public class Disconnect extends BukkitListener {
 	}
 
 	private void playerDisconnect(Player player) {
-		UserChatData.removeCache(NiftyBukkit.getMojangRepository().searchByExactUUID(player.getUniqueId()));
+		UserChatData.removeCache(NiftyBukkit.getMojangRepository().searchByUniqueId(player.getUniqueId()));
 	}
 
 	@EventHandler

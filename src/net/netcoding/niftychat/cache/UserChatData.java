@@ -75,15 +75,15 @@ public class UserChatData extends BukkitHelper {
 	}
 
 	public static ConcurrentSet<UserChatData> getCache() {
-		return CACHE;
-	}
-
-	public static UserChatData getCache(MojangProfile profile) {
-		for (UserChatData data : getCache()) {
+		for (UserChatData data : CACHE) {
 			if (!data.isOnline())
 				CACHE.remove(data);
 		}
 
+		return CACHE;
+	}
+
+	public static UserChatData getCache(MojangProfile profile) {
 		for (UserChatData data : getCache()) {
 			if (profile.equals(data.getProfile()))
 				return data;

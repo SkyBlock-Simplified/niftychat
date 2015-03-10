@@ -27,7 +27,7 @@ import org.bukkit.plugin.java.JavaPlugin;
 
 public class UserChatData extends BukkitHelper {
 
-	private static final transient ConcurrentSet<UserChatData> cache = new ConcurrentSet<>();
+	private static final transient ConcurrentSet<UserChatData> CACHE = new ConcurrentSet<>();
 	private MojangProfile profile;
 	private String lastMessage;
 	private MojangProfile lastMessenger;
@@ -41,7 +41,7 @@ public class UserChatData extends BukkitHelper {
 	private UserChatData(JavaPlugin plugin, MojangProfile profile, boolean addToCache) {
 		super(plugin);
 		this.profile = profile;
-		if (addToCache) cache.add(this);
+		if (addToCache) CACHE.add(this);
 	}
 
 	public void addFlagData(UserFlagData flagData) {
@@ -75,10 +75,15 @@ public class UserChatData extends BukkitHelper {
 	}
 
 	public static ConcurrentSet<UserChatData> getCache() {
-		return cache;
+		return CACHE;
 	}
 
 	public static UserChatData getCache(MojangProfile profile) {
+		for (UserChatData data : getCache()) {
+			if (!data.isOnline())
+				CACHE.remove(data);
+		}
+
 		for (UserChatData data : getCache()) {
 			if (profile.equals(data.getProfile()))
 				return data;
@@ -105,7 +110,7 @@ public class UserChatData extends BukkitHelper {
 			return this.getOfflinePlayer().getPlayer().getDisplayName();
 		else {
 			try {
-				return _getDisplayName(this.profile);
+				return _getDisplayName(this.getProfile());
 			} catch (SQLException ex) {
 				return this.getProfile().getName();
 			}
@@ -120,7 +125,7 @@ public class UserChatData extends BukkitHelper {
 				String rank = "default";
 
 				if (result.next()) {
-					rank = UserRankData.getOfflineRanks(profile).get(0);
+					rank = UserRankData.getCache(profile).getPrimaryRank();
 					String nick = result.getString("nick");
 					displayName = (result.wasNull() ? displayName : ("*" + RegexUtil.replaceColor(nick, RegexUtil.REPLACE_ALL_PATTERN)));
 				}
@@ -211,13 +216,6 @@ public class UserChatData extends BukkitHelper {
 
 	public boolean isOnline() {
 		return this.getOfflinePlayer().isOnline();
-	}
-
-	public static void removeCache(MojangProfile profile) {
-		for (UserChatData data : cache) {
-			if (data.getProfile().equals(profile))
-				cache.remove(data);
-		}
 	}
 
 	public void reloadFlagData() {

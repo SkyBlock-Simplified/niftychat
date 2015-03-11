@@ -94,9 +94,9 @@ public class UserChatData extends BukkitHelper {
 
 	@Override
 	public boolean equals(Object obj) {
-		if (this == obj) return true;
 		if (obj == null) return false;
-		if (this.getClass() != obj.getClass()) return false;
+		if (!(obj instanceof UserChatData)) return false;
+		if (this == obj) return true;
 		UserChatData userData = (UserChatData)obj;
 		return this.getProfile().equals(userData.getProfile());
 	}

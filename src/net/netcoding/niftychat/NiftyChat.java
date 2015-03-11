@@ -87,7 +87,8 @@ public class NiftyChat extends BukkitPlugin {
 
 	@Override
 	public void onDisable() {
-		Cache.MySQL.removeListeners();
+		if (Cache.MySQL != null)
+			Cache.MySQL.removeListeners();
 	}
 
 	private boolean setupTables() {

@@ -30,7 +30,7 @@ public class Message extends BukkitCommand {
 	public Message(JavaPlugin plugin) {
 		super(plugin, "message");
 		this.setPlayerOnly();
-		this.setHelpCheck(false);
+		this.setCheckHelp(false);
 		this.editUsage(0, "reply", "[message]");
 		this.editUsage(0, "r", "[message]");
 	}
@@ -109,9 +109,15 @@ public class Message extends BukkitCommand {
 	@Override
 	public void onCommand(CommandSender sender, String alias, String[] args) throws Exception {
 		Player player = (Player)sender;
-		String playerName = args[0];
 		MojangProfile profile;
 		boolean reply = alias.matches("^r(?:eply)?$");
+
+		if (args.length < (reply ? 1 : 2)) {
+			this.showUsage(sender);
+			return;
+		}
+
+		String playerName = args[0];
 		String message = StringUtil.implode(" ", args, reply ? 0 : 1);
 		MojangProfile senderprofile = NiftyBukkit.getMojangRepository().searchByPlayer(player);
 		UserChatData senderData = UserChatData.getCache(senderprofile);
@@ -123,11 +129,6 @@ public class Message extends BukkitCommand {
 				playerName = lastMessenger.getName();
 			} else {
 				this.getLog().error(sender, "You have no one to reply to!");
-				return;
-			}
-		} else {
-			if (args.length <= 1) {
-				this.showUsage(sender);
 				return;
 			}
 		}

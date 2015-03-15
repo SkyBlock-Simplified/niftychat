@@ -79,8 +79,8 @@ public class Format extends BukkitCommand {
 						public String handle(ResultSet result) throws SQLException {
 							if (result.next())
 								return result.getString(action);
-							else
-								return _null;
+
+							return _null;
 						}
 					}, rank);
 

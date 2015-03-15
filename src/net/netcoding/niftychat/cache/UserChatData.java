@@ -108,12 +108,11 @@ public class UserChatData extends BukkitHelper {
 	private String getDisplayName(boolean fetch) {
 		if (!fetch && this.isOnline())
 			return this.getOfflinePlayer().getPlayer().getDisplayName();
-		else {
-			try {
-				return _getDisplayName(this.getProfile());
-			} catch (SQLException ex) {
-				return this.getProfile().getName();
-			}
+
+		try {
+			return _getDisplayName(this.getProfile());
+		} catch (SQLException ex) {
+			return this.getProfile().getName();
 		}
 	}
 
@@ -194,6 +193,11 @@ public class UserChatData extends BukkitHelper {
 		return UserRankData.getCache(this.getProfile());
 	}
 
+	@Override
+	public int hashCode() {
+		return this.getProfile().hashCode();
+	}
+
 	public boolean hasMoved() {
 		return this.hasMoved;
 	}
@@ -208,9 +212,8 @@ public class UserChatData extends BukkitHelper {
 
 		if (StringUtil.notEmpty(lastMessage) && lastMessage.equalsIgnoreCase(message))
 			return true;
-		else
-			this.lastMessage = message;
 
+		this.lastMessage = message;
 		return false;
 	}
 

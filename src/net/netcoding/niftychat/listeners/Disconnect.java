@@ -15,12 +15,12 @@ public class Disconnect extends BukkitListener {
 
 	@EventHandler
 	public void onPlayerKick(PlayerKickEvent event) {
-		event.setLeaveMessage("");
+		event.setLeaveMessage(null);
 	}
 
 	@EventHandler
 	public void onPlayerLeave(PlayerQuitEvent event) {
-		event.setQuitMessage("");
+		event.setQuitMessage(null);
 	}
 
 }

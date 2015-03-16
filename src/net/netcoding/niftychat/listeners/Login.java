@@ -26,7 +26,7 @@ public class Login extends BukkitListener {
 
 	@EventHandler
 	public void onPlayerJoin(PlayerJoinEvent event) {
-		event.setJoinMessage("");
+		event.setJoinMessage(null);
 	}
 
 	@EventHandler

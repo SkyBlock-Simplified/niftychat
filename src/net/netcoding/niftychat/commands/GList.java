@@ -31,8 +31,8 @@ public class GList extends BukkitCommand {
 	public void onCommand(CommandSender sender, String alias, String[] args) throws Exception {
 		UserChatData senderData = isConsole(sender) ? null : UserChatData.getCache(NiftyBukkit.getMojangRepository().searchByPlayer((Player)sender));
 		List<String> output = new ArrayList<>();
-		int totalPlayers = this.getPlugin().getServer().getOnlinePlayers().length;
-		int maxPlayers = this.getPlugin().getServer().getMaxPlayers();
+		int totalPlayers = NiftyBukkit.getBungeeHelper().getPlayerCount();
+		int maxPlayers = NiftyBukkit.getBungeeHelper().getMaxPlayers();
 		BungeeServer selected = null;
 
 		if (NiftyBukkit.getBungeeHelper().isDetected()) {
@@ -113,7 +113,7 @@ public class GList extends BukkitCommand {
 		}
 
 		output.add("");
-		output.add(StringUtil.format("{{0}}Players&f: {{1}} &8/ {{2}}", ChatColor.RESET, totalPlayers, maxPlayers));
+		if (totalPlayers > 0) output.add(StringUtil.format("{{0}}Players&f: {{1}} &8/ {{2}}", ChatColor.RESET, totalPlayers, maxPlayers));
 		this.getLog().message(sender, RegexUtil.replaceColor(StringUtil.implode("\n", output), RegexUtil.REPLACE_ALL_PATTERN));
 	}
 

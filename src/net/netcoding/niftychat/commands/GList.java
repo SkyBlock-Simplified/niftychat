@@ -57,10 +57,8 @@ public class GList extends BukkitCommand {
 				if (selected != null) {
 					profiles.addAll(selected.getPlayerList());
 					output.add(StringUtil.format("Showing players in {{0}},", selected.getName()));
-				} else {
+				} else
 					profiles.addAll(NiftyBukkit.getBungeeHelper().getPlayerList());
-					output.add(StringUtil.format("Showing players in {{0}},", NiftyBukkit.getBungeeHelper().getServerName()));
-				}
 			}
 
 			if (profiles.size() > 0) {

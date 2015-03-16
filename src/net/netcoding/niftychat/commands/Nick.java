@@ -2,11 +2,10 @@ package net.netcoding.niftychat.commands;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.util.List;
 
 import net.netcoding.niftybukkit.NiftyBukkit;
 import net.netcoding.niftybukkit.database.factory.ResultCallback;
-import net.netcoding.niftybukkit.minecraft.BukkitTabCommand;
+import net.netcoding.niftybukkit.minecraft.BukkitCommand;
 import net.netcoding.niftybukkit.mojang.MojangProfile;
 import net.netcoding.niftybukkit.mojang.exceptions.ProfileNotFoundException;
 import net.netcoding.niftybukkit.util.RegexUtil;
@@ -14,16 +13,11 @@ import net.netcoding.niftybukkit.util.StringUtil;
 import net.netcoding.niftychat.NiftyChat;
 import net.netcoding.niftychat.cache.Cache;
 import net.netcoding.niftychat.cache.Config;
-import net.netcoding.niftychat.cache.UserChatData;
 
 import org.bukkit.ChatColor;
 import org.bukkit.command.CommandSender;
 
-import com.google.common.base.Function;
-import com.google.common.base.Predicate;
-import com.google.common.collect.Iterables;
-
-public class Nick extends BukkitTabCommand {
+public class Nick extends BukkitCommand {
 
 	public Nick(NiftyChat plugin) {
 		super(plugin, "nick");
@@ -31,7 +25,7 @@ public class Nick extends BukkitTabCommand {
 	}
 
 	@Override
-	public void onCommand(CommandSender sender, String alias, String[] args) throws Exception, Exception {
+	protected void onCommand(CommandSender sender, String alias, String[] args) throws Exception, Exception {
 		if (isConsole(sender) && args.length < 2) {
 			this.getLog().error(sender, "You must pass a player name when changing the nickname of a player from console!");
 			return;
@@ -155,7 +149,7 @@ public class Nick extends BukkitTabCommand {
 		}
 	}
 
-	@Override
+	/*@Override
 	public List<String> onTabComplete(CommandSender sender, String label, String[] args) {
 		final String firstArg = (args.length > 0 ? args[0] : "");
 
@@ -176,6 +170,6 @@ public class Nick extends BukkitTabCommand {
 		});
 
 		return iterableToList(iterable.iterator());
-	}
+	}*/
 
 }

@@ -165,7 +165,7 @@ public class UserChatData extends BukkitHelper {
 				if (flagData.isGlobal()) {
 					found = flagData;
 					break;
-				} else if (bungeeHelper.isOnline()) {
+				} else if (bungeeHelper.isDetected()) {
 					if (bungeeServer.equals(flagData.getServer())) {
 						found = flagData;
 						break;

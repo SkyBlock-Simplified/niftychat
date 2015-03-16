@@ -35,7 +35,7 @@ public class GList extends BukkitCommand {
 		int maxPlayers = this.getPlugin().getServer().getMaxPlayers();
 		BungeeServer selected = null;
 
-		if (NiftyBukkit.getBungeeHelper().isOnline()) {
+		if (NiftyBukkit.getBungeeHelper().isDetected()) {
 			if (ListUtil.notEmpty(args)) {
 				selected = NiftyBukkit.getBungeeHelper().getServer(args[0]);
 
@@ -46,11 +46,11 @@ public class GList extends BukkitCommand {
 			}
 		}
 
-		if (alias.matches("^list|online$") || selected != null || !NiftyBukkit.getBungeeHelper().isOnline()) {
+		if (alias.matches("^list|online$") || selected != null || !NiftyBukkit.getBungeeHelper().isDetected()) {
 			List<String> nameList = new ArrayList<>();
 			List<MojangProfile> profiles = new ArrayList<>();
 
-			if (!NiftyBukkit.getBungeeHelper().isOnline()) {
+			if (!NiftyBukkit.getBungeeHelper().isDetected()) {
 				for (Player player : this.getPlugin().getServer().getOnlinePlayers())
 					profiles.add(NiftyBukkit.getMojangRepository().searchByPlayer(player));
 			} else {

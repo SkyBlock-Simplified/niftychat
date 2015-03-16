@@ -31,7 +31,7 @@ public class SocialSpy extends BukkitCommand {
 			return;
 		}
 
-		if (NiftyBukkit.getBungeeHelper().isOnline()) {
+		if (NiftyBukkit.getBungeeHelper().isDetected()) {
 			server = NiftyBukkit.getBungeeHelper().getServerName();
 
 			if (args.length > 0) {
@@ -78,7 +78,7 @@ public class SocialSpy extends BukkitCommand {
 		if (!sender.getName().equalsIgnoreCase(profile.getName()))
 			this.getLog().message(sender, sendMsg, profile.getName(), (!server.equals("*") ? "" : "globally "), (!isSpying ? "" : "un"), serverMsg);
 
-		if (!NiftyBukkit.getBungeeHelper().isOnline()) {
+		if (!NiftyBukkit.getBungeeHelper().isDetected()) {
 			if (userData.isOnline())
 				this.getLog().message(userData.getOfflinePlayer().getPlayer(), receiveMsg, "", (!isSpying ? "" : "un"), "");
 		} else {

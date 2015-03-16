@@ -5,7 +5,7 @@ import java.util.Date;
 
 import net.netcoding.niftybukkit.NiftyBukkit;
 import net.netcoding.niftybukkit.minecraft.BukkitCommand;
-import net.netcoding.niftybukkit.minecraft.Log;
+import net.netcoding.niftybukkit.minecraft.BukkitLogger;
 import net.netcoding.niftybukkit.mojang.MojangProfile;
 import net.netcoding.niftybukkit.mojang.exceptions.ProfileNotFoundException;
 import net.netcoding.niftybukkit.util.StringUtil;
@@ -27,7 +27,7 @@ public class Mute extends BukkitCommand {
 		this.setMaximumArgsLength(3);
 	}
 
-	public static void sendMutedError(Log logger, CommandSender sender, UserChatData userData) {
+	public static void sendMutedError(BukkitLogger logger, CommandSender sender, UserChatData userData) {
 		UserFlagData muteData = userData.getFlagData("muted");
 		String expiry = muteData.hasExpiry() ? StringUtil.format(" until {{0}}", EXPIRE_FORMAT.format(new Date(muteData.getExpires()))) : "";
 		String server = muteData.isGlobal() ? "" : StringUtil.format(" in {{0}}", muteData.getServerName());
@@ -46,7 +46,7 @@ public class Mute extends BukkitCommand {
 			return;
 		}
 
-		if (NiftyBukkit.getBungeeHelper().isOnline()) {
+		if (NiftyBukkit.getBungeeHelper().isDetected()) {
 			server = NiftyBukkit.getBungeeHelper().getServerName();
 
 			if ((args.length == 2 && expires == 0) || args.length == 3) {
@@ -96,7 +96,7 @@ public class Mute extends BukkitCommand {
 		if (!sender.getName().equalsIgnoreCase(profile.getName()))
 			this.getLog().message(sender, sendMsg, profile.getName(), (!server.equals("*") ? "" : "globally "), (!isMuted ? "" : "un"), serverMsg, expireMsg);
 
-		if (!NiftyBukkit.getBungeeHelper().isOnline()) {
+		if (!NiftyBukkit.getBungeeHelper().isDetected()) {
 			if (userData.isOnline())
 				this.getLog().message(userData.getOfflinePlayer().getPlayer(), receiveMsg, "", (!isMuted ? "" : "un"), "", expireMsg);
 		} else {

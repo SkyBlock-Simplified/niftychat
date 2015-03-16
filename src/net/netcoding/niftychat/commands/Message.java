@@ -45,18 +45,22 @@ public class Message extends BukkitCommand {
 						@Override
 						public List<MojangProfile> handle(ResultSet result) throws SQLException {
 							List<MojangProfile> profiles = new ArrayList<>();
-							while (result.next()) profiles.add(NiftyBukkit.getMojangRepository().searchByUniqueId(UUID.fromString(result.getString("uuid"))));
+							while (result.next()) {
+								try {
+									profiles.add(NiftyBukkit.getMojangRepository().searchByUniqueId(UUID.fromString(result.getString("uuid")), false));
+								} catch (ProfileNotFoundException pnfex) { }
+							}
 							return profiles;
 						}
 					}, "spying", true);
 
 					for (MojangProfile spy : spies) {
 						if (!spy.getUniqueId().equals(senderData.getProfile().getUniqueId()) && !spy.getUniqueId().equals(receiverData.getProfile().getUniqueId())) {
-							if (!NiftyBukkit.getBungeeHelper().isOnline()) {
+							if (!NiftyBukkit.getBungeeHelper().isDetected()) {
 								UserChatData spyData = UserChatData.getCache(spy);
 								if (spyData.getOfflinePlayer().isOnline()) helper.getLog().message(spyData.getOfflinePlayer().getPlayer(), format.getFormat(), senderData.getDisplayName(), receiverData.getDisplayName(), format);
 							} else {
-								if (spy.isOnline())
+								if (spy.isOnlineAnywhere())
 									NiftyBukkit.getBungeeHelper().forward(receiverData.getProfile(), NiftyBukkit.getBungeeHelper().getPlayerServer(spy).getName(), Config.CHAT_CHANNEL, "SpyMessage", senderData.getProfile().getName(), receiverData.getProfile().getName(), spy.getName(), message);
 							}	
 						}
@@ -74,7 +78,7 @@ public class Message extends BukkitCommand {
 		UserChatData recipientData = UserChatData.getCache(NiftyBukkit.getMojangRepository().searchByUsername(recipientName)); // Sent
 
 		if (recipientData.getProfile().equals(senderData.getProfile())) { // Sending
-			boolean receiverOnline = NiftyBukkit.getBungeeHelper().isOnline() ? receiverData.getProfile().isOnline() : receiverData.isOnline();
+			boolean receiverOnline = NiftyBukkit.getBungeeHelper().isDetected() ? receiverData.getProfile().isOnlineAnywhere() : receiverData.isOnline();
 
 			if (!receiverOnline) {
 				helper.getLog().error(senderData.getOfflinePlayer().getPlayer(), "Unable to locate {{0}}!", receiverData.getProfile().getName());
@@ -156,7 +160,7 @@ public class Message extends BukkitCommand {
 			return;
 		}
 
-		if (!NiftyBukkit.getBungeeHelper().isOnline()) {
+		if (!NiftyBukkit.getBungeeHelper().isDetected()) {
 			if (send(this, sender.getName(), profile.getName(), sender.getName(), message))
 				send(this, sender.getName(), profile.getName(), profile.getName(), message);
 		} else {

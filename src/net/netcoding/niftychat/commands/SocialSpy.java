@@ -23,23 +23,13 @@ public class SocialSpy extends BukkitCommand {
 	@Override
 	public void onCommand(CommandSender sender, String alias, String[] args) throws Exception {
 		MojangProfile profile;
-		String server = "*";
+		String server = Config.getServerNameFromArgs(args, (args.length > 0));
 		String playerName = args.length == 0 ? sender.getName() : args[0];
+		playerName = NiftyBukkit.getBungeeHelper().isDetected() ? !NiftyBukkit.getBungeeHelper().getServerName().equals(server) ? args.length == 1 ? sender.getName() : playerName : playerName : playerName;
 
 		if (isConsole(sender) && args.length == 0) {
 			this.getLog().error(sender, "You must provide a player name when modifying a players socialspy from console!");
 			return;
-		}
-
-		if (NiftyBukkit.getBungeeHelper().isDetected()) {
-			server = NiftyBukkit.getBungeeHelper().getServerName();
-
-			if (args.length > 0) {
-				if (NiftyBukkit.getBungeeHelper().getServer(args[args.length - 1]) != null) {
-					server = args[args.length - 1];
-					if (args.length == 1) playerName = sender.getName();
-				}
-			}
 		}
 
 		if (isConsole(playerName)) {
@@ -67,10 +57,10 @@ public class SocialSpy extends BukkitCommand {
 			return;
 		}
 
-		if (Config.isGlobalCommand(alias, server)) userData.resetNonGlobalFlagData("spying");
+		if (Config.isGlobalCommand(alias, server)) userData.resetFlagData("spying", "");
 		boolean isSpying = userData.getFlagData("spying", server).getValue();
 		if (Config.isForcedCommand(alias)) isSpying = true;
-		userData.updateFlagData("spying", isSpying, server, 0);
+		userData.updateFlagData("spying", !isSpying, server, 0);
 		String serverMsg = server.equals("*") ? "" : StringUtil.format(" in the {{0}} server", server);
 		String receiveMsg = "You are {{0}}{1}spying{2}.";
 		String sendMsg = "{{0}} is {{1}}{2}spying{3}.";

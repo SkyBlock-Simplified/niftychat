@@ -39,21 +39,7 @@ public class Mute extends BukkitCommand {
 		String playerName = args[0];
 		MojangProfile profile;
 		long expires = args.length >= 2 ? System.currentTimeMillis() + TimeUtil.getDateTime(args[1]) : 0;
-		String server = "*";
-
-		if (isConsole(playerName)) {
-			this.getLog().error(sender, "You cannot mute the console!");
-			return;
-		}
-
-		if (NiftyBukkit.getBungeeHelper().isDetected()) {
-			server = NiftyBukkit.getBungeeHelper().getServerName();
-
-			if ((args.length == 2 && expires == 0) || args.length == 3) {
-				if (NiftyBukkit.getBungeeHelper().getServer(args[args.length - 1]) != null)
-					server = args[args.length - 1];
-			}
-		}
+		String server = Config.getServerNameFromArgs(args, ((args.length == 2 && expires == 0) || args.length == 3));
 
 		if (isConsole(playerName)) {
 			this.getLog().error(sender, "You cannot mute the console!");
@@ -76,7 +62,7 @@ public class Mute extends BukkitCommand {
 
 		if (Config.isGlobalCommand(alias, server)) {
 			server = "*";
-			userData.resetNonGlobalFlagData("muted");
+			userData.resetFlagData("muted", "");
 		}
 
 		if (server.equals("*") && !this.hasPermissions(sender, "mute", "global")) {
@@ -87,7 +73,7 @@ public class Mute extends BukkitCommand {
 		boolean isMuted = userData.getFlagData("muted", server).getValue();
 		if (Config.isForcedCommand(alias)) isMuted = true;
 		if (isMuted) expires = 0;
-		userData.updateFlagData("muted", isMuted, server, expires);
+		userData.updateFlagData("muted", !isMuted, server, expires);
 		String serverMsg = server.equals("*") ? "" : StringUtil.format(" in the {{0}} server", server);
 		String expireMsg = (!isMuted && expires != 0) ? StringUtil.format(" until {{0}}", EXPIRE_FORMAT.format(new Date(expires))) : "";
 		String receiveMsg = "You are {{0}}{1}muted{2}{3}.";

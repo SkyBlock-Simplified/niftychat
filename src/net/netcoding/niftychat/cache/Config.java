@@ -1,5 +1,6 @@
 package net.netcoding.niftychat.cache;
 
+import net.netcoding.niftybukkit.NiftyBukkit;
 import net.netcoding.niftybukkit.yaml.annotations.Path;
 
 import org.bukkit.plugin.java.JavaPlugin;
@@ -59,6 +60,21 @@ public class Config extends net.netcoding.niftybukkit.yaml.Config {
 
 	public static boolean isGlobalCommand(String alias, String server) {
 		return alias.matches("^g(lobal)?(un)?[\\w]+") || server.matches("^global|all|\\*$");
+	}
+
+	public static String getServerNameFromArgs(String[] args, boolean check) {
+		String server = "*";
+
+		if (NiftyBukkit.getBungeeHelper().isDetected()) {
+			server = NiftyBukkit.getBungeeHelper().getServerName();
+
+			if (check) {
+				if (NiftyBukkit.getBungeeHelper().getServer(args[args.length - 1]) != null)
+					server = args[args.length - 1];
+			}
+		}
+
+		return server;
 	}
 
 }

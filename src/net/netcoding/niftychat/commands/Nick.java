@@ -175,7 +175,7 @@ public class Nick extends BukkitCommand {
 	}
 
 	@Override
-	public List<String> onTabComplete(CommandSender sender, String label, String[] args) {
+	public List<String> onTabComplete(CommandSender sender, String label, String[] args) throws Exception {
 		final String firstArg = (args.length > 0 ? args[0] : "");
 		List<String> names = new ArrayList<>();
 

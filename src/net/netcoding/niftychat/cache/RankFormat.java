@@ -11,7 +11,7 @@ import net.netcoding.niftyranks.cache.Cache;
 
 public class RankFormat {
 
-	private static final transient ConcurrentSet<RankFormat> cache = new ConcurrentSet<>();
+	private static final transient ConcurrentSet<RankFormat> CACHE = new ConcurrentSet<>();
 	private String rank;
 	private String group;
 	private String format;
@@ -30,17 +30,17 @@ public class RankFormat {
 		this.setPrefix(prefix);
 		this.setSuffix(suffix);
 		this.setFormat(format);
-		cache.add(this);
+		CACHE.add(this);
 	}
 
 	public static ConcurrentSet<RankFormat> getCache() {
-		return cache;
+		return CACHE;
 	}
 
 	public static RankFormat getCache(String rank) {
 		RankFormat _default = null;
 
-		for (RankFormat data : cache) {
+		for (RankFormat data : getCache()) {
 			if (data.getRank().equalsIgnoreCase("default"))
 				_default = data;
 
@@ -77,7 +77,7 @@ public class RankFormat {
 
 	public static void reload() {
 		try {
-			cache.clear();
+			CACHE.clear();
 
 			Cache.MySQL.query(StringUtil.format("SELECT * FROM `{0}`;", Config.FORMAT_TABLE), new ResultCallback<Void>() {
 				@Override
@@ -106,9 +106,9 @@ public class RankFormat {
 	}
 
 	public static void removeCache(String rank) {
-		for (RankFormat data : cache) {
+		for (RankFormat data : getCache()) {
 			if (data.getRank().equals(rank))
-				cache.remove(data);
+				CACHE.remove(data);
 		}
 	}
 
@@ -155,7 +155,9 @@ public class RankFormat {
 		value = value.replace("{privatemessage}", (this.getMessage() + "{2}"));
 		value = value.replace("{privatemsg}", (this.getMessage() + "{2}"));
 		value = value.replace("{pmessage}", (this.getMessage() + "{2}"));
+		value = value.replace("{message}", (this.getMessage() + "{2}"));
 		value = value.replace("{pmsg}", (this.getMessage() + "{2}"));
+		value = value.replace("{msg}", (this.getMessage() + "{2}"));
 
 		this.format = value;
 	}

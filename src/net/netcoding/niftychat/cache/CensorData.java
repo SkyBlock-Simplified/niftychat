@@ -10,7 +10,7 @@ import net.netcoding.niftybukkit.util.concurrent.ConcurrentSet;
 
 public class CensorData {
 
-	private static final transient ConcurrentSet<CensorData> cache = new ConcurrentSet<>();
+	private static final transient ConcurrentSet<CensorData> CACHE = new ConcurrentSet<>();
 	public static final transient String DEFAULT_REPLACE = "***";
 	private String badword;
 	private Pattern pattern;
@@ -24,7 +24,7 @@ public class CensorData {
 		this.badword = badword;
 		this.pattern = Pattern.compile(String.format("(?i)\\b(%1$s)\\b", badword.replaceAll("%", "[\\\\S-]*")));
 		this.replace = (replace == null ? DEFAULT_REPLACE : replace);
-		cache.add(this);
+		CACHE.add(this);
 	}
 
 	public String getBadword() {
@@ -32,11 +32,11 @@ public class CensorData {
 	}
 
 	public static ConcurrentSet<CensorData> getCache() {
-		return cache;
+		return CACHE;
 	}
 
 	public static CensorData getCache(String badword) {
-		for (CensorData data : cache) {
+		for (CensorData data : getCache()) {
 			if (data.getBadword().equalsIgnoreCase(badword))
 				return data;
 		}
@@ -54,7 +54,7 @@ public class CensorData {
 
 	public static void reload() {
 		try {
-			cache.clear();
+			CACHE.clear();
 
 			Cache.MySQL.query(StringUtil.format("SELECT * FROM `{0}`;", Config.CENSOR_TABLE), new ResultCallback<Void>() {
 				@Override
@@ -62,22 +62,20 @@ public class CensorData {
 					while (result.next()) {
 						String badword = result.getString("badword");
 						String replace = result.getString("replace");
-						replace        = (result.wasNull() ? null : replace);
+						replace = (result.wasNull() ? null : replace);
 						new CensorData(badword, replace);
 					}
 
 					return null;
 				}
 			});
-		} catch (Exception ex) {
-			ex.printStackTrace();
-		}
+		} catch (Exception ex) { }
 	}
 
 	public static void removeCache(String badword) {
-		for (CensorData censor : cache) {
+		for (CensorData censor : getCache()) {
 			if (censor.getBadword().equalsIgnoreCase(badword))
-				cache.remove(censor);
+				CACHE.remove(censor);
 		}
 	}
 

@@ -157,15 +157,20 @@ public class UserChatData extends BukkitHelper {
 	public UserFlagData getFlagData(String flag, String server) {
 		List<UserFlagData> flagDatas = this.getAllFlagData(flag);
 		BungeeHelper bungeeHelper = NiftyBukkit.getBungeeHelper();
-		UserFlagData found = new UserFlagData(flag);
-		BungeeServer bungeeServer = StringUtil.isEmpty(server) || server.equals("*") ? bungeeHelper.getServer() : bungeeHelper.getServer(server);
+		UserFlagData found = null;
 
 		for (UserFlagData flagData : flagDatas) {
-			if (flagData.getValue()) {
-				if (flagData.isGlobal()) {
-					found = flagData;
-					break;
-				} else if (bungeeHelper.isDetected()) {
+			if (flagData.isGlobal()) {
+				found = flagData;
+				break;
+			}
+		}
+
+		if (found == null && bungeeHelper.isDetected()) {
+			BungeeServer bungeeServer = StringUtil.isEmpty(server) || server.equals("*") ? bungeeHelper.getServer() : bungeeHelper.getServer(server);
+
+			for (UserFlagData flagData : flagDatas) {
+				if (bungeeHelper.isDetected()) {
 					if (bungeeServer.equals(flagData.getServer())) {
 						found = flagData;
 						break;
@@ -174,7 +179,7 @@ public class UserChatData extends BukkitHelper {
 			}
 		}
 
-		return found;
+		return found == null ? new UserFlagData(flag) : found;
 	}
 
 	public MojangProfile getLastMessenger() {
@@ -203,16 +208,12 @@ public class UserChatData extends BukkitHelper {
 	}
 
 	public boolean hasPermissions(String... permissions) {
-		return super.hasPermissions(this.getOfflinePlayer().getPlayer(), permissions);
+		return super.hasPermissions(this.getProfile(), permissions);
 	}
 
 	public boolean hasRepeatedMessage(String message) {
 		if (this.hasPermissions("chat", "bypass", "repeat")) return false;
-		String lastMessage  = this.lastMessage;
-
-		if (StringUtil.notEmpty(lastMessage) && lastMessage.equalsIgnoreCase(message))
-			return true;
-
+		if (StringUtil.notEmpty(this.lastMessage) && this.lastMessage.equalsIgnoreCase(message)) return true;
 		this.lastMessage = message;
 		return false;
 	}
@@ -247,12 +248,12 @@ public class UserChatData extends BukkitHelper {
 		}
 	}
 
-	public boolean resetNonGlobalFlagData(String flag) throws SQLException {
-		return this.resetFlagData(flag, "*");
+	public boolean resetNonGlobalFlagData2(String flag) throws SQLException {
+		return this.resetFlagData(flag, "");
 	}
 
-	public boolean resetFlagData(String flag, String notServer) throws SQLException {
-		return Cache.MySQL.update(StringUtil.format("DELETE FROM `{0}` WHERE `uuid` = ? AND `flag` = ? AND `server` <> ?;", Config.USER_FLAGS_TABLE), this.getProfile().getUniqueId(), flag, notServer);
+	public boolean resetFlagData(String flag, String server) throws SQLException {
+		return Cache.MySQL.update(StringUtil.format("DELETE FROM `{0}` WHERE `uuid` = ? AND `flag` = ? AND (`server` = ? OR \"\" = ?);", Config.USER_FLAGS_TABLE), this.getProfile().getUniqueId(), flag, server, server);
 	}
 
 	public void setLastMessenger(MojangProfile profile) {
@@ -275,7 +276,7 @@ public class UserChatData extends BukkitHelper {
 
 	public boolean updateFlagData(String flag, boolean value, String server, long expires) throws SQLException {
 		String sqlFormat = expires > 0 ? TimeUtil.SQL_FORMAT.format(new Date(expires)) : null;
-		return Cache.MySQL.update(StringUtil.format("INSERT INTO `{0}` (`uuid`, `flag`, `value`, `server`, `_expires`) VALUES (?, ?, ?, ?, ?) ON DUPLICATE KEY UPDATE `value` = ?, `_expires` = ?;", Config.USER_FLAGS_TABLE), this.getProfile().getUniqueId(), flag, !value, server, sqlFormat, !value, sqlFormat);
+		return Cache.MySQL.update(StringUtil.format("INSERT INTO `{0}` (`uuid`, `flag`, `value`, `server`, `_expires`) VALUES (?, ?, ?, ?, ?) ON DUPLICATE KEY UPDATE `value` = ?, `_expires` = ?;", Config.USER_FLAGS_TABLE), this.getProfile().getUniqueId(), flag, value, server, sqlFormat, value, sqlFormat);
 	}
 
 	public void updateTabListName() {

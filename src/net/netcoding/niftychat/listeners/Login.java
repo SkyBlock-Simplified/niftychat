@@ -5,17 +5,17 @@ import net.netcoding.niftybukkit.minecraft.BungeeHelper;
 import net.netcoding.niftybukkit.minecraft.events.BungeeLoadedEvent;
 import net.netcoding.niftybukkit.minecraft.events.PlayerPostLoginEvent;
 import net.netcoding.niftybukkit.util.StringUtil;
-import net.netcoding.niftychat.NiftyChat;
 import net.netcoding.niftychat.cache.Cache;
 import net.netcoding.niftychat.cache.Config;
 import net.netcoding.niftychat.cache.UserChatData;
 
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.player.PlayerJoinEvent;
+import org.bukkit.plugin.java.JavaPlugin;
 
 public class Login extends BukkitListener {
 
-	public Login(NiftyChat plugin) {
+	public Login(JavaPlugin plugin) {
 		super(plugin);
 	}
 

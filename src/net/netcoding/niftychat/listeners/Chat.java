@@ -8,7 +8,6 @@ import net.netcoding.niftybukkit.minecraft.BukkitListener;
 import net.netcoding.niftybukkit.mojang.MojangProfile;
 import net.netcoding.niftybukkit.util.RegexUtil;
 import net.netcoding.niftybukkit.util.StringUtil;
-import net.netcoding.niftychat.NiftyChat;
 import net.netcoding.niftychat.cache.CensorData;
 import net.netcoding.niftychat.cache.RankFormat;
 import net.netcoding.niftychat.cache.UserChatData;
@@ -18,11 +17,12 @@ import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.player.AsyncPlayerChatEvent;
+import org.bukkit.plugin.java.JavaPlugin;
 import org.bukkit.scoreboard.Team;
 
 public class Chat extends BukkitListener {
 
-	public Chat(NiftyChat plugin) {
+	public Chat(JavaPlugin plugin) {
 		super(plugin);
 	}
 

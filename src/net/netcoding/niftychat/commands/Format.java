@@ -7,18 +7,18 @@ import net.netcoding.niftybukkit.database.factory.ResultCallback;
 import net.netcoding.niftybukkit.minecraft.BukkitCommand;
 import net.netcoding.niftybukkit.util.RegexUtil;
 import net.netcoding.niftybukkit.util.StringUtil;
-import net.netcoding.niftychat.NiftyChat;
 import net.netcoding.niftychat.cache.Cache;
 import net.netcoding.niftychat.cache.Config;
 import net.netcoding.niftyranks.cache.UserRankData;
 
 import org.bukkit.command.CommandSender;
+import org.bukkit.plugin.java.JavaPlugin;
 
 import com.mysql.jdbc.exceptions.jdbc4.MySQLIntegrityConstraintViolationException;
 
 public class Format extends BukkitCommand {
 
-	public Format(NiftyChat plugin) {
+	public Format(JavaPlugin plugin) {
 		super(plugin, "format");
 		this.editUsage(1, "prefix", "<rank> [prefix]");
 		this.editUsage(1, "suffix", "<rank> [suffix]");

@@ -1,15 +1,15 @@
 package net.netcoding.niftychat.listeners;
 
 import net.netcoding.niftybukkit.minecraft.BukkitListener;
-import net.netcoding.niftychat.NiftyChat;
 
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.player.PlayerKickEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
+import org.bukkit.plugin.java.JavaPlugin;
 
 public class Disconnect extends BukkitListener {
 
-	public Disconnect(NiftyChat plugin) {
+	public Disconnect(JavaPlugin plugin) {
 		super(plugin);
 	}
 

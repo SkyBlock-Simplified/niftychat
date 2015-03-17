@@ -14,13 +14,13 @@ import net.netcoding.niftybukkit.mojang.MojangProfile;
 import net.netcoding.niftybukkit.mojang.exceptions.ProfileNotFoundException;
 import net.netcoding.niftybukkit.util.RegexUtil;
 import net.netcoding.niftybukkit.util.StringUtil;
-import net.netcoding.niftychat.NiftyChat;
 import net.netcoding.niftychat.cache.Cache;
 import net.netcoding.niftychat.cache.Config;
 import net.netcoding.niftychat.cache.UserChatData;
 
 import org.bukkit.ChatColor;
 import org.bukkit.command.CommandSender;
+import org.bukkit.plugin.java.JavaPlugin;
 
 public class Nick extends BukkitCommand {
 
@@ -29,7 +29,7 @@ public class Nick extends BukkitCommand {
 	public static final transient Pattern CONTAIN_NICKNAME_CHARS = Pattern.compile("([\\w-])");
 	public static final transient Pattern INVALID_NICKNAME_CHARS = Pattern.compile("([^\\w-])");
 
-	public Nick(NiftyChat plugin) {
+	public Nick(JavaPlugin plugin) {
 		super(plugin, "nick");
 		this.setMaximumArgsLength(2);
 	}

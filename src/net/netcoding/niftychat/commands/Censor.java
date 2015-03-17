@@ -7,17 +7,17 @@ import java.util.regex.PatternSyntaxException;
 
 import net.netcoding.niftybukkit.minecraft.BukkitCommand;
 import net.netcoding.niftybukkit.util.StringUtil;
-import net.netcoding.niftychat.NiftyChat;
 import net.netcoding.niftychat.cache.Cache;
 import net.netcoding.niftychat.cache.CensorData;
 import net.netcoding.niftychat.cache.Config;
 
 import org.bukkit.ChatColor;
 import org.bukkit.command.CommandSender;
+import org.bukkit.plugin.java.JavaPlugin;
 
 public class Censor extends BukkitCommand {
 
-	public Censor(NiftyChat plugin) {
+	public Censor(JavaPlugin plugin) {
 		super(plugin, "censor");
 	}
 

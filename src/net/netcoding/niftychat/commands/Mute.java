@@ -10,19 +10,19 @@ import net.netcoding.niftybukkit.mojang.MojangProfile;
 import net.netcoding.niftybukkit.mojang.exceptions.ProfileNotFoundException;
 import net.netcoding.niftybukkit.util.StringUtil;
 import net.netcoding.niftybukkit.util.TimeUtil;
-import net.netcoding.niftychat.NiftyChat;
 import net.netcoding.niftychat.cache.Config;
 import net.netcoding.niftychat.cache.UserChatData;
 import net.netcoding.niftychat.cache.UserFlagData;
 
 import org.bukkit.ChatColor;
 import org.bukkit.command.CommandSender;
+import org.bukkit.plugin.java.JavaPlugin;
 
 public class Mute extends BukkitCommand {
 
 	public static final transient SimpleDateFormat EXPIRE_FORMAT = new SimpleDateFormat("MMM dd, yyyy h:mm:ss a z");
 
-	public Mute(NiftyChat plugin) {
+	public Mute(JavaPlugin plugin) {
 		super(plugin, "mute");
 		this.setMaximumArgsLength(3);
 	}

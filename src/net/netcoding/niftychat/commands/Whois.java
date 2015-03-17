@@ -48,8 +48,10 @@ public class Whois extends BukkitCommand {
 		}
 
 		UserChatData userData = UserChatData.getCache(profile);
+		String separator = StringUtil.format("{0}{1}{2}", ChatColor.GRAY, ", ", ChatColor.RED);
 		this.getLog().message(sender, "Whois {{0}}", userData.getProfile().getName());
 		this.getLog().message(sender, "Display Name: {0}", userData.getDisplayName());
+		this.getLog().message(sender, "Ranks: {{0}}", StringUtil.implode(separator, userData.getRankData().getRanks()));
 		String serverName = userData.getProfile().isOnlineAnywhere() ? userData.getProfile().getServer().getName() : "*";
 		if (userData.getProfile().isOnlineAnywhere()) this.getLog().message(sender, "Server: {{0}}", serverName);
 
@@ -90,7 +92,7 @@ public class Whois extends BukkitCommand {
 				}
 
 				if (!ListUtil.isEmpty(servers))
-					this.getLog().message(sender, "Spying: {{0}}", StringUtil.implode(StringUtil.format("{0}{1}{2}", ChatColor.GRAY, ", ", ChatColor.RED), servers));
+					this.getLog().message(sender, "Spying: {{0}}", StringUtil.implode(separator, servers));
 				else
 					this.getLog().message(sender, "Spying: {{0}}", "No");
 			}
@@ -107,7 +109,7 @@ public class Whois extends BukkitCommand {
 					}
 
 					if (!ListUtil.isEmpty(servers))
-						this.getLog().message(sender, "Vanished: {{0}}", StringUtil.implode(StringUtil.format("{0}{1}{2}", ChatColor.GRAY, ", ", ChatColor.RED), servers));
+						this.getLog().message(sender, "Vanished: {{0}}", StringUtil.implode(separator, servers));
 					else
 						this.getLog().message(sender, "Vanished: {{0}}", "No");
 				}

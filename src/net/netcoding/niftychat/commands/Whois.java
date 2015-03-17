@@ -57,6 +57,7 @@ public class Whois extends BukkitCommand {
 			if (userData.getProfile().isOnlineAnywhere()) 
 				this.getLog().message(sender, "IP Address: {{0}}", userData.getProfile().getAddress().getHostName());
 
+			this.getLog().message(sender, "Nickname Access: {{0}}", (!userData.getFlagData("nick-revoke").getValue() ? (ChatColor.GREEN + "Yes") : "No"));
 			UserFlagData globalMuteData = userData.getFlagData("muted", "*");
 
 			if (globalMuteData.getValue()) {
@@ -78,6 +79,22 @@ public class Whois extends BukkitCommand {
 					this.getLog().message(sender, "Muted: {{0}}", "No");
 			}
 
+			if (userData.getFlagData("spying", "*").getValue())
+				this.getLog().message(sender, "Spying: {{0}}", "Globally");
+			else {
+				List<String> servers = new ArrayList<>();
+
+				for (UserFlagData spyData : userData.getAllFlagData("spying")) {
+					if (spyData.getValue())
+						servers.add(spyData.getServerName());
+				}
+
+				if (!ListUtil.isEmpty(servers))
+					this.getLog().message(sender, "Spying: {{0}}", StringUtil.implode(StringUtil.format("{0}{1}{2}", ChatColor.GRAY, ", ", ChatColor.RED), servers));
+				else
+					this.getLog().message(sender, "Spying: {{0}}", "No");
+			}
+
 			if (this.hasPermissions(sender, "vanish", "see")) {
 				if (userData.getFlagData("vanished", "*").getValue())
 					this.getLog().message(sender, "Vanished: {{0}}", "Globally");
@@ -94,22 +111,6 @@ public class Whois extends BukkitCommand {
 					else
 						this.getLog().message(sender, "Vanished: {{0}}", "No");
 				}
-			}
-
-			if (userData.getFlagData("spying", "*").getValue())
-				this.getLog().message(sender, "Spying: {{0}}", "Globally");
-			else {
-				List<String> servers = new ArrayList<>();
-
-				for (UserFlagData spyData : userData.getAllFlagData("spying")) {
-					if (spyData.getValue())
-						servers.add(spyData.getServerName());
-				}
-
-				if (!ListUtil.isEmpty(servers))
-					this.getLog().message(sender, "Spying: {{0}}", StringUtil.implode(StringUtil.format("{0}{1}{2}", ChatColor.GRAY, ", ", ChatColor.RED), servers));
-				else
-					this.getLog().message(sender, "Spying: {{0}}", "No");
 			}
 		}
 

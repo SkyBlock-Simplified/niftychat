@@ -1,0 +1,131 @@
+package net.netcoding.niftychat.commands;
+
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Date;
+import java.util.List;
+
+import net.netcoding.niftybukkit.NiftyBukkit;
+import net.netcoding.niftybukkit.minecraft.BukkitCommand;
+import net.netcoding.niftybukkit.mojang.MojangProfile;
+import net.netcoding.niftybukkit.mojang.exceptions.ProfileNotFoundException;
+import net.netcoding.niftybukkit.util.ListUtil;
+import net.netcoding.niftybukkit.util.NumberUtil;
+import net.netcoding.niftybukkit.util.StringUtil;
+import net.netcoding.niftybukkit.util.concurrent.ConcurrentList;
+import net.netcoding.niftychat.cache.UserChatData;
+import net.netcoding.niftychat.cache.UserFlagData;
+
+import org.bukkit.ChatColor;
+import org.bukkit.command.CommandSender;
+import org.bukkit.entity.Damageable;
+import org.bukkit.entity.Player;
+import org.bukkit.plugin.java.JavaPlugin;
+
+public class Whois extends BukkitCommand {
+
+	private static final List<String> ANTI_CONSOLE = Arrays.asList("Top secret!", "Nothing to see here...", "Someone's up to no good!");
+
+	public Whois(JavaPlugin plugin) {
+		super(plugin, "whois");
+	}
+
+	@Override
+	protected void onCommand(CommandSender sender, String alias, String[] args) throws Exception {
+		String playerName = args[0];
+		MojangProfile profile;
+
+		if (isConsole(playerName)) {
+			this.getLog().error(sender, ANTI_CONSOLE.get(NumberUtil.rand(0, ANTI_CONSOLE.size() - 1)));
+			return;
+		}
+
+		try {
+			profile = NiftyBukkit.getMojangRepository().searchByUsername(playerName);
+		} catch (ProfileNotFoundException pnfe) {
+			this.getLog().error(sender, "Unable to locate the profile of {{0}}!", playerName);
+			return;
+		}
+
+		UserChatData userData = UserChatData.getCache(profile);
+		this.getLog().message(sender, "Whois {{0}}", userData.getProfile().getName());
+		this.getLog().message(sender, "Display Name: {0}", userData.getDisplayName());
+		String serverName = userData.getProfile().isOnlineAnywhere() ? userData.getProfile().getServer().getName() : "*";
+		if (userData.getProfile().isOnlineAnywhere()) this.getLog().message(sender, "Server: {{0}}", serverName);
+
+		if (this.hasPermissions(sender, "whois", "admin")) {
+			if (userData.getProfile().isOnlineAnywhere()) 
+				this.getLog().message(sender, "IP Address: {{0}}", userData.getProfile().getAddress().getHostName());
+
+			UserFlagData globalMuteData = userData.getFlagData("muted", "*");
+
+			if (globalMuteData.getValue()) {
+				this.getLog().message(sender, "Muted: {{0}} (Expires {{1}})", "Globally", (globalMuteData.getExpires() > 0 ? Mute.EXPIRE_FORMAT.format(new Date(globalMuteData.getExpires())) : "Never"));
+			} else {
+				ConcurrentList<UserFlagData> muteDatas = new ConcurrentList<>(userData.getAllFlagData("muted"));
+
+				for (UserFlagData muteData : muteDatas) {
+					if (!muteData.getValue())
+						muteDatas.remove(muteData);
+				}
+
+				if (muteDatas.size() > 0) {
+					this.getLog().message(sender, "Muted:");
+
+					for (UserFlagData muteData : userData.getAllFlagData("muted"))
+						this.getLog().message(sender, "- {{0}} (Expires {{1}})", muteData.getServerName(), (muteData.getExpires() > 0 ? Mute.EXPIRE_FORMAT.format(new Date(muteData.getExpires())) : "Never"));
+				} else
+					this.getLog().message(sender, "Muted: {{0}}", "No");
+			}
+
+			if (this.hasPermissions(sender, "vanish", "see")) {
+				if (userData.getFlagData("vanished", "*").getValue())
+					this.getLog().message(sender, "Vanished: {{0}}", "Globally");
+				else {
+					List<String> servers = new ArrayList<>();
+
+					for (UserFlagData vanishData : userData.getAllFlagData("vanished")) {
+						if (vanishData.getValue())
+							servers.add(vanishData.getServerName());
+					}
+
+					if (!ListUtil.isEmpty(servers))
+						this.getLog().message(sender, "Vanished: {{0}}", StringUtil.implode(StringUtil.format("{0}{1}{2}", ChatColor.GRAY, ", ", ChatColor.RED), servers));
+					else
+						this.getLog().message(sender, "Vanished: {{0}}", "No");
+				}
+			}
+
+			if (userData.getFlagData("spying", "*").getValue())
+				this.getLog().message(sender, "Spying: {{0}}", "Globally");
+			else {
+				List<String> servers = new ArrayList<>();
+
+				for (UserFlagData spyData : userData.getAllFlagData("spying")) {
+					if (spyData.getValue())
+						servers.add(spyData.getServerName());
+				}
+
+				if (!ListUtil.isEmpty(servers))
+					this.getLog().message(sender, "Spying: {{0}}", StringUtil.implode(StringUtil.format("{0}{1}{2}", ChatColor.GRAY, ", ", ChatColor.RED), servers));
+				else
+					this.getLog().message(sender, "Spying: {{0}}", "No");
+			}
+		}
+
+		if (userData.isOnline()) {
+			Player player = userData.getOfflinePlayer().getPlayer();
+			this.getLog().message(sender, "Operator: {{0}}", (userData.getOfflinePlayer().isOp() ? (ChatColor.GREEN + "Yes") : "No"));
+			this.getLog().message(sender, "Location: {{0}}, {{1}}, {{2}}, {{3}}", player.getLocation().getWorld().getName(), player.getLocation().getX(), player.getLocation().getY(), player.getLocation().getZ());
+			this.getLog().message(sender, "Game Mode: {{0}}", player.getGameMode().toString().toLowerCase());
+			this.getLog().message(sender, "Health: {{0}}/{{1}}", ((Damageable)player).getHealth(), ((Damageable)player).getMaxHealth());
+			this.getLog().message(sender, "Hunger: {{0}}/{{1}} ({{2}} Saturation)", player.getFoodLevel(), "20", ((player.getSaturation() > 0 ? "+" : "") + player.getSaturation()));
+			this.getLog().message(sender, "Experience: {{0}} (Level {{1}})", player.getExp(), player.getExpToLevel());
+			//this.getLog().message(sender, "God Mode: {{0}}", "??");
+			this.getLog().message(sender, "Flight: {{0}} ({1})", (player.getAllowFlight() ? (ChatColor.GREEN + "Yes") : "No"), ((!player.isFlying() ? "Not " : "") + "Flying"));
+			//this.getLog().message(sender, "AFK: {{0}}", "??");
+			//this.getLog().message(sender, "Jail: {{0}}", "??");
+		}
+	}
+
+}

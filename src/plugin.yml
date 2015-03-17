@@ -40,6 +40,10 @@ commands:
     description: Vanish from other players
     usage: /<command> <player> [server]
     aliases: [unvanish, globalvanish, globalunvanish, gvanish, gunvanish, gv, gunv, v, unv]
+  whois:
+    description: Shows information about a given player
+    usage: /<command> <player>
+    aliases: [who, what]
 
 permissions:
   niftychat.*:

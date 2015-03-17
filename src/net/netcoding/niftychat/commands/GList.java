@@ -28,7 +28,7 @@ public class GList extends BukkitCommand {
 
 	@SuppressWarnings("deprecation")
 	@Override
-	public void onCommand(CommandSender sender, String alias, String[] args) throws Exception {
+	protected void onCommand(CommandSender sender, String alias, String[] args) throws Exception {
 		UserChatData senderData = isConsole(sender) ? null : UserChatData.getCache(NiftyBukkit.getMojangRepository().searchByPlayer((Player)sender));
 		List<String> output = new ArrayList<>();
 		int totalPlayers = NiftyBukkit.getBungeeHelper().getPlayerCount();

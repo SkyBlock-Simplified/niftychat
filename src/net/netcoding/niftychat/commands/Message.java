@@ -35,7 +35,7 @@ public class Message extends BukkitCommand {
 		this.editUsage(0, "r", "[message]");
 	}
 
-	private static void notifySpies(final BukkitHelper helper, final UserChatData senderData, final UserChatData receiverData, final String message) {
+	protected static void notifySpies(final BukkitHelper helper, final UserChatData senderData, final UserChatData receiverData, final String message) {
 		helper.getPlugin().getServer().getScheduler().runTaskAsynchronously(helper.getPlugin(), new Runnable() {
 			@Override
 			public void run() {

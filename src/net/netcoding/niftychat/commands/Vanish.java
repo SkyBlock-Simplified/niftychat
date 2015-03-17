@@ -21,7 +21,7 @@ public class Vanish extends BukkitCommand {
 	}
 
 	@Override
-	public void onCommand(CommandSender sender, String alias, String[] args) throws Exception {
+	protected void onCommand(CommandSender sender, String alias, String[] args) throws Exception {
 		MojangProfile profile;
 		String server = Config.getServerNameFromArgs(args, (args.length > 0));
 		String playerName = args.length == 0 ? sender.getName() : args[0];

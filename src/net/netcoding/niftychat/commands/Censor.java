@@ -22,7 +22,7 @@ public class Censor extends BukkitCommand {
 	}
 
 	@Override
-	public void onCommand(final CommandSender sender, String alias, final String[] args) throws Exception {
+	protected void onCommand(final CommandSender sender, String alias, final String[] args) throws Exception {
 		String action = args[0].toLowerCase();
 
 		if (action.equalsIgnoreCase("list")) {

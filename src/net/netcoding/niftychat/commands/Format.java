@@ -31,7 +31,7 @@ public class Format extends BukkitCommand {
 	}
 
 	@Override
-	public void onCommand(final CommandSender sender, String alias, final String[] args) throws Exception {
+	protected void onCommand(final CommandSender sender, String alias, final String[] args) throws Exception {
 		final String action = args[0].toLowerCase();
 		final String rank = args[1].toLowerCase();
 		final String _null = RegexUtil.SECTOR_SYMBOL + "onull";

@@ -30,7 +30,16 @@ public class Realname extends BukkitCommand {
 
 	@Override
 	public void onCommand(final CommandSender sender, String alias, final String[] args) throws Exception {
-		final List<String> foundData = Cache.MySQL.query(StringUtil.format("SELECT * FROM `{0}` WHERE LOWER(`ufnick`) = LOWER(?) OR LOWER(`ufnick`) LIKE LOWER(?) OR GROUP BY `ufnick`;", Config.USER_TABLE), new ResultCallback<List<String>>() {
+		String argLookup = args[0];
+		MojangProfile profile;
+		String profileLookup = "";
+
+		try {
+			profile = NiftyBukkit.getMojangRepository().searchByUsername(argLookup);
+			profileLookup = profile.getUniqueId().toString();
+		} catch (ProfileNotFoundException pnfe) { }
+
+		final List<String> foundData = Cache.MySQL.query(StringUtil.format("SELECT * FROM `{0}` WHERE LOWER(`ufnick`) = ? OR LOWER(`ufnick`) LIKE ? OR `uuid` = ? GROUP BY `ufnick`, `uuid`;", Config.USER_TABLE), new ResultCallback<List<String>>() {
 			@Override
 			public List<String> handle(ResultSet result) throws SQLException {
 				List<String> data = new ArrayList<>();
@@ -52,12 +61,12 @@ public class Realname extends BukkitCommand {
 
 				return data;
 			}
-		}, args[0], ("%" + args[0] + "%"));
+		}, argLookup, ("%" + argLookup + "%"), profileLookup);
 
 		if (ListUtil.notEmpty(foundData))
 			this.getLog().message(sender, "{{0}} has the nickname {{1}}.", foundData.get(0), foundData.get(1));
 		else
-			this.getLog().error(sender, "No player with the nickname {{0}} was found!", args[0]);
+			this.getLog().error(sender, "No player with the nickname {{0}} was found!", argLookup);
 	}
 
 	@Override

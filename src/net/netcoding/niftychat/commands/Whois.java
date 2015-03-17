@@ -49,13 +49,13 @@ public class Whois extends BukkitCommand {
 
 		UserChatData userData = UserChatData.getCache(profile);
 		String separator = StringUtil.format("{0}{1}{2}", ChatColor.GRAY, ", ", ChatColor.RED);
+		String serverName = userData.getProfile().isOnlineAnywhere() ? userData.getProfile().getServer().getName() : "*";
 		this.getLog().message(sender, "Whois {{0}}", userData.getProfile().getName());
 		this.getLog().message(sender, "Display Name: {0}", userData.getDisplayName());
 		this.getLog().message(sender, "Ranks: {{0}}", StringUtil.implode(separator, userData.getRankData().getRanks()));
-		String serverName = userData.getProfile().isOnlineAnywhere() ? userData.getProfile().getServer().getName() : "*";
 		if (userData.getProfile().isOnlineAnywhere()) this.getLog().message(sender, "Server: {{0}}", serverName);
 
-		if (this.hasPermissions(sender, "whois", "admin")) {
+		if (alias.matches("admin$") && this.hasPermissions(sender, "whois", "admin")) {
 			if (userData.getProfile().isOnlineAnywhere()) 
 				this.getLog().message(sender, "IP Address: {{0}}", userData.getProfile().getAddress().getHostName());
 
@@ -114,20 +114,20 @@ public class Whois extends BukkitCommand {
 						this.getLog().message(sender, "Vanished: {{0}}", "No");
 				}
 			}
-		}
-
-		if (userData.isOnline()) {
-			Player player = userData.getOfflinePlayer().getPlayer();
-			this.getLog().message(sender, "Operator: {{0}}", (userData.getOfflinePlayer().isOp() ? (ChatColor.GREEN + "Yes") : "No"));
-			this.getLog().message(sender, "Location: {{0}}, {{1}}, {{2}}, {{3}}", player.getLocation().getWorld().getName(), player.getLocation().getX(), player.getLocation().getY(), player.getLocation().getZ());
-			this.getLog().message(sender, "Game Mode: {{0}}", player.getGameMode().toString().toLowerCase());
-			this.getLog().message(sender, "Health: {{0}}/{{1}}", ((Damageable)player).getHealth(), ((Damageable)player).getMaxHealth());
-			this.getLog().message(sender, "Hunger: {{0}}/{{1}} ({{2}} Saturation)", player.getFoodLevel(), "20", ((player.getSaturation() > 0 ? "+" : "") + player.getSaturation()));
-			this.getLog().message(sender, "Experience: {{0}} (Level {{1}})", player.getTotalExperience(), player.getLevel());
-			//this.getLog().message(sender, "God Mode: {{0}}", "??");
-			this.getLog().message(sender, "Flight: {{0}} ({1})", (player.getAllowFlight() ? (ChatColor.GREEN + "Yes") : "No"), ((!player.isFlying() ? "Not " : "") + "Flying"));
-			//this.getLog().message(sender, "AFK: {{0}}", "??");
-			//this.getLog().message(sender, "Jail: {{0}}", "??");
+		} else {
+			if (userData.isOnline()) {
+				Player player = userData.getOfflinePlayer().getPlayer();
+				this.getLog().message(sender, "Operator: {{0}}", (userData.getOfflinePlayer().isOp() ? (ChatColor.GREEN + "Yes") : "No"));
+				this.getLog().message(sender, "Location: {{0}}, {{1}}, {{2}}, {{3}}", player.getLocation().getWorld().getName(), player.getLocation().getX(), player.getLocation().getY(), player.getLocation().getZ());
+				this.getLog().message(sender, "Game Mode: {{0}}", player.getGameMode().toString().toLowerCase());
+				this.getLog().message(sender, "Health: {{0}}/{{1}}", ((Damageable)player).getHealth(), ((Damageable)player).getMaxHealth());
+				this.getLog().message(sender, "Hunger: {{0}}/{{1}} ({{2}} Saturation)", player.getFoodLevel(), "20", ((player.getSaturation() > 0 ? "+" : "") + player.getSaturation()));
+				this.getLog().message(sender, "Experience: {{0}} (Level {{1}})", player.getTotalExperience(), player.getLevel());
+				//this.getLog().message(sender, "God Mode: {{0}}", "??");
+				this.getLog().message(sender, "Flight: {{0}} ({1})", (player.getAllowFlight() ? (ChatColor.GREEN + "Yes") : "No"), ((!player.isFlying() ? "Not " : "") + "Flying"));
+				//this.getLog().message(sender, "AFK: {{0}}", "??");
+				//this.getLog().message(sender, "Jail: {{0}}", "??");
+			}
 		}
 	}
 

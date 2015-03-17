@@ -43,7 +43,7 @@ commands:
   whois:
     description: Shows information about a given player
     usage: /<command> <player>
-    aliases: [who, what]
+    aliases: [who, what, whoadmin, whoisadmin, whatadmin]
 
 permissions:
   niftychat.*:

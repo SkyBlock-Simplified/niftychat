@@ -123,7 +123,7 @@ public class Whois extends BukkitCommand {
 			this.getLog().message(sender, "Game Mode: {{0}}", player.getGameMode().toString().toLowerCase());
 			this.getLog().message(sender, "Health: {{0}}/{{1}}", ((Damageable)player).getHealth(), ((Damageable)player).getMaxHealth());
 			this.getLog().message(sender, "Hunger: {{0}}/{{1}} ({{2}} Saturation)", player.getFoodLevel(), "20", ((player.getSaturation() > 0 ? "+" : "") + player.getSaturation()));
-			this.getLog().message(sender, "Experience: {{0}} (Level {{1}})", player.getExp(), player.getExpToLevel());
+			this.getLog().message(sender, "Experience: {{0}} (Level {{1}})", player.getTotalExperience(), player.getLevel());
 			//this.getLog().message(sender, "God Mode: {{0}}", "??");
 			this.getLog().message(sender, "Flight: {{0}} ({1})", (player.getAllowFlight() ? (ChatColor.GREEN + "Yes") : "No"), ((!player.isFlying() ? "Not " : "") + "Flying"));
 			//this.getLog().message(sender, "AFK: {{0}}", "??");

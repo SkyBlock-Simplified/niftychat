@@ -25,6 +25,7 @@ public class Mute extends BukkitCommand {
 	public Mute(JavaPlugin plugin) {
 		super(plugin, "mute");
 		this.setMaximumArgsLength(3);
+		this.setPlayerTabComplete();
 	}
 
 	public static void sendMutedError(BukkitLogger logger, CommandSender sender, UserChatData userData) {

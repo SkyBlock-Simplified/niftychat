@@ -13,6 +13,7 @@ import net.netcoding.niftybukkit.minecraft.BungeeServer;
 import net.netcoding.niftybukkit.mojang.MojangProfile;
 import net.netcoding.niftybukkit.mojang.exceptions.ProfileNotFoundException;
 import net.netcoding.niftybukkit.util.ListUtil;
+import net.netcoding.niftybukkit.util.RegexUtil;
 import net.netcoding.niftybukkit.util.StringUtil;
 import net.netcoding.niftychat.cache.Cache;
 import net.netcoding.niftychat.cache.Config;
@@ -25,7 +26,7 @@ public class Realname extends BukkitCommand {
 
 	public Realname(JavaPlugin plugin) {
 		super(plugin, "realname");
-		this.setMaximumArgsLength(1);
+		this.setPlayerTabComplete();
 	}
 
 	@Override
@@ -71,25 +72,19 @@ public class Realname extends BukkitCommand {
 
 	@Override
 	public List<String> onTabComplete(final CommandSender sender, String alias, String[] args) throws Exception {
-		final String firstArg = (args.length > 0 ? args[0] : "");
+		final String arg = args[0].toLowerCase();
 		List<String> names = new ArrayList<>();
-		List<UserChatData> userDatas = new ArrayList<>(UserChatData.getCache());
 
 		if (NiftyBukkit.getBungeeHelper().isDetected()) {
 			for (BungeeServer server : NiftyBukkit.getBungeeHelper().getServers()) {
-				for (MojangProfile profile : server.getPlayerList())
-					userDatas.add(UserChatData.getCache(profile));
+				for (MojangProfile profile : server.getPlayerList()) {
+					UserChatData userData = UserChatData.getCache(profile);
+					String displayName = RegexUtil.strip(userData.getDisplayName(), RegexUtil.VANILLA_PATTERN);
+
+					if (displayName.toLowerCase().startsWith(arg) || displayName.toLowerCase().contains(arg))
+						names.add(displayName);
+				}
 			}
-		}
-
-		for (UserChatData userData : userDatas) {
-			String displayName = userData.getDisplayName();
-
-			if (userData.getProfile().getName().startsWith(firstArg) || userData.getProfile().getName().contains(firstArg))
-				names.add(displayName);
-
-			if (displayName.startsWith(firstArg) || displayName.contains(firstArg))
-				names.add(displayName);
 		}
 
 		return names;

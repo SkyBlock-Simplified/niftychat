@@ -30,6 +30,7 @@ public class Message extends BukkitCommand {
 	public Message(JavaPlugin plugin) {
 		super(plugin, "message");
 		this.setPlayerOnly();
+		this.setPlayerTabComplete();
 		this.setCheckHelp(false);
 		this.editUsage(0, "reply", "[message]");
 		this.editUsage(0, "r", "[message]");
@@ -164,7 +165,7 @@ public class Message extends BukkitCommand {
 			if (send(this, sender.getName(), profile.getName(), sender.getName(), message))
 				send(this, sender.getName(), profile.getName(), profile.getName(), message);
 		} else {
-			if (NiftyBukkit.getBungeeHelper().isPlayerOnline(profile)) {
+			if (profile.isOnlineAnywhere()) {
 				BungeeServer server = NiftyBukkit.getBungeeHelper().getPlayerServer(profile);
 
 				if (!server.equals(NiftyBukkit.getBungeeHelper().getServer())) {

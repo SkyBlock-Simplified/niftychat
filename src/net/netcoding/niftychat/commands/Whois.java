@@ -28,6 +28,7 @@ public class Whois extends BukkitCommand {
 
 	public Whois(JavaPlugin plugin) {
 		super(plugin, "whois");
+		this.setPlayerTabComplete();
 	}
 
 	@Override

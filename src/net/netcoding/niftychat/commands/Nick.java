@@ -2,14 +2,11 @@ package net.netcoding.niftychat.commands;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.util.ArrayList;
-import java.util.List;
 import java.util.regex.Pattern;
 
 import net.netcoding.niftybukkit.NiftyBukkit;
 import net.netcoding.niftybukkit.database.factory.ResultCallback;
 import net.netcoding.niftybukkit.minecraft.BukkitCommand;
-import net.netcoding.niftybukkit.minecraft.BungeeServer;
 import net.netcoding.niftybukkit.mojang.MojangProfile;
 import net.netcoding.niftybukkit.mojang.exceptions.ProfileNotFoundException;
 import net.netcoding.niftybukkit.util.RegexUtil;
@@ -31,6 +28,7 @@ public class Nick extends BukkitCommand {
 	public Nick(JavaPlugin plugin) {
 		super(plugin, "nick");
 		this.setMaximumArgsLength(2);
+		this.setPlayerTabComplete();
 	}
 
 	@Override
@@ -171,28 +169,6 @@ public class Nick extends BukkitCommand {
 			} else
 				this.getLog().error(sender, "Player {{0}} not found!", playerName);
 		}
-	}
-
-	@Override
-	protected List<String> onTabComplete(CommandSender sender, String label, String[] args) throws Exception {
-		final String firstArg = (args.length > 0 ? args[0] : "");
-		List<String> names = new ArrayList<>();
-
-		if (NiftyBukkit.getBungeeHelper().isDetected()) {
-			for (BungeeServer server : NiftyBukkit.getBungeeHelper().getServers()) {
-				for (MojangProfile profile : server.getPlayerList()) {
-					if (profile.getName().startsWith(firstArg) || profile.getName().contains(firstArg))
-						names.add(profile.getName());
-				}
-			}
-		} else {
-			for (UserChatData userData : UserChatData.getCache()) {
-				if (userData.getProfile().getName().startsWith(firstArg) || userData.getProfile().getName().contains(firstArg))
-					names.add(userData.getProfile().getName());
-			}
-		}
-
-		return names;
 	}
 
 }

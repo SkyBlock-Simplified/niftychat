@@ -167,5 +167,5 @@ permissions:
             description: Allows you to vanish from all servers
           niftychat.vanish.others:
             description: Allows you to vanish other players
-          niftychat.vanish.others:
+          niftychat.vanish.see:
             description: Allows you to see vanished players

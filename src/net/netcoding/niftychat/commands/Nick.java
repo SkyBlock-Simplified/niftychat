@@ -26,8 +26,7 @@ public class Nick extends BukkitCommand {
 
 	private static final int MINIMUM_CHARS = 3;
 	private static final int MAXIMUM_CHARS = 16;
-	public static final transient Pattern CONTAIN_NICKNAME_CHARS = Pattern.compile("([\\w-])");
-	public static final transient Pattern INVALID_NICKNAME_CHARS = Pattern.compile("([^\\w-])");
+	public static final transient Pattern INVALID_NICKNAME_CHARS = Pattern.compile("([^\\w])");
 
 	public Nick(JavaPlugin plugin) {
 		super(plugin, "nick");
@@ -42,7 +41,7 @@ public class Nick extends BukkitCommand {
 		}
 
 		String playerName = (args.length == 2 ? args[0] : sender.getName());
-		String nick = (args.length == 2 ? args[1] : args[0]);
+		String nick = RegexUtil.strip((args.length == 2 ? args[1] : args[0]), RegexUtil.VANILLA_PATTERN);
 		boolean isMe = sender.getName() == playerName;
 		String your = (isMe ? ChatColor.GRAY + "You" : playerName);
 		String has = (isMe ? "have" : "has");
@@ -98,10 +97,10 @@ public class Nick extends BukkitCommand {
 				return;
 			}
 
-			String noColorNick  = RegexUtil.strip(nick, RegexUtil.REPLACE_ALL_PATTERN);
+			String noColorNick = RegexUtil.strip(nick, RegexUtil.REPLACE_ALL_PATTERN);
 			String strippedNick = RegexUtil.strip(noColorNick, INVALID_NICKNAME_CHARS);
 
-			if (strippedNick != noColorNick) {
+			if (!strippedNick.equals(noColorNick)) {
 				if (!this.hasPermissions(sender, "nick", "special")) {
 					this.getLog().error(sender, "Nicknames can only contain letters, numbers and underscores!");
 					return;
@@ -120,21 +119,21 @@ public class Nick extends BukkitCommand {
 				}
 			}
 
-			if (RegexUtil.replaceColor(nick, RegexUtil.REPLACE_COLOR_PATTERN) != nick) {
+			if (RegexUtil.strip(nick, RegexUtil.REPLACE_COLOR_PATTERN) != nick) {
 				if (!this.hasPermissions(sender, "nick", "color")) {
 					this.getLog().error(sender, "You do not have access to use color in nicknames!");
 					return;
 				}
 			}
 
-			if (RegexUtil.replaceColor(nick, RegexUtil.REPLACE_MAGIC_PATTERN) != nick) {
+			if (RegexUtil.strip(nick, RegexUtil.REPLACE_MAGIC_PATTERN) != nick) {
 				if (!this.hasPermissions(sender, "nick", "magic")) {
 					this.getLog().error(sender, "You do not have access to use magic nicknames!");
 					return;
 				}
 			}
 
-			if (RegexUtil.replaceColor(nick, RegexUtil.REPLACE_FORMAT_PATTERN) != nick) {
+			if (RegexUtil.strip(nick, RegexUtil.REPLACE_FORMAT_PATTERN) != nick) {
 				if (!this.hasPermissions(sender, "nick", "format")) {
 					this.getLog().error(sender, "You do not have access to use formatting in nicknames!");
 					return;
@@ -149,7 +148,7 @@ public class Nick extends BukkitCommand {
 			}, strippedNick, profile.getUniqueId());
 
 			if (taken) {
-				this.getLog().error(sender, "The nickname {{0}} is already taken!", nick);
+				this.getLog().error(sender, "The nickname {{0}} is already taken!", strippedNick);
 				return;
 			}
 		}
@@ -162,7 +161,7 @@ public class Nick extends BukkitCommand {
 				this.getLog().message(sender, "{{0}} now {1} nickname access.", your, has);
 		} else {
 			String _ufnick = null;
-			if (nick != null) _ufnick = RegexUtil.replaceColor(nick, RegexUtil.REPLACE_ALL_PATTERN);
+			if (nick != null) _ufnick = RegexUtil.strip(nick, RegexUtil.REPLACE_ALL_PATTERN);
 
 			if (Cache.MySQL.update(StringUtil.format("UPDATE `{0}` SET `nick` = ?, `ufnick` = ? WHERE `uuid` = ?;", Config.USER_TABLE), nick, _ufnick, profile.getUniqueId())) {
 				if (clear)

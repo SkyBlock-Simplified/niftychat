@@ -170,11 +170,9 @@ public class UserChatData extends BukkitHelper {
 			BungeeServer bungeeServer = StringUtil.isEmpty(server) || server.equals("*") ? bungeeHelper.getServer() : bungeeHelper.getServer(server);
 
 			for (UserFlagData flagData : flagDatas) {
-				if (bungeeHelper.isDetected()) {
-					if (bungeeServer.equals(flagData.getServer())) {
-						found = flagData;
-						break;
-					}
+				if (bungeeServer.equals(flagData.getServer())) {
+					found = flagData;
+					break;
 				}
 			}
 		}

@@ -32,6 +32,7 @@ public class Message extends BukkitCommand {
 		for (UserChatData userData : UserChatData.getCache()) {
 			if (userData.equals(senderData) || userData.equals(receiverData)) continue;
 			if (!userData.getFlagData("spying", server).getValue()) continue;
+			if ((senderData.getFlagData("vanished").getValue() || receiverData.getFlagData("vanished").getValue()) && !helper.hasPermissions(userData.getOfflinePlayer().getPlayer(), "vanish", "see")) continue;
 			send(helper, senderData.getProfile().getName(), receiverData.getProfile().getName(), userData.getProfile().getName(), message);
 		}
 	}
@@ -68,9 +69,6 @@ public class Message extends BukkitCommand {
 				NiftyBukkit.getBungeeHelper().forward("ONLINE", Config.CHAT_CHANNEL, data);
 				NiftyBukkit.getBungeeHelper().forward(NiftyBukkit.getBungeeHelper().getServerName(), Config.CHAT_CHANNEL, data);
 			}
-		} else { // Spying
-			if ((senderData.getFlagData("vanished").getValue() || receiverData.getFlagData("vanished").getValue()) && !helper.hasPermissions(recipientData.getOfflinePlayer().getPlayer(), "vanish", "see"))
-				return false;
 		}
 
 		RankFormat format = RankFormat.getCache("message");

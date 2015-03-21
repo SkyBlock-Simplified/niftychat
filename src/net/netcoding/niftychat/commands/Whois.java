@@ -24,7 +24,8 @@ import org.bukkit.plugin.java.JavaPlugin;
 
 public class Whois extends BukkitCommand {
 
-	private static final List<String> ANTI_CONSOLE = Arrays.asList("Top secret!", "Nothing to see here...", "Someone's up to no good!");
+	private static final List<String> ANTI_CONSOLE = Arrays.asList("Top secret!", "Nothing to see here...", "Someone's up to no good!",
+			"One does not search for console, it searches for you.");
 
 	public Whois(JavaPlugin plugin) {
 		super(plugin, "whois");
@@ -56,7 +57,7 @@ public class Whois extends BukkitCommand {
 		this.getLog().message(sender, "Ranks: {{0}}", StringUtil.implode(separator, userData.getRankData().getRanks()));
 		if (NiftyBukkit.getBungeeHelper().isDetected() && userData.getProfile().isOnline()) this.getLog().message(sender, "Server: {{0}}", serverName);
 
-		if (alias.matches("admin$") && this.hasPermissions(sender, "whois", "admin")) {
+		if (alias.matches("^.+?admin$") && this.hasPermissions(sender, "whois", "admin")) {
 			if (userData.getProfile().isOnline()) 
 				this.getLog().message(sender, "IP Address: {{0}}", userData.getProfile().getAddress().getHostName());
 

@@ -43,35 +43,38 @@ public class GList extends BukkitCommand {
 					totalPlayers = selected.getPlayerCount();
 					maxPlayers = selected.getMaxPlayers();
 				}
-			}
+			} else
+				selected = NiftyBukkit.getBungeeHelper().getServer();
 		}
 
-		if (alias.matches("^list|online$") || selected != null || !NiftyBukkit.getBungeeHelper().isDetected()) {
+		if (!NiftyBukkit.getBungeeHelper().isDetected() || alias.matches("^list|online$") || !selected.equals(NiftyBukkit.getBungeeHelper().getServer())) {
 			List<String> nameList = new ArrayList<>();
 			List<MojangProfile> profiles = new ArrayList<>();
+			String serverName = NiftyBukkit.getBungeeHelper().isDetected() ? selected.getName() : "*";
 
 			if (!NiftyBukkit.getBungeeHelper().isDetected()) {
 				for (Player player : this.getPlugin().getServer().getOnlinePlayers())
 					profiles.add(NiftyBukkit.getMojangRepository().searchByPlayer(player));
 			} else {
-				if (selected != null) {
-					profiles.addAll(selected.getPlayerList());
+				profiles.addAll(selected.getPlayerList());
+
+				if (!selected.equals(NiftyBukkit.getBungeeHelper().getServer()))
 					output.add(StringUtil.format("Showing players in {{0}},", selected.getName()));
-				} else
-					profiles.addAll(NiftyBukkit.getBungeeHelper().getPlayerList());
 			}
 
 			if (profiles.size() > 0) {
 				for (MojangProfile profile : profiles) {
 					UserChatData userData = UserChatData.getCache(profile);
+					boolean isVanished = userData.getFlagData("vanished", serverName).getValue();
+					String displayName = isVanished ? StringUtil.format("{{0}}{1}", "*", userData.getDisplayName()) : userData.getDisplayName();
 
-					if (userData.getFlagData("vanished", (selected == null ? "*" : selected.getName())).getValue()) {
-						if ((isPlayer(sender) && userData.equals(senderData)) || this.hasPermissions(sender, "vanish", "see"))
-							nameList.add(StringUtil.format("{{0}}{1}", "*", userData.getDisplayName()));
+					if (isVanished && isPlayer(sender)) {
+						if (senderData.equals(userData) || this.hasPermissions(sender, "vanish", "see"))
+							nameList.add(displayName);
 						else
 							totalPlayers--;
 					} else
-						nameList.add(userData.getDisplayName());
+						nameList.add(displayName);
 				}
 			} else
 				output.add("&oNo players online");
@@ -91,16 +94,18 @@ public class GList extends BukkitCommand {
 
 						for (MojangProfile profile : server.getPlayerList()) {
 							UserChatData userData = UserChatData.getCache(profile);
+							boolean isVanished = userData.getFlagData("vanished", server.getName()).getValue();
+							String displayName = isVanished ? StringUtil.format("{{0}}{1}", "*", userData.getDisplayName()) : userData.getDisplayName();
 
-							if (userData.getFlagData("vanished", server.getName()).getValue()) {
-								if ((isPlayer(sender) && userData.equals(senderData)) || this.hasPermissions(sender, "vanish", "see"))
-									nameList.add(StringUtil.format("{{0}}{1}", "*", userData.getDisplayName()));
+							if (isVanished && isPlayer(sender)) {
+								if (senderData.equals(userData) || this.hasPermissions(sender, "vanish", "see"))
+									nameList.add(displayName);
 								else {
 									serverPlayers--;
 									totalPlayers--;
 								}
 							} else
-								nameList.add(userData.getDisplayName());
+								nameList.add(displayName);
 						}
 
 						names += StringUtil.implode("&r, ", nameList);

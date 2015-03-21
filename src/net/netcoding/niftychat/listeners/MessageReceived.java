@@ -37,7 +37,7 @@ public class MessageReceived extends BukkitHelper implements BungeeListener {
 		} else if (action.equals("SpyMessage")) {
 			UserChatData senderData = UserChatData.getCache(NiftyBukkit.getMojangRepository().searchByUsername(fwData.readUTF())); // Sender
 			UserChatData receiverData = UserChatData.getCache(NiftyBukkit.getMojangRepository().searchByUsername(fwData.readUTF())); // Receiver
-			Message.notifySpies(this, fwData.readUTF(), senderData, receiverData, fwData.readUTF());
+			Message.notifySpies(this, receiverData.getProfile().getServer().getName(), senderData, receiverData, fwData.readUTF());
 		}
 	}
 

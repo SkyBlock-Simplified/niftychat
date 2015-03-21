@@ -64,7 +64,7 @@ public class Message extends BukkitCommand {
 			if (!NiftyBukkit.getBungeeHelper().isDetected())
 				notifySpies(helper, "*", senderData, receiverData, message);
 			else {
-				Object[] data = new Object[] { "SpyMessage", senderData.getProfile().getName(), receiverData.getProfile().getName(), receiverData.getProfile().getServer().getName(), message };
+				Object[] data = new Object[] { "SpyMessage", senderData.getProfile().getName(), receiverData.getProfile().getName(), message };
 				NiftyBukkit.getBungeeHelper().forward("ONLINE", Config.CHAT_CHANNEL, data);
 				NiftyBukkit.getBungeeHelper().forward(NiftyBukkit.getBungeeHelper().getServerName(), Config.CHAT_CHANNEL, data);
 			}

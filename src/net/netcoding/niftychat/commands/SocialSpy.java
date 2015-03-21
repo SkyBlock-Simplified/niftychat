@@ -14,6 +14,8 @@ import org.bukkit.plugin.java.JavaPlugin;
 
 public class SocialSpy extends BukkitCommand {
 
+	public static final String FLAG = "spying";
+
 	public SocialSpy(JavaPlugin plugin) {
 		super(plugin, "socialspy");
 		this.setMinimumArgsLength(0);
@@ -57,10 +59,10 @@ public class SocialSpy extends BukkitCommand {
 			return;
 		}
 
-		if (Config.isGlobalCommand(alias, server)) userData.resetFlagData("spying", "");
-		boolean isSpying = userData.getFlagData("spying", server).getValue();
+		if (Config.isGlobalCommand(alias, server)) userData.resetFlagData(FLAG, "");
+		boolean isSpying = userData.getFlagData(FLAG, server).getValue();
 		if (Config.isForcedCommand(alias)) isSpying = true;
-		userData.updateFlagData("spying", !isSpying, server, 0);
+		userData.updateFlagData(FLAG, !isSpying, server, 0);
 		String serverMsg = server.equals("*") ? "" : StringUtil.format(" in the {{0}} server", server);
 		String receiveMsg = "You are {{0}}{1}spying{2}.";
 		String sendMsg = "{{0}} is {{1}}{2}spying{3}.";

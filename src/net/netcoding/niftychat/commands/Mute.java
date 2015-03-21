@@ -21,6 +21,7 @@ import org.bukkit.plugin.java.JavaPlugin;
 public class Mute extends BukkitCommand {
 
 	public static final transient SimpleDateFormat EXPIRE_FORMAT = new SimpleDateFormat("MMM dd, yyyy h:mm:ss a z");
+	public static final String FLAG = "muted";
 
 	public Mute(JavaPlugin plugin) {
 		super(plugin, "mute");
@@ -63,7 +64,7 @@ public class Mute extends BukkitCommand {
 
 		if (Config.isGlobalCommand(alias, server)) {
 			server = "*";
-			userData.resetFlagData("muted", "");
+			userData.resetFlagData(FLAG, "");
 		}
 
 		if (server.equals("*") && !this.hasPermissions(sender, "mute", "global")) {
@@ -71,10 +72,10 @@ public class Mute extends BukkitCommand {
 			return;
 		}
 
-		boolean isMuted = userData.getFlagData("muted", server).getValue();
+		boolean isMuted = userData.getFlagData(FLAG, server).getValue();
 		if (Config.isForcedCommand(alias)) isMuted = true;
 		if (isMuted) expires = 0;
-		userData.updateFlagData("muted", !isMuted, server, expires);
+		userData.updateFlagData(FLAG, !isMuted, server, expires);
 		String serverMsg = server.equals("*") ? "" : StringUtil.format(" in the {{0}} server", server);
 		String expireMsg = (!isMuted && expires != 0) ? StringUtil.format(" until {{0}}", EXPIRE_FORMAT.format(new Date(expires))) : "";
 		String receiveMsg = "You are {{0}}{1}muted{2}{3}.";

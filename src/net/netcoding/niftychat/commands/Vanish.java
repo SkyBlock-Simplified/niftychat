@@ -14,6 +14,8 @@ import org.bukkit.plugin.java.JavaPlugin;
 
 public class Vanish extends BukkitCommand {
 
+	public static final String FLAG = "vanished";
+
 	public Vanish(JavaPlugin plugin) {
 		super(plugin, "vanish");
 		this.setMinimumArgsLength(0);
@@ -53,12 +55,12 @@ public class Vanish extends BukkitCommand {
 
 		if (Config.isGlobalCommand(alias, server)) {
 			server = "*";
-			userData.resetFlagData("vanished", "");
+			userData.resetFlagData(FLAG, "");
 		}
 
-		boolean isVanished = userData.getFlagData("vanished", server).getValue();
+		boolean isVanished = userData.getFlagData(FLAG, server).getValue();
 		if (Config.isForcedCommand(alias)) isVanished = true;
-		userData.updateFlagData("vanished", !isVanished, server, 0);
+		userData.updateFlagData(FLAG, !isVanished, server, 0);
 		String serverMsg = server.equals("*") ? "" : StringUtil.format(" in the {{0}} server", server);
 		String receiveMsg = "You are {{0}}{1}vanished{2}.";
 		String sendMsg = "{{0}} is {{1}}{2}vanished{3}.";

@@ -178,7 +178,7 @@ public class UserChatData extends BukkitHelper {
 			}
 		}
 
-		return found == null ? new UserFlagData(flag) : found;
+		return found == null ? new UserFlagData(flag, server) : found;
 	}
 
 	public MojangProfile getLastMessenger() {
@@ -230,11 +230,10 @@ public class UserChatData extends BukkitHelper {
 					List<UserFlagData> flags = new ArrayList<>();
 
 					while (result.next()) {
-						UserFlagData flagData = new UserFlagData(result.getString("flag"));
+						UserFlagData flagData = new UserFlagData(result.getString("flag"), result.getString("server"));
 						Timestamp expires = result.getTimestamp("_expires");
 						flagData.setExpires(result.wasNull() ? 0 : expires.getTime());
 						flagData.setSubmitted(result.getTimestamp("_submitted").getTime());
-						flagData.setServer(result.getString("server"));
 						flagData.setValue(result.getBoolean("value"));
 						flags.add(flagData);
 					}

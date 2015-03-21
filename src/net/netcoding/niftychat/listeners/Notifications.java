@@ -126,9 +126,8 @@ public class Notifications implements DatabaseListener {
 									}
 								}
 
-								if (flagMatch == null) userData.addFlagData(flagMatch = new UserFlagData(flag));
+								if (flagMatch == null) userData.addFlagData(flagMatch = new UserFlagData(flag, server));
 								flagMatch.setExpires(_expires);
-								flagMatch.setServer(server);
 								flagMatch.setSubmitted(_submitted);
 								flagMatch.setValue(result.getBoolean("value"));
 								userData.applyFlagData(flag);

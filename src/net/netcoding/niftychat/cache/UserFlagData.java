@@ -2,21 +2,23 @@ package net.netcoding.niftychat.cache;
 
 import net.netcoding.niftybukkit.NiftyBukkit;
 import net.netcoding.niftybukkit.minecraft.BungeeServer;
+import net.netcoding.niftybukkit.util.StringUtil;
 
 public class UserFlagData {
 
 	private long expires = 0;
 
-	private String flag = "";
+	private final String flag;
 
-	private String server = "*";
+	private final String server;
 
 	private long submitted = System.currentTimeMillis();
 
 	private boolean value = false;
 
-	public UserFlagData(String flag) {
+	public UserFlagData(String flag, String server) {
 		this.flag = flag;
+		this.server = StringUtil.isEmpty(server) ? "*" : server;
 	}
 
 	public String getFlag() {
@@ -53,10 +55,6 @@ public class UserFlagData {
 
 	public void setExpires(long expires) {
 		this.expires = expires;
-	}
-
-	public void setServer(String serverName) {
-		this.server = serverName;
 	}
 
 	public void setValue(boolean value) {

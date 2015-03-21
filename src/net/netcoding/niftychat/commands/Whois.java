@@ -62,12 +62,12 @@ public class Whois extends BukkitCommand {
 				this.getLog().message(sender, "IP Address: {{0}}", userData.getProfile().getAddress().getHostName());
 
 			this.getLog().message(sender, "Nickname Access: {{0}}", (!userData.getFlagData("nick-revoke").getValue() ? (ChatColor.GREEN + "Yes") : "No"));
-			UserFlagData globalMuteData = userData.getFlagData("muted", "*");
+			UserFlagData globalMuteData = userData.getFlagData(Mute.FLAG, "*");
 
 			if (globalMuteData.getValue()) {
 				this.getLog().message(sender, "Muted: {{0}} (Expires {{1}})", "Globally", (globalMuteData.getExpires() > 0 ? Mute.EXPIRE_FORMAT.format(new Date(globalMuteData.getExpires())) : "Never"));
 			} else {
-				ConcurrentList<UserFlagData> muteDatas = new ConcurrentList<>(userData.getAllFlagData("muted"));
+				ConcurrentList<UserFlagData> muteDatas = new ConcurrentList<>(userData.getAllFlagData(Mute.FLAG));
 
 				for (UserFlagData muteData : muteDatas) {
 					if (!muteData.getValue())
@@ -77,18 +77,18 @@ public class Whois extends BukkitCommand {
 				if (muteDatas.size() > 0) {
 					this.getLog().message(sender, "Muted:");
 
-					for (UserFlagData muteData : userData.getAllFlagData("muted"))
+					for (UserFlagData muteData : userData.getAllFlagData(Mute.FLAG))
 						this.getLog().message(sender, "- {{0}} (Expires {{1}})", muteData.getServerName(), (muteData.getExpires() > 0 ? Mute.EXPIRE_FORMAT.format(new Date(muteData.getExpires())) : "Never"));
 				} else
 					this.getLog().message(sender, "Muted: {{0}}", "No");
 			}
 
-			if (userData.getFlagData("spying", "*").getValue())
+			if (userData.getFlagData(SocialSpy.FLAG, "*").getValue())
 				this.getLog().message(sender, "Spying: {{0}}", "Globally");
 			else {
 				List<String> servers = new ArrayList<>();
 
-				for (UserFlagData spyData : userData.getAllFlagData("spying")) {
+				for (UserFlagData spyData : userData.getAllFlagData(SocialSpy.FLAG)) {
 					if (spyData.getValue())
 						servers.add(spyData.getServerName());
 				}
@@ -100,12 +100,12 @@ public class Whois extends BukkitCommand {
 			}
 
 			if (this.hasPermissions(sender, "vanish", "see")) {
-				if (userData.getFlagData("vanished", "*").getValue())
+				if (userData.getFlagData(Vanish.FLAG, "*").getValue())
 					this.getLog().message(sender, "Vanished: {{0}}", "Globally");
 				else {
 					List<String> servers = new ArrayList<>();
 
-					for (UserFlagData vanishData : userData.getAllFlagData("vanished")) {
+					for (UserFlagData vanishData : userData.getAllFlagData(Vanish.FLAG)) {
 						if (vanishData.getValue())
 							servers.add(vanishData.getServerName());
 					}

@@ -65,7 +65,7 @@ public class GList extends BukkitCommand {
 			if (profiles.size() > 0) {
 				for (MojangProfile profile : profiles) {
 					UserChatData userData = UserChatData.getCache(profile);
-					boolean isVanished = userData.getFlagData("vanished", serverName).getValue();
+					boolean isVanished = userData.getFlagData(Vanish.FLAG, serverName).getValue();
 					String displayName = isVanished ? StringUtil.format("{{0}}{1}", "*", userData.getDisplayName()) : userData.getDisplayName();
 
 					if (isVanished && isPlayer(sender)) {
@@ -94,7 +94,7 @@ public class GList extends BukkitCommand {
 
 						for (MojangProfile profile : server.getPlayerList()) {
 							UserChatData userData = UserChatData.getCache(profile);
-							boolean isVanished = userData.getFlagData("vanished", server.getName()).getValue();
+							boolean isVanished = userData.getFlagData(Vanish.FLAG, server.getName()).getValue();
 							String displayName = isVanished ? StringUtil.format("{{0}}{1}", "*", userData.getDisplayName()) : userData.getDisplayName();
 
 							if (isVanished && isPlayer(sender)) {

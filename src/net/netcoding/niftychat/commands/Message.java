@@ -31,8 +31,8 @@ public class Message extends BukkitCommand {
 	public static void notifySpies(BukkitHelper helper, String server, UserChatData senderData, UserChatData receiverData, String message) {
 		for (UserChatData userData : UserChatData.getCache()) {
 			if (userData.equals(senderData) || userData.equals(receiverData)) continue;
-			if (!userData.getFlagData("spying", server).getValue()) continue;
-			if ((senderData.getFlagData("vanished").getValue() || receiverData.getFlagData("vanished").getValue()) && !helper.hasPermissions(userData.getOfflinePlayer().getPlayer(), "vanish", "see")) continue;
+			if (!userData.getFlagData(SocialSpy.FLAG, server).getValue()) continue;
+			if ((senderData.getFlagData(Vanish.FLAG).getValue() || receiverData.getFlagData(Vanish.FLAG).getValue()) && !helper.hasPermissions(userData.getOfflinePlayer().getPlayer(), "vanish", "see")) continue;
 			send(helper, senderData.getProfile().getName(), receiverData.getProfile().getName(), userData.getProfile().getName(), message);
 		}
 	}
@@ -50,12 +50,12 @@ public class Message extends BukkitCommand {
 				return false;
 			}
 
-			if (senderData.getFlagData("muted").getValue() && !helper.hasPermissions(senderData.getOfflinePlayer().getPlayer(), "mute", "roar")) {
+			if (senderData.getFlagData(Mute.FLAG).getValue() && !helper.hasPermissions(senderData.getOfflinePlayer().getPlayer(), "mute", "roar")) {
 				Mute.sendMutedError(helper.getLog(), senderData.getOfflinePlayer().getPlayer(), senderData);
 				return false;
 			}
 
-			if (receiverData.getFlagData("vanished").getValue() && !senderData.hasPermissions("vanish", "see")) {
+			if (receiverData.getFlagData(Vanish.FLAG).getValue() && !senderData.hasPermissions("vanish", "see")) {
 				helper.getLog().error(senderData.getOfflinePlayer().getPlayer(), "Unable to locate {{0}}!", receiverData.getProfile().getName());
 				return false;
 			}

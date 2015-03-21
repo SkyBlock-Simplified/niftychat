@@ -1,8 +1,10 @@
 package net.netcoding.niftychat.listeners;
 
+import net.netcoding.niftybukkit.NiftyBukkit;
 import net.netcoding.niftybukkit.minecraft.BukkitHelper;
 import net.netcoding.niftybukkit.minecraft.BungeeListener;
 import net.netcoding.niftychat.cache.Config;
+import net.netcoding.niftychat.cache.UserChatData;
 import net.netcoding.niftychat.commands.Message;
 
 import org.bukkit.entity.Player;
@@ -33,11 +35,9 @@ public class MessageReceived extends BukkitHelper implements BungeeListener {
 			String msg = fwData.readUTF();
 			Message.send(this, senderName, receiverName, receiverName, msg);
 		} else if (action.equals("SpyMessage")) {
-			String senderName = fwData.readUTF();
-			String receiverName = fwData.readUTF();
-			String spyName = fwData.readUTF();
-			String msg = fwData.readUTF();
-			Message.send(this, senderName, receiverName, spyName, msg);
+			UserChatData senderData = UserChatData.getCache(NiftyBukkit.getMojangRepository().searchByUsername(fwData.readUTF())); // Sender
+			UserChatData receiverData = UserChatData.getCache(NiftyBukkit.getMojangRepository().searchByUsername(fwData.readUTF())); // Receiver
+			Message.notifySpies(this, fwData.readUTF(), senderData, receiverData, fwData.readUTF());
 		}
 	}
 

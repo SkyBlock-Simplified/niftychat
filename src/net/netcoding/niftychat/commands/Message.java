@@ -1,13 +1,6 @@
 package net.netcoding.niftychat.commands;
 
-import java.sql.ResultSet;
-import java.sql.SQLException;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.UUID;
-
 import net.netcoding.niftybukkit.NiftyBukkit;
-import net.netcoding.niftybukkit.database.factory.ResultCallback;
 import net.netcoding.niftybukkit.minecraft.BukkitCommand;
 import net.netcoding.niftybukkit.minecraft.BukkitHelper;
 import net.netcoding.niftybukkit.minecraft.BungeeServer;
@@ -15,7 +8,6 @@ import net.netcoding.niftybukkit.mojang.MojangProfile;
 import net.netcoding.niftybukkit.mojang.exceptions.ProfileNotFoundException;
 import net.netcoding.niftybukkit.util.RegexUtil;
 import net.netcoding.niftybukkit.util.StringUtil;
-import net.netcoding.niftychat.cache.Cache;
 import net.netcoding.niftychat.cache.Config;
 import net.netcoding.niftychat.cache.RankFormat;
 import net.netcoding.niftychat.cache.UserChatData;
@@ -36,46 +28,18 @@ public class Message extends BukkitCommand {
 		this.editUsage(0, "r", "[message]");
 	}
 
-	protected static void notifySpies(final BukkitHelper helper, final UserChatData senderData, final UserChatData receiverData, final String message) {
-		helper.getPlugin().getServer().getScheduler().runTaskAsynchronously(helper.getPlugin(), new Runnable() {
-			@Override
-			public void run() {
-				try {
-					RankFormat format = RankFormat.getCache("message");
-					List<MojangProfile> spies = Cache.MySQL.query(StringUtil.format("SELECT `uuid` FROM `{0}` WHERE `flag` = ? AND `value` = ?;", Config.USER_FLAGS_TABLE), new ResultCallback<List<MojangProfile>>() {
-						@Override
-						public List<MojangProfile> handle(ResultSet result) throws SQLException {
-							List<MojangProfile> profiles = new ArrayList<>();
-							while (result.next()) {
-								try {
-									profiles.add(NiftyBukkit.getMojangRepository().searchByUniqueId(UUID.fromString(result.getString("uuid")), false));
-								} catch (ProfileNotFoundException pnfex) { }
-							}
-							return profiles;
-						}
-					}, "spying", true);
-
-					for (MojangProfile spy : spies) {
-						if (!spy.getUniqueId().equals(senderData.getProfile().getUniqueId()) && !spy.getUniqueId().equals(receiverData.getProfile().getUniqueId())) {
-							if (!NiftyBukkit.getBungeeHelper().isDetected()) {
-								UserChatData spyData = UserChatData.getCache(spy);
-								if (spyData.getOfflinePlayer().isOnline()) helper.getLog().message(spyData.getOfflinePlayer().getPlayer(), format.getFormat(), senderData.getDisplayName(), receiverData.getDisplayName(), format);
-							} else if (spy.isOnline())
-								NiftyBukkit.getBungeeHelper().forward(receiverData.getProfile(), NiftyBukkit.getBungeeHelper().getPlayerServer(spy).getName(), Config.CHAT_CHANNEL, "SpyMessage", senderData.getProfile().getName(), receiverData.getProfile().getName(), spy.getName(), message);
-						}
-					}
-				} catch (Exception ex) {
-					helper.getLog().console(ex);
-				}
-			}
-		});
+	public static void notifySpies(BukkitHelper helper, String server, UserChatData senderData, UserChatData receiverData, String message) {
+		for (UserChatData userData : UserChatData.getCache()) {
+			if (userData.equals(senderData) || userData.equals(receiverData)) continue;
+			if (!userData.getFlagData("spying", server).getValue()) continue;
+			send(helper, senderData.getProfile().getName(), receiverData.getProfile().getName(), userData.getProfile().getName(), message);
+		}
 	}
 
 	public static boolean send(final BukkitHelper helper, String senderName, String receiverName, String recipientName, String message) {
 		UserChatData senderData = UserChatData.getCache(NiftyBukkit.getMojangRepository().searchByUsername(senderName)); // Sender
 		UserChatData receiverData = UserChatData.getCache(NiftyBukkit.getMojangRepository().searchByUsername(receiverName)); // Receiver
-		UserChatData recipientData = UserChatData.getCache(NiftyBukkit.getMojangRepository().searchByUsername(recipientName)); // Sent
-		boolean log = true;
+		UserChatData recipientData = UserChatData.getCache(NiftyBukkit.getMojangRepository().searchByUsername(recipientName)); // Recipient
 
 		if (recipientData.equals(senderData)) { // Sending
 			boolean receiverOnline = receiverData.isOnline();
@@ -96,9 +60,15 @@ public class Message extends BukkitCommand {
 			}
 		} else if (recipientData.equals(receiverData)) { // Receiving
 			receiverData.setLastMessenger(senderData.getProfile());
-			notifySpies(helper, senderData, receiverData, message);
+
+			if (!NiftyBukkit.getBungeeHelper().isDetected())
+				notifySpies(helper, "*", senderData, receiverData, message);
+			else {
+				Object[] data = new Object[] { "SpyMessage", senderData.getProfile().getName(), receiverData.getProfile().getName(), receiverData.getProfile().getServer().getName(), message };
+				NiftyBukkit.getBungeeHelper().forward("ONLINE", Config.CHAT_CHANNEL, data);
+				NiftyBukkit.getBungeeHelper().forward(NiftyBukkit.getBungeeHelper().getServerName(), Config.CHAT_CHANNEL, data);
+			}
 		} else { // Spying
-			log = false;
 			if ((senderData.getFlagData("vanished").getValue() || receiverData.getFlagData("vanished").getValue()) && !helper.hasPermissions(recipientData.getOfflinePlayer().getPlayer(), "vanish", "see"))
 				return false;
 		}
@@ -107,7 +77,7 @@ public class Message extends BukkitCommand {
 		String senderDisplayName = recipientData.getProfile().equals(senderData.getProfile()) ? RegexUtil.replaceColor("&7me", RegexUtil.REPLACE_ALL_PATTERN) : senderData.getDisplayName();
 		String receiverDisplayName = recipientData.getProfile().equals(receiverData.getProfile()) ? RegexUtil.replaceColor("&7me", RegexUtil.REPLACE_ALL_PATTERN) : receiverData.getDisplayName();
 		helper.getLog().message(recipientData.getOfflinePlayer().getPlayer(), format.getFormat(), senderDisplayName, receiverDisplayName, message);
-		if (log) helper.getLog().console(format.getFormat(), senderDisplayName, receiverDisplayName, message);
+		if (senderData.equals(recipientData)) helper.getLog().console(format.getFormat(), senderData.getDisplayName(), receiverData.getDisplayName(), message);
 		return true;
 	}
 

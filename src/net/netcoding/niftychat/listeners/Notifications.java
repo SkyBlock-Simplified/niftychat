@@ -34,7 +34,7 @@ public class Notifications implements DatabaseListener {
 							UUID uuid = UUID.fromString(result.getString("uuid"));
 							UserChatData userData = UserChatData.getCache(NiftyBukkit.getMojangRepository().searchByUniqueId(uuid));
 
-							if (userData.isOnline()) {
+							if (userData.getOfflinePlayer().isOnline()) {
 								userData.updateDisplayName();
 								userData.updateTabListName();
 							}
@@ -93,7 +93,7 @@ public class Notifications implements DatabaseListener {
 				UUID uuid = UUID.fromString((String)data.get("uuid"));
 				UserChatData userData = UserChatData.getCache(NiftyBukkit.getMojangRepository().searchByUniqueId(uuid));
 
-				if (userData.isOnline()) {
+				if (userData.getOfflinePlayer().isOnline()) {
 					userData.reloadFlagData();
 					userData.applyFlagData((String)data.get("flag"));
 				}
@@ -107,7 +107,7 @@ public class Notifications implements DatabaseListener {
 							UUID uuid = UUID.fromString(result.getString("uuid"));
 							UserChatData userData = UserChatData.getCache(NiftyBukkit.getMojangRepository().searchByUniqueId(uuid));
 
-							if (userData.isOnline()) {
+							if (userData.getOfflinePlayer().isOnline()) {
 								String flag = result.getString("flag");
 								List<UserFlagData> flagDatas = userData.getAllFlagData(flag);
 								String server = result.getString("server");

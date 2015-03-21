@@ -66,10 +66,9 @@ public class Vanish extends BukkitCommand {
 		if (!sender.getName().equalsIgnoreCase(profile.getName()))
 			this.getLog().message(sender, sendMsg, profile.getName(), (!server.equals("*") ? "" : "globally "), (!isVanished ? "" : "un"), serverMsg);
 
-		if (!NiftyBukkit.getBungeeHelper().isDetected()) {
-			if (userData.isOnline())
-				this.getLog().message(userData.getOfflinePlayer().getPlayer(), receiveMsg, "", (!isVanished ? "" : "un"), "");
-		} else {
+		if (!NiftyBukkit.getBungeeHelper().isDetected() && userData.isOnline())
+			this.getLog().message(userData.getOfflinePlayer().getPlayer(), receiveMsg, "", (!isVanished ? "" : "un"), "");
+		else {
 			if (isConsole(sender) && NiftyBukkit.getBungeeHelper().getServer().getPlayerCount() == 0) return;
 			NiftyBukkit.getBungeeHelper().message(profile, ChatColor.GRAY + StringUtil.format(receiveMsg, (!server.equals("*") ? "" : "globally "), (!isVanished ? "" : "un"), serverMsg));
 		}

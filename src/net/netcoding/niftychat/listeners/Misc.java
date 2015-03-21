@@ -22,7 +22,7 @@ public class Misc extends BukkitListener {
 		try {
 			MojangProfile profile = NiftyBukkit.getMojangRepository().searchByPlayer(event.getPlayer());
 			UserChatData userData = UserChatData.getCache(profile);
-			if (userData.isOnline()) userData.setMoved();
+			if (userData.getOfflinePlayer().isOnline()) userData.setMoved();
 		} catch (ProfileNotFoundException pfne) { }
 	}
 
@@ -30,7 +30,7 @@ public class Misc extends BukkitListener {
 	public void onRankChangeEvent(RankChangeEvent event) {
 		UserChatData userData = UserChatData.getCache(event.getProfile());
 
-		if (userData.isOnline()) {
+		if (userData.getOfflinePlayer().isOnline()) {
 			userData.updateDisplayName();
 			userData.updateTabListName();
 			userData.applyFlagData("vanished");

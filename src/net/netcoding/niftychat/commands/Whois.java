@@ -50,14 +50,14 @@ public class Whois extends BukkitCommand {
 
 		UserChatData userData = UserChatData.getCache(profile);
 		String separator = StringUtil.format("{0}{1}{2}", ChatColor.GRAY, ", ", ChatColor.RED);
-		String serverName = userData.getProfile().isOnlineAnywhere() ? userData.getProfile().getServer().getName() : "*";
+		String serverName = (NiftyBukkit.getBungeeHelper().isDetected() && userData.getProfile().isOnline()) ? userData.getProfile().getServer().getName() : "*";
 		this.getLog().message(sender, "Whois {{0}}", userData.getProfile().getName());
 		this.getLog().message(sender, "Display Name: {0}", userData.getDisplayName());
 		this.getLog().message(sender, "Ranks: {{0}}", StringUtil.implode(separator, userData.getRankData().getRanks()));
-		if (userData.getProfile().isOnlineAnywhere()) this.getLog().message(sender, "Server: {{0}}", serverName);
+		if (NiftyBukkit.getBungeeHelper().isDetected() && userData.getProfile().isOnline()) this.getLog().message(sender, "Server: {{0}}", serverName);
 
 		if (alias.matches("admin$") && this.hasPermissions(sender, "whois", "admin")) {
-			if (userData.getProfile().isOnlineAnywhere()) 
+			if (userData.getProfile().isOnline()) 
 				this.getLog().message(sender, "IP Address: {{0}}", userData.getProfile().getAddress().getHostName());
 
 			this.getLog().message(sender, "Nickname Access: {{0}}", (!userData.getFlagData("nick-revoke").getValue() ? (ChatColor.GREEN + "Yes") : "No"));
@@ -116,7 +116,7 @@ public class Whois extends BukkitCommand {
 				}
 			}
 		} else {
-			if (userData.isOnline()) {
+			if (userData.getOfflinePlayer().isOnline()) {
 				Player player = userData.getOfflinePlayer().getPlayer();
 				this.getLog().message(sender, "Operator: {{0}}", (userData.getOfflinePlayer().isOp() ? (ChatColor.GREEN + "Yes") : "No"));
 				this.getLog().message(sender, "Location: {{0}}, {{1}}, {{2}}, {{3}}", player.getLocation().getWorld().getName(), player.getLocation().getX(), player.getLocation().getY(), player.getLocation().getZ());

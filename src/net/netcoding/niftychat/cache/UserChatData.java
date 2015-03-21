@@ -49,7 +49,7 @@ public class UserChatData extends BukkitHelper {
 	}
 
 	public void applyFlagData(final String flag) {
-		if (!this.isOnline()) return;
+		if (!this.getOfflinePlayer().isOnline()) return;
 		final boolean flagValue = this.getFlagData(flag).getValue();
 
 		if ("vanished".equals(flag)) {
@@ -76,7 +76,7 @@ public class UserChatData extends BukkitHelper {
 
 	public static ConcurrentSet<UserChatData> getCache() {
 		for (UserChatData data : CACHE) {
-			if (!data.isOnline())
+			if (!data.getOfflinePlayer().isOnline())
 				CACHE.remove(data);
 		}
 
@@ -106,7 +106,7 @@ public class UserChatData extends BukkitHelper {
 	}
 
 	private String getDisplayName(boolean fetch) {
-		if (!fetch && this.isOnline())
+		if (!fetch && this.getOfflinePlayer().isOnline())
 			return this.getOfflinePlayer().getPlayer().getDisplayName();
 
 		try {
@@ -219,7 +219,7 @@ public class UserChatData extends BukkitHelper {
 	}
 
 	public boolean isOnline() {
-		return this.getOfflinePlayer().isOnline();
+		return this.getProfile().isOnline();
 	}
 
 	public void reloadFlagData() {

@@ -161,13 +161,17 @@ public class Nick extends BukkitCommand {
 			String _ufnick = null;
 			if (nick != null) _ufnick = RegexUtil.strip(nick, RegexUtil.REPLACE_ALL_PATTERN);
 
-			if (Cache.MySQL.update(StringUtil.format("UPDATE `{0}` SET `nick` = ?, `ufnick` = ? WHERE `uuid` = ?;", Config.USER_TABLE), nick, _ufnick, profile.getUniqueId())) {
-				if (clear)
-					this.getLog().message(sender, "{{0}} now {1} no nickname.", your, has);
-				else
-					this.getLog().message(sender, "{{0}} now {1} the nickname {{2}}.", your, has, RegexUtil.replaceColor(nick, RegexUtil.REPLACE_COLOR_PATTERN));
-			} else
-				this.getLog().error(sender, "Player {{0}} not found!", playerName);
+			try {
+				if (Cache.MySQL.update(StringUtil.format("UPDATE `{0}` SET `nick` = ?, `ufnick` = ? WHERE `uuid` = ?;", Config.USER_TABLE), nick, _ufnick, profile.getUniqueId())) {
+					if (clear)
+						this.getLog().message(sender, "{{0}} now {1} no nickname.", your, has);
+					else
+						this.getLog().message(sender, "{{0}} now {1} the nickname {{2}}.", your, has, RegexUtil.replaceColor(nick, RegexUtil.REPLACE_COLOR_PATTERN));
+				} else
+					this.getLog().error(sender, "Player {{0}} not found!", playerName);
+			} catch (SQLException sqlex) {
+				this.getLog().error(sender, "Unable to set nickname {{0}} for {{1}}!", nick, profile.getName());
+			}
 		}
 	}
 

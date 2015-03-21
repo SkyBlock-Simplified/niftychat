@@ -169,3 +169,10 @@ permissions:
             description: Allows you to vanish other players
           niftychat.vanish.see:
             description: Allows you to see vanished players
+      niftychat.whois.*:
+        description: Allows you to access all whois features
+        children:
+          niftychat.whois:
+            description: Allows you to run the whois command
+          niftychat.whois.admin:
+            description: Allows you to view whois admin output

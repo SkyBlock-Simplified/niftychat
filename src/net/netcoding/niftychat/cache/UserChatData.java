@@ -11,7 +11,6 @@ import java.util.List;
 import net.netcoding.niftybukkit.NiftyBukkit;
 import net.netcoding.niftybukkit.database.factory.ResultCallback;
 import net.netcoding.niftybukkit.minecraft.BukkitHelper;
-import net.netcoding.niftybukkit.minecraft.BungeeHelper;
 import net.netcoding.niftybukkit.minecraft.BungeeServer;
 import net.netcoding.niftybukkit.mojang.MojangProfile;
 import net.netcoding.niftybukkit.util.ListUtil;
@@ -20,6 +19,7 @@ import net.netcoding.niftybukkit.util.StringUtil;
 import net.netcoding.niftybukkit.util.TimeUtil;
 import net.netcoding.niftybukkit.util.concurrent.ConcurrentSet;
 import net.netcoding.niftychat.NiftyChat;
+import net.netcoding.niftychat.commands.Vanish;
 import net.netcoding.niftyranks.cache.UserRankData;
 
 import org.bukkit.OfflinePlayer;
@@ -52,7 +52,7 @@ public class UserChatData extends BukkitHelper {
 		if (!this.getOfflinePlayer().isOnline()) return;
 		final boolean flagValue = this.getFlagData(flag).getValue();
 
-		if ("vanished".equals(flag)) {
+		if (Vanish.FLAG.equals(flag)) {
 			this.getPlugin().getServer().getScheduler().runTask(this.getPlugin(), new Runnable() {
 				@Override
 				public void run() {
@@ -156,20 +156,21 @@ public class UserChatData extends BukkitHelper {
 
 	public UserFlagData getFlagData(String flag, String server) {
 		List<UserFlagData> flagDatas = this.getAllFlagData(flag);
-		BungeeHelper bungeeHelper = NiftyBukkit.getBungeeHelper();
 		UserFlagData found = null;
 
 		for (UserFlagData flagData : flagDatas) {
-			if (flagData.isGlobal()) {
+			if (flagData.isGlobal() && (flagData.getValue() || "*".equals(server))) {
 				found = flagData;
 				break;
 			}
 		}
 
-		if (found == null && bungeeHelper.isDetected()) {
-			BungeeServer bungeeServer = StringUtil.isEmpty(server) || server.equals("*") ? bungeeHelper.getServer() : bungeeHelper.getServer(server);
+		if (NiftyBukkit.getBungeeHelper().isDetected() && found == null) {
+			BungeeServer bungeeServer = (StringUtil.isEmpty(server) || server.equals("*")) ? NiftyBukkit.getBungeeHelper().getServer() : NiftyBukkit.getBungeeHelper().getServer(server);
 
 			for (UserFlagData flagData : flagDatas) {
+				if (flagData.isGlobal()) continue;
+
 				if (bungeeServer.equals(flagData.getServer())) {
 					found = flagData;
 					break;
@@ -274,7 +275,7 @@ public class UserChatData extends BukkitHelper {
 
 	public boolean updateFlagData(String flag, boolean value, String server, long expires) throws SQLException {
 		String sqlFormat = expires > 0 ? TimeUtil.SQL_FORMAT.format(new Date(expires)) : null;
-		return Cache.MySQL.update(StringUtil.format("INSERT INTO `{0}` (`uuid`, `flag`, `value`, `server`, `_expires`) VALUES (?, ?, ?, ?, ?) ON DUPLICATE KEY UPDATE `value` = ?, `_expires` = ?;", Config.USER_FLAGS_TABLE), this.getProfile().getUniqueId(), flag, value, server, sqlFormat, value, sqlFormat);
+		return Cache.MySQL.update(StringUtil.format("INSERT INTO `{0}` (`uuid`, `flag`, `value`, `server`, `_expires`) VALUES (?, ?, ?, ?, ?) ON DUPLICATE KEY UPDATE `uuid` = ?, `value` = ?, `_expires` = ?;", Config.USER_FLAGS_TABLE), this.getProfile().getUniqueId(), flag, value, server, sqlFormat, this.getProfile().getUniqueId(), value, sqlFormat);
 	}
 
 	public void updateTabListName() {

@@ -149,6 +149,8 @@ permissions:
             description: Allows you to set nicknames with magic
           niftychat.nick.format:
             description: Allows you to set nicknames with formatting
+          niftychat.nick.specal:
+            description: Allows you to set nicknames with special characters
       niftychat.realname:
         description: Allows you to find a players realname by nickname
       niftychat.socialspy.*:

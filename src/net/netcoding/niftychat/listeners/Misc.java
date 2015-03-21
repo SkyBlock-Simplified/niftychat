@@ -5,6 +5,7 @@ import net.netcoding.niftybukkit.minecraft.BukkitListener;
 import net.netcoding.niftybukkit.mojang.MojangProfile;
 import net.netcoding.niftybukkit.mojang.exceptions.ProfileNotFoundException;
 import net.netcoding.niftychat.cache.UserChatData;
+import net.netcoding.niftychat.commands.Vanish;
 import net.netcoding.niftyranks.events.RankChangeEvent;
 
 import org.bukkit.event.EventHandler;
@@ -33,7 +34,7 @@ public class Misc extends BukkitListener {
 		if (userData.getOfflinePlayer().isOnline()) {
 			userData.updateDisplayName();
 			userData.updateTabListName();
-			userData.applyFlagData("vanished");
+			userData.applyFlagData(Vanish.FLAG);
 		}
 	}
 

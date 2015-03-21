@@ -8,6 +8,7 @@ import net.netcoding.niftybukkit.util.StringUtil;
 import net.netcoding.niftychat.cache.Cache;
 import net.netcoding.niftychat.cache.Config;
 import net.netcoding.niftychat.cache.UserChatData;
+import net.netcoding.niftychat.commands.Vanish;
 
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.player.PlayerJoinEvent;
@@ -41,7 +42,7 @@ public class Login extends BukkitListener {
 			if (userData.hasPermissions("chat", "bypass", "move"))
 				userData.setMoved();
 
-			userData.applyFlagData("vanished");
+			userData.applyFlagData(Vanish.FLAG);
 		} catch (Exception ex) {
 			this.getLog().console(ex);
 		}

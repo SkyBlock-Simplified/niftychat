@@ -60,10 +60,8 @@ public class Message extends BukkitCommand {
 							if (!NiftyBukkit.getBungeeHelper().isDetected()) {
 								UserChatData spyData = UserChatData.getCache(spy);
 								if (spyData.getOfflinePlayer().isOnline()) helper.getLog().message(spyData.getOfflinePlayer().getPlayer(), format.getFormat(), senderData.getDisplayName(), receiverData.getDisplayName(), format);
-							} else {
-								if (spy.isOnlineAnywhere())
-									NiftyBukkit.getBungeeHelper().forward(receiverData.getProfile(), NiftyBukkit.getBungeeHelper().getPlayerServer(spy).getName(), Config.CHAT_CHANNEL, "SpyMessage", senderData.getProfile().getName(), receiverData.getProfile().getName(), spy.getName(), message);
-							}	
+							} else if (spy.isOnline())
+								NiftyBukkit.getBungeeHelper().forward(receiverData.getProfile(), NiftyBukkit.getBungeeHelper().getPlayerServer(spy).getName(), Config.CHAT_CHANNEL, "SpyMessage", senderData.getProfile().getName(), receiverData.getProfile().getName(), spy.getName(), message);
 						}
 					}
 				} catch (Exception ex) {
@@ -77,9 +75,10 @@ public class Message extends BukkitCommand {
 		UserChatData senderData = UserChatData.getCache(NiftyBukkit.getMojangRepository().searchByUsername(senderName)); // Sender
 		UserChatData receiverData = UserChatData.getCache(NiftyBukkit.getMojangRepository().searchByUsername(receiverName)); // Receiver
 		UserChatData recipientData = UserChatData.getCache(NiftyBukkit.getMojangRepository().searchByUsername(recipientName)); // Sent
+		boolean log = true;
 
-		if (recipientData.getProfile().equals(senderData.getProfile())) { // Sending
-			boolean receiverOnline = NiftyBukkit.getBungeeHelper().isDetected() ? receiverData.getProfile().isOnlineAnywhere() : receiverData.isOnline();
+		if (recipientData.equals(senderData)) { // Sending
+			boolean receiverOnline = receiverData.isOnline();
 
 			if (!receiverOnline) {
 				helper.getLog().error(senderData.getOfflinePlayer().getPlayer(), "Unable to locate {{0}}!", receiverData.getProfile().getName());
@@ -91,15 +90,16 @@ public class Message extends BukkitCommand {
 				return false;
 			}
 
-			if (receiverData.getFlagData("vanished").getValue() && !senderData.hasPermissions("vanish", "interact")) {
+			if (receiverData.getFlagData("vanished").getValue() && !senderData.hasPermissions("vanish", "see")) {
 				helper.getLog().error(senderData.getOfflinePlayer().getPlayer(), "Unable to locate {{0}}!", receiverData.getProfile().getName());
 				return false;
 			}
-		} else if (recipientData.getProfile().equals(receiverData.getProfile())) { // Receiving
+		} else if (recipientData.equals(receiverData)) { // Receiving
 			receiverData.setLastMessenger(senderData.getProfile());
 			notifySpies(helper, senderData, receiverData, message);
 		} else { // Spying
-			if ((senderData.getFlagData("vanished").getValue() || receiverData.getFlagData("vanished").getValue()) && !helper.hasPermissions(recipientData.getOfflinePlayer().getPlayer(), "vanish", "spy"))
+			log = false;
+			if ((senderData.getFlagData("vanished").getValue() || receiverData.getFlagData("vanished").getValue()) && !helper.hasPermissions(recipientData.getOfflinePlayer().getPlayer(), "vanish", "see"))
 				return false;
 		}
 
@@ -107,7 +107,7 @@ public class Message extends BukkitCommand {
 		String senderDisplayName = recipientData.getProfile().equals(senderData.getProfile()) ? RegexUtil.replaceColor("&7me", RegexUtil.REPLACE_ALL_PATTERN) : senderData.getDisplayName();
 		String receiverDisplayName = recipientData.getProfile().equals(receiverData.getProfile()) ? RegexUtil.replaceColor("&7me", RegexUtil.REPLACE_ALL_PATTERN) : receiverData.getDisplayName();
 		helper.getLog().message(recipientData.getOfflinePlayer().getPlayer(), format.getFormat(), senderDisplayName, receiverDisplayName, message);
-		if (recipientData.getProfile().equals(senderData.getProfile())) helper.getLog().console(format.getFormat(), senderData.getDisplayName(), receiverData.getDisplayName(), message);
+		if (log) helper.getLog().console(format.getFormat(), senderDisplayName, receiverDisplayName, message);
 		return true;
 	}
 
@@ -124,8 +124,7 @@ public class Message extends BukkitCommand {
 
 		String playerName = args[0];
 		String message = StringUtil.implode(" ", args, reply ? 0 : 1);
-		MojangProfile senderprofile = NiftyBukkit.getMojangRepository().searchByPlayer(player);
-		UserChatData senderData = UserChatData.getCache(senderprofile);
+		UserChatData senderData = UserChatData.getCache(NiftyBukkit.getMojangRepository().searchByPlayer(player));
 
 		if (reply) {
 			MojangProfile lastMessenger = senderData.getLastMessenger();
@@ -165,19 +164,17 @@ public class Message extends BukkitCommand {
 			if (send(this, sender.getName(), profile.getName(), sender.getName(), message))
 				send(this, sender.getName(), profile.getName(), profile.getName(), message);
 		} else {
-			if (profile.isOnlineAnywhere()) {
-				BungeeServer server = NiftyBukkit.getBungeeHelper().getPlayerServer(profile);
+			BungeeServer server = NiftyBukkit.getBungeeHelper().getPlayerServer(profile);
 
-				if (!server.equals(NiftyBukkit.getBungeeHelper().getServer())) {
-					if (!this.hasPermissions(sender, "message", "global")) {
-						this.getLog().error(sender, "You cannot send messages across servers!");
-						return;
-					}
+			if (!server.equals(NiftyBukkit.getBungeeHelper().getServer())) {
+				if (!this.hasPermissions(sender, "message", "global")) {
+					this.getLog().error(sender, "You cannot send messages across servers!");
+					return;
 				}
-
-				if (send(this, sender.getName(), profile.getName(), sender.getName(), message))
-					NiftyBukkit.getBungeeHelper().forward(senderprofile, server.getName(), Config.CHAT_CHANNEL, "Message", sender.getName(), profile.getName(), message);
 			}
+
+			if (send(this, sender.getName(), profile.getName(), sender.getName(), message))
+				NiftyBukkit.getBungeeHelper().forward(senderData.getProfile(), server.getName(), Config.CHAT_CHANNEL, "Message", sender.getName(), profile.getName(), message);
 		}
 	}
 

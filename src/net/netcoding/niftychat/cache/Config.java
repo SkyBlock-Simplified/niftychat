@@ -4,6 +4,7 @@ import net.netcoding.niftybukkit.NiftyBukkit;
 import net.netcoding.niftybukkit.database.MySQL;
 import net.netcoding.niftybukkit.yaml.ConfigSection;
 import net.netcoding.niftybukkit.yaml.SQLConfig;
+import net.netcoding.niftybukkit.yaml.exceptions.InvalidConfigurationException;
 
 import org.bukkit.plugin.java.JavaPlugin;
 
@@ -45,7 +46,7 @@ public class Config extends SQLConfig<MySQL> {
 	}
 
 	@Override
-	public boolean update(ConfigSection section) {
+	public boolean update(ConfigSection section) throws InvalidConfigurationException {
 		if (section.has("mysql")) {
 			ConfigSection mysql = (ConfigSection)section.get("mysql");
 			section.remove("mysql");

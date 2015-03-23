@@ -1,7 +1,5 @@
 package net.netcoding.niftychat;
 
-import java.sql.SQLException;
-
 import net.netcoding.niftybukkit.database.MySQL;
 import net.netcoding.niftybukkit.minecraft.BukkitPlugin;
 import net.netcoding.niftybukkit.util.StringUtil;
@@ -32,9 +30,15 @@ public class NiftyChat extends BukkitPlugin {
 	public void onEnable() {
 		this.getLog().console("Loading SQL Config");
 		try {
-			pluginConfig = new Config(this);
-		} catch (SQLException sqlex) {
-			this.getLog().console("Invalid MySQL Configuration!", sqlex);
+			(pluginConfig = new Config(this)).init();
+
+			if (pluginConfig.getSQL() == null) {
+				this.getLog().console("Incomplete MySQL Configuration!");
+				this.setEnabled(false);
+				return;
+			}
+		} catch (Exception ex) {
+			this.getLog().console("Invalid MySQL Configuration!", ex);
 			this.setEnabled(false);
 			return;
 		}

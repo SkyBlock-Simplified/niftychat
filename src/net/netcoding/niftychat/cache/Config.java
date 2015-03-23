@@ -1,7 +1,5 @@
 package net.netcoding.niftychat.cache;
 
-import java.sql.SQLException;
-
 import net.netcoding.niftybukkit.NiftyBukkit;
 import net.netcoding.niftybukkit.database.MySQL;
 import net.netcoding.niftybukkit.yaml.ConfigSection;
@@ -19,7 +17,7 @@ public class Config extends SQLConfig<MySQL> {
 	public static final transient String USER_FLAGS_TABLE = TABLE_PREFIX + "flags_users";
 	public static final transient String SERVER_FLAGS_TABLE = TABLE_PREFIX + "flags_servers";
 
-	public Config(JavaPlugin plugin) throws SQLException {
+	public Config(JavaPlugin plugin) throws Exception {
 		super(plugin, "config");
 	}
 
@@ -47,16 +45,21 @@ public class Config extends SQLConfig<MySQL> {
 	}
 
 	@Override
-	public void onUpdate(ConfigSection section) {
+	public boolean update(ConfigSection section) {
 		if (section.has("mysql")) {
-			this.driver = "mysql";
-			this.hostname = section.get("mysql.host");
-			this.username = section.get("mysql.user");
-			this.password = section.get("mysql.pass");
-			this.port = section.get("mysql.port");
-			this.schema = section.get("mysql.schema");
+			ConfigSection mysql = (ConfigSection)section.get("mysql");
 			section.remove("mysql");
+			this.driver = "mysql";
+			this.hostname = mysql.get("host");
+			this.username = mysql.get("user");
+			this.password = mysql.get("pass");
+			this.port = mysql.get("port");
+			this.schema = mysql.get("schema");
+
+			return true;
 		}
+
+		return false;
 	}
 
 }

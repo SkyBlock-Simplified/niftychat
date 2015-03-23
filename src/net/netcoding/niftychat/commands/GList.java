@@ -26,7 +26,6 @@ public class GList extends BukkitCommand {
 		this.editUsage(0, "gonline", "[server]");
 	}
 
-	@SuppressWarnings("deprecation")
 	@Override
 	protected void onCommand(CommandSender sender, String alias, String[] args) throws Exception {
 		UserChatData senderData = isConsole(sender) ? null : UserChatData.getCache(NiftyBukkit.getMojangRepository().searchByPlayer((Player)sender));

@@ -7,7 +7,7 @@ import java.util.regex.PatternSyntaxException;
 
 import net.netcoding.niftybukkit.minecraft.BukkitCommand;
 import net.netcoding.niftybukkit.util.StringUtil;
-import net.netcoding.niftychat.cache.Cache;
+import net.netcoding.niftychat.NiftyChat;
 import net.netcoding.niftychat.cache.CensorData;
 import net.netcoding.niftychat.cache.Config;
 
@@ -57,7 +57,7 @@ public class Censor extends BukkitCommand {
 					}
 				}
 
-				if (Cache.MySQL.update(StringUtil.format("INSERT INTO `{0}` (`badword`, `replace`) VALUES (?, ?) ON DUPLICATE KEY UPDATE `replace` = ?;", Config.CENSOR_TABLE), badword, replace, replace)) {
+				if (NiftyChat.getSQL().update(StringUtil.format("INSERT INTO `{0}` (`badword`, `replace`) VALUES (?, ?) ON DUPLICATE KEY UPDATE `replace` = ?;", Config.CENSOR_TABLE), badword, replace, replace)) {
 					String _replace = (replace == null ? CensorData.DEFAULT_REPLACE : replace);
 
 					if (action.equalsIgnoreCase("add"))
@@ -72,7 +72,7 @@ public class Censor extends BukkitCommand {
 			if (this.hasPermissions(sender, "censor", "manage")) {
 				String badword = args[1].toLowerCase();
 
-				if (Cache.MySQL.update(StringUtil.format("DELETE FROM `{0}` WHERE `badword` = ?;", Config.CENSOR_TABLE), badword)) {
+				if (NiftyChat.getSQL().update(StringUtil.format("DELETE FROM `{0}` WHERE `badword` = ?;", Config.CENSOR_TABLE), badword)) {
 					CensorData.removeCache(badword);
 					this.getLog().message(sender, "Censored word {{0}} removed.", badword);
 				} else

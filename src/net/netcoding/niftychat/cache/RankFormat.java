@@ -7,7 +7,7 @@ import net.netcoding.niftybukkit.database.factory.ResultCallback;
 import net.netcoding.niftybukkit.util.RegexUtil;
 import net.netcoding.niftybukkit.util.StringUtil;
 import net.netcoding.niftybukkit.util.concurrent.ConcurrentSet;
-import net.netcoding.niftyranks.cache.Cache;
+import net.netcoding.niftychat.NiftyChat;
 
 public class RankFormat {
 
@@ -79,7 +79,7 @@ public class RankFormat {
 		try {
 			CACHE.clear();
 
-			Cache.MySQL.query(StringUtil.format("SELECT * FROM `{0}`;", Config.FORMAT_TABLE), new ResultCallback<Void>() {
+			NiftyChat.getSQL().query(StringUtil.format("SELECT * FROM `{0}`;", Config.FORMAT_TABLE), new ResultCallback<Void>() {
 				@Override
 				public Void handle(ResultSet result) throws SQLException {
 					while (result.next()) {

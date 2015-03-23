@@ -15,7 +15,7 @@ import net.netcoding.niftybukkit.mojang.MojangProfile;
 import net.netcoding.niftybukkit.mojang.exceptions.ProfileNotFoundException;
 import net.netcoding.niftybukkit.util.ListUtil;
 import net.netcoding.niftybukkit.util.StringUtil;
-import net.netcoding.niftychat.cache.Cache;
+import net.netcoding.niftychat.NiftyChat;
 import net.netcoding.niftychat.cache.Config;
 import net.netcoding.niftychat.cache.UserChatData;
 
@@ -38,7 +38,7 @@ public class Realname extends BukkitCommand {
 			profileLookup = profile.getUniqueId().toString();
 		} catch (ProfileNotFoundException pnfe) { }
 
-		final HashSet<MojangProfile> profiles = Cache.MySQL.query(StringUtil.format("SELECT `uuid` FROM `{0}` WHERE LOWER(`ufnick`) = ? OR LOWER(`ufnick`) LIKE ? OR `uuid` = ? ORDER BY `ufnick`;", Config.USER_TABLE), new ResultCallback<HashSet<MojangProfile>>() {
+		final HashSet<MojangProfile> profiles = NiftyChat.getSQL().query(StringUtil.format("SELECT `uuid` FROM `{0}` WHERE LOWER(`ufnick`) = ? OR LOWER(`ufnick`) LIKE ? OR `uuid` = ? ORDER BY `ufnick`;", Config.USER_TABLE), new ResultCallback<HashSet<MojangProfile>>() {
 			@Override
 			public HashSet<MojangProfile> handle(ResultSet result) throws SQLException {
 				HashSet<MojangProfile> data = new HashSet<>();

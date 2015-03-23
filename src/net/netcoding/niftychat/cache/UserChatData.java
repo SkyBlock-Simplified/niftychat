@@ -117,7 +117,7 @@ public class UserChatData extends BukkitHelper {
 	}
 
 	private static String _getDisplayName(final MojangProfile profile) throws SQLException {
-		return Cache.MySQL.query(StringUtil.format("SELECT * FROM `{0}` WHERE `uuid` = ?;", Config.USER_TABLE), new ResultCallback<String>() {
+		return NiftyChat.getSQL().query(StringUtil.format("SELECT * FROM `{0}` WHERE `uuid` = ?;", Config.USER_TABLE), new ResultCallback<String>() {
 			@Override
 			public String handle(ResultSet result) throws SQLException {
 				String displayName = profile.getName();
@@ -228,7 +228,7 @@ public class UserChatData extends BukkitHelper {
 	public void reloadFlagData() {
 		try {
 			this.flagData.clear();
-			this.flagData.addAll(Cache.MySQL.query(StringUtil.format("SELECT * FROM `{0}` WHERE `uuid` = ?;", Config.USER_FLAGS_TABLE), new ResultCallback<List<UserFlagData>>() {
+			this.flagData.addAll(NiftyChat.getSQL().query(StringUtil.format("SELECT * FROM `{0}` WHERE `uuid` = ?;", Config.USER_FLAGS_TABLE), new ResultCallback<List<UserFlagData>>() {
 				@Override
 				public List<UserFlagData> handle(ResultSet result) throws SQLException {
 					List<UserFlagData> flags = new ArrayList<>();
@@ -255,7 +255,7 @@ public class UserChatData extends BukkitHelper {
 	}
 
 	public boolean resetFlagData(String flag, String server) throws SQLException {
-		return Cache.MySQL.update(StringUtil.format("DELETE FROM `{0}` WHERE `uuid` = ? AND `flag` = ? AND (`server` = ? OR \"\" = ?);", Config.USER_FLAGS_TABLE), this.getProfile().getUniqueId(), flag, server, server);
+		return NiftyChat.getSQL().update(StringUtil.format("DELETE FROM `{0}` WHERE `uuid` = ? AND `flag` = ? AND (`server` = ? OR \"\" = ?);", Config.USER_FLAGS_TABLE), this.getProfile().getUniqueId(), flag, server, server);
 	}
 
 	public void setLastMessenger(MojangProfile profile) {
@@ -278,7 +278,7 @@ public class UserChatData extends BukkitHelper {
 
 	public boolean updateFlagData(String flag, boolean value, String server, long expires) throws SQLException {
 		String sqlFormat = expires > 0 ? TimeUtil.SQL_FORMAT.format(new Date(expires)) : null;
-		return Cache.MySQL.update(StringUtil.format("INSERT INTO `{0}` (`uuid`, `flag`, `value`, `server`, `_expires`) VALUES (?, ?, ?, ?, ?) ON DUPLICATE KEY UPDATE `uuid` = ?, `value` = ?, `_expires` = ?;", Config.USER_FLAGS_TABLE), this.getProfile().getUniqueId(), flag, value, server, sqlFormat, this.getProfile().getUniqueId(), value, sqlFormat);
+		return NiftyChat.getSQL().update(StringUtil.format("INSERT INTO `{0}` (`uuid`, `flag`, `value`, `server`, `_expires`) VALUES (?, ?, ?, ?, ?) ON DUPLICATE KEY UPDATE `uuid` = ?, `value` = ?, `_expires` = ?;", Config.USER_FLAGS_TABLE), this.getProfile().getUniqueId(), flag, value, server, sqlFormat, this.getProfile().getUniqueId(), value, sqlFormat);
 	}
 
 	public void updateTabListName() {

@@ -11,7 +11,7 @@ import net.netcoding.niftybukkit.mojang.MojangProfile;
 import net.netcoding.niftybukkit.mojang.exceptions.ProfileNotFoundException;
 import net.netcoding.niftybukkit.util.RegexUtil;
 import net.netcoding.niftybukkit.util.StringUtil;
-import net.netcoding.niftychat.cache.Cache;
+import net.netcoding.niftychat.NiftyChat;
 import net.netcoding.niftychat.cache.Config;
 import net.netcoding.niftychat.cache.UserChatData;
 
@@ -138,7 +138,7 @@ public class Nick extends BukkitCommand {
 				}
 			}
 
-			boolean taken = Cache.MySQL.query(StringUtil.format("SELECT * FROM `{0}` WHERE LOWER(`ufnick`) = LOWER(?) AND `uuid` <> ?;", Config.USER_TABLE), new ResultCallback<Boolean>() {
+			boolean taken = NiftyChat.getSQL().query(StringUtil.format("SELECT * FROM `{0}` WHERE LOWER(`ufnick`) = LOWER(?) AND `uuid` <> ?;", Config.USER_TABLE), new ResultCallback<Boolean>() {
 				@Override
 				public Boolean handle(ResultSet result) throws SQLException {
 					return result.next();
@@ -162,7 +162,7 @@ public class Nick extends BukkitCommand {
 			if (nick != null) _ufnick = RegexUtil.strip(nick, RegexUtil.REPLACE_ALL_PATTERN);
 
 			try {
-				if (Cache.MySQL.update(StringUtil.format("UPDATE `{0}` SET `nick` = ?, `ufnick` = ? WHERE `uuid` = ?;", Config.USER_TABLE), nick, _ufnick, profile.getUniqueId())) {
+				if (NiftyChat.getSQL().update(StringUtil.format("UPDATE `{0}` SET `nick` = ?, `ufnick` = ? WHERE `uuid` = ?;", Config.USER_TABLE), nick, _ufnick, profile.getUniqueId())) {
 					if (clear)
 						this.getLog().message(sender, "{{0}} now {1} no nickname.", your, has);
 					else

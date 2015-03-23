@@ -52,11 +52,17 @@ public class Whois extends BukkitCommand {
 		this.getLog().message(sender, "Whois {{0}}", userData.getProfile().getName());
 		this.getLog().message(sender, "Display Name: {0}", userData.getDisplayName());
 		this.getLog().message(sender, "Ranks: {{0}}", StringUtil.implode(separator, userData.getRankData().getRanks()));
-		if (NiftyBukkit.getBungeeHelper().isDetected() && userData.getProfile().isOnline()) this.getLog().message(sender, "Server: {{0}}", serverName);
+
+		if (NiftyBukkit.getBungeeHelper().isDetected() && userData.getProfile().isOnline()) {
+			if (!userData.getFlagData(Vanish.FLAG).getValue() || this.hasPermissions(sender, "vanish", "see"))
+				this.getLog().message(sender, "Server: {{0}}", serverName);
+		}
 
 		if (alias.matches("^.+?admin$") && this.hasPermissions(sender, "whois", "admin")) {
-			if (userData.getProfile().isOnline()) 
-				this.getLog().message(sender, "IP Address: {{0}}", userData.getProfile().getAddress().getHostName());
+			if (userData.getProfile().isOnline()) {
+				if (!userData.getFlagData(Vanish.FLAG).getValue() || this.hasPermissions(sender, "vanish", "see"))
+					this.getLog().message(sender, "IP Address: {{0}}", userData.getProfile().getAddress().getHostName());
+			}
 
 			this.getLog().message(sender, "Nickname Access: {{0}}", (!userData.getFlagData("nick-revoke").getValue() ? (ChatColor.GREEN + "Yes") : "No"));
 			UserFlagData globalMuteData = userData.getFlagData(Mute.FLAG, "*");
@@ -115,17 +121,19 @@ public class Whois extends BukkitCommand {
 			}
 		} else {
 			if (userData.getOfflinePlayer().isOnline()) {
-				Player player = userData.getOfflinePlayer().getPlayer();
-				this.getLog().message(sender, "Operator: {{0}}", (userData.getOfflinePlayer().isOp() ? (ChatColor.GREEN + "Yes") : "No"));
-				this.getLog().message(sender, "Location: {{0}}, {{1}}, {{2}}, {{3}}", player.getLocation().getWorld().getName(), player.getLocation().getX(), player.getLocation().getY(), player.getLocation().getZ());
-				this.getLog().message(sender, "Game Mode: {{0}}", player.getGameMode().toString().toLowerCase());
-				this.getLog().message(sender, "Health: {{0}}/{{1}}", ((Damageable)player).getHealth(), ((Damageable)player).getMaxHealth());
-				this.getLog().message(sender, "Hunger: {{0}}/{{1}} ({{2}} Saturation)", player.getFoodLevel(), "20", ((player.getSaturation() > 0 ? "+" : "") + player.getSaturation()));
-				this.getLog().message(sender, "Experience: {{0}} (Level {{1}})", player.getTotalExperience(), player.getLevel());
-				//this.getLog().message(sender, "God Mode: {{0}}", "??");
-				this.getLog().message(sender, "Flight: {{0}} ({1})", (player.getAllowFlight() ? (ChatColor.GREEN + "Yes") : "No"), ((!player.isFlying() ? "Not " : "") + "Flying"));
-				//this.getLog().message(sender, "AFK: {{0}}", "??");
-				//this.getLog().message(sender, "Jail: {{0}}", "??");
+				if (!userData.getFlagData(Vanish.FLAG).getValue() || this.hasPermissions(sender, "vanish", "see")) {
+					Player player = userData.getOfflinePlayer().getPlayer();
+					this.getLog().message(sender, "Operator: {{0}}", (userData.getOfflinePlayer().isOp() ? (ChatColor.GREEN + "Yes") : "No"));
+					this.getLog().message(sender, "Location: {{0}}, {{1}}, {{2}}, {{3}}", player.getLocation().getWorld().getName(), player.getLocation().getX(), player.getLocation().getY(), player.getLocation().getZ());
+					this.getLog().message(sender, "Game Mode: {{0}}", player.getGameMode().toString().toLowerCase());
+					this.getLog().message(sender, "Health: {{0}}/{{1}}", ((Damageable)player).getHealth(), ((Damageable)player).getMaxHealth());
+					this.getLog().message(sender, "Hunger: {{0}}/{{1}} ({{2}} Saturation)", player.getFoodLevel(), "20", ((player.getSaturation() > 0 ? "+" : "") + player.getSaturation()));
+					this.getLog().message(sender, "Experience: {{0}} (Level {{1}})", player.getTotalExperience(), player.getLevel());
+					//this.getLog().message(sender, "God Mode: {{0}}", "??");
+					this.getLog().message(sender, "Flight: {{0}} ({1})", (player.getAllowFlight() ? (ChatColor.GREEN + "Yes") : "No"), ((!player.isFlying() ? "Not " : "") + "Flying"));
+					//this.getLog().message(sender, "AFK: {{0}}", "??");
+					//this.getLog().message(sender, "Jail: {{0}}", "??");
+				}
 			}
 		}
 	}

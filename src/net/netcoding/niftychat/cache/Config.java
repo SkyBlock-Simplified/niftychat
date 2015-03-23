@@ -1,11 +1,15 @@
 package net.netcoding.niftychat.cache;
 
+import java.sql.SQLException;
+
 import net.netcoding.niftybukkit.NiftyBukkit;
-import net.netcoding.niftybukkit.yaml.annotations.Path;
+import net.netcoding.niftybukkit.database.MySQL;
+import net.netcoding.niftybukkit.yaml.ConfigSection;
+import net.netcoding.niftybukkit.yaml.SQLConfig;
 
 import org.bukkit.plugin.java.JavaPlugin;
 
-public class Config extends net.netcoding.niftybukkit.yaml.Config {
+public class Config extends SQLConfig<MySQL> {
 
 	public static final transient String CHAT_CHANNEL = "NiftyChat";
 	private static final transient String TABLE_PREFIX = CHAT_CHANNEL.toLowerCase() + "_";
@@ -15,43 +19,8 @@ public class Config extends net.netcoding.niftybukkit.yaml.Config {
 	public static final transient String USER_FLAGS_TABLE = TABLE_PREFIX + "flags_users";
 	public static final transient String SERVER_FLAGS_TABLE = TABLE_PREFIX + "flags_servers";
 
-	@Path("mysql.host")
-	private String hostname = "localhost";
-
-	@Path("mysql.user")
-	private String username = "minecraft";
-
-	@Path("mysql.pass")
-	private String password = "";
-
-	@Path("mysql.port")
-	private int port = 3306;
-
-	@Path("mysql.schema")
-	private String schema = "nifty";
-
-	public Config(JavaPlugin plugin) {
+	public Config(JavaPlugin plugin) throws SQLException {
 		super(plugin, "config");
-	}
-
-	public String getHost() {
-		return this.hostname;
-	}
-
-	public String getUser() {
-		return this.username;
-	}
-
-	public String getPass() {
-		return this.password;
-	}
-
-	public int getPort() {
-		return this.port;
-	}
-
-	public String getSchema() {
-		return this.schema;
 	}
 
 	public static boolean isForcedCommand(String alias) {
@@ -75,6 +44,19 @@ public class Config extends net.netcoding.niftybukkit.yaml.Config {
 		}
 
 		return server;
+	}
+
+	@Override
+	public void onUpdate(ConfigSection section) {
+		if (section.has("mysql")) {
+			this.driver = "mysql";
+			this.hostname = section.get("mysql.host");
+			this.username = section.get("mysql.user");
+			this.password = section.get("mysql.pass");
+			this.port = section.get("mysql.port");
+			this.schema = section.get("mysql.schema");
+			section.remove("mysql");
+		}
 	}
 
 }

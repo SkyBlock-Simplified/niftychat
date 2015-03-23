@@ -5,7 +5,7 @@ import net.netcoding.niftybukkit.minecraft.BungeeHelper;
 import net.netcoding.niftybukkit.minecraft.events.BungeeLoadedEvent;
 import net.netcoding.niftybukkit.minecraft.events.PlayerPostLoginEvent;
 import net.netcoding.niftybukkit.util.StringUtil;
-import net.netcoding.niftychat.cache.Cache;
+import net.netcoding.niftychat.NiftyChat;
 import net.netcoding.niftychat.cache.Config;
 import net.netcoding.niftychat.cache.UserChatData;
 import net.netcoding.niftychat.commands.Vanish;
@@ -35,7 +35,7 @@ public class Login extends BukkitListener {
 		final UserChatData userData = new UserChatData(this.getPlugin(), event.getProfile());
 
 		try {
-			Cache.MySQL.update(StringUtil.format("INSERT IGNORE INTO `{0}` (`uuid`) VALUES (?);", Config.USER_TABLE), userData.getProfile().getUniqueId());
+			NiftyChat.getSQL().update(StringUtil.format("INSERT IGNORE INTO `{0}` (`uuid`) VALUES (?);", Config.USER_TABLE), userData.getProfile().getUniqueId());
 			userData.updateDisplayName();
 			userData.updateTabListName();
 

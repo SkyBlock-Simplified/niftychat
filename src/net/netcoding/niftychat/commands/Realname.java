@@ -3,6 +3,7 @@ package net.netcoding.niftychat.commands;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
 import java.util.UUID;
 
@@ -13,7 +14,6 @@ import net.netcoding.niftybukkit.minecraft.BungeeServer;
 import net.netcoding.niftybukkit.mojang.MojangProfile;
 import net.netcoding.niftybukkit.mojang.exceptions.ProfileNotFoundException;
 import net.netcoding.niftybukkit.util.ListUtil;
-import net.netcoding.niftybukkit.util.RegexUtil;
 import net.netcoding.niftybukkit.util.StringUtil;
 import net.netcoding.niftychat.cache.Cache;
 import net.netcoding.niftychat.cache.Config;
@@ -29,45 +29,56 @@ public class Realname extends BukkitCommand {
 		this.setPlayerTabComplete();
 	}
 
-	@Override
-	public void onCommand(final CommandSender sender, String alias, final String[] args) throws Exception {
-		String argLookup = args[0];
+	public static HashSet<MojangProfile> getProfileMatches(String lookup) throws Exception {
 		MojangProfile profile;
 		String profileLookup = "";
 
 		try {
-			profile = NiftyBukkit.getMojangRepository().searchByUsername(argLookup);
+			profile = NiftyBukkit.getMojangRepository().searchByUsername(lookup);
 			profileLookup = profile.getUniqueId().toString();
 		} catch (ProfileNotFoundException pnfe) { }
 
-		final List<String> foundData = Cache.MySQL.query(StringUtil.format("SELECT * FROM `{0}` WHERE LOWER(`ufnick`) = ? OR LOWER(`ufnick`) LIKE ? OR `uuid` = ? GROUP BY `ufnick`, `uuid`;", Config.USER_TABLE), new ResultCallback<List<String>>() {
+		final HashSet<MojangProfile> profiles = Cache.MySQL.query(StringUtil.format("SELECT `uuid` FROM `{0}` WHERE LOWER(`ufnick`) = ? OR LOWER(`ufnick`) LIKE ? OR `uuid` = ? ORDER BY `ufnick`;", Config.USER_TABLE), new ResultCallback<HashSet<MojangProfile>>() {
 			@Override
-			public List<String> handle(ResultSet result) throws SQLException {
-				List<String> data = new ArrayList<>();
+			public HashSet<MojangProfile> handle(ResultSet result) throws SQLException {
+				HashSet<MojangProfile> data = new HashSet<>();
 
-				if (result.next()) {
+				while (result.next()) {
 					MojangProfile profile;
 
 					try {
 						profile = NiftyBukkit.getMojangRepository().searchByUniqueId(UUID.fromString(result.getString("uuid")));
-					} catch (ProfileNotFoundException pnfe) {
-						getLog().error(sender, "Unable to locate the profile of {{0}}!", args[0]);
-						return data;
-					}
-
-					data.add(profile.getName());
-					String nick = result.getString("nick");
-					data.add(result.wasNull() ? null : nick);
+						data.add(profile);
+					} catch (ProfileNotFoundException pnfe) { }
 				}
 
 				return data;
 			}
-		}, argLookup, ("%" + argLookup + "%"), profileLookup);
+		}, lookup, ("%" + lookup + "%"), profileLookup);
 
-		if (ListUtil.notEmpty(foundData))
-			this.getLog().message(sender, "{{0}} has the nickname {{1}}.", foundData.get(0), foundData.get(1));
-		else
-			this.getLog().error(sender, "No player with the nickname {{0}} was found!", argLookup);
+		return profiles;
+	}
+
+	@Override
+	public void onCommand(CommandSender sender, String alias, String[] args) throws Exception {
+		if (args[0].length() < 3) {
+			this.getLog().error(sender, "At least 3 letters must be queried.");
+			return;
+		}
+
+		HashSet<MojangProfile> profiles = getProfileMatches(args[0]);
+
+		if (ListUtil.notEmpty(profiles)) {
+			for (MojangProfile profile : profiles) {
+				UserChatData userData = UserChatData.getCache(profile);
+
+				if (!profile.getName().equals(userData.getStrippedDisplayName()))
+					this.getLog().message(sender, "{{0}} has the nickname {{1}}.", profile.getName(), userData.getStrippedDisplayName());
+				else
+					this.getLog().message(sender, "{{0}} has no nickname.", profile.getName());
+			}
+		} else
+			this.getLog().error(sender, "No players matching {{0}} were found!", args[0]);
 	}
 
 	@Override
@@ -79,7 +90,7 @@ public class Realname extends BukkitCommand {
 			for (BungeeServer server : NiftyBukkit.getBungeeHelper().getServers()) {
 				for (MojangProfile profile : server.getPlayerList()) {
 					UserChatData userData = UserChatData.getCache(profile);
-					String displayName = RegexUtil.strip(userData.getDisplayName(), RegexUtil.VANILLA_PATTERN);
+					String displayName = userData.getStrippedDisplayName();
 
 					if (displayName.toLowerCase().startsWith(arg) || displayName.toLowerCase().contains(arg))
 						names.add(displayName);

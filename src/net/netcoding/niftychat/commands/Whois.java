@@ -3,12 +3,12 @@ package net.netcoding.niftychat.commands;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
+import java.util.HashSet;
 import java.util.List;
 
 import net.netcoding.niftybukkit.NiftyBukkit;
 import net.netcoding.niftybukkit.minecraft.BukkitCommand;
 import net.netcoding.niftybukkit.mojang.MojangProfile;
-import net.netcoding.niftybukkit.mojang.exceptions.ProfileNotFoundException;
 import net.netcoding.niftybukkit.util.ListUtil;
 import net.netcoding.niftybukkit.util.NumberUtil;
 import net.netcoding.niftybukkit.util.StringUtil;
@@ -34,22 +34,19 @@ public class Whois extends BukkitCommand {
 
 	@Override
 	protected void onCommand(CommandSender sender, String alias, String[] args) throws Exception {
-		String playerName = args[0];
-		MojangProfile profile;
-
-		if (isConsole(playerName)) {
+		if (isConsole(args[0])) {
 			this.getLog().error(sender, ANTI_CONSOLE.get(NumberUtil.rand(0, ANTI_CONSOLE.size() - 1)));
 			return;
 		}
 
-		try {
-			profile = NiftyBukkit.getMojangRepository().searchByUsername(playerName);
-		} catch (ProfileNotFoundException pnfe) {
-			this.getLog().error(sender, "Unable to locate the profile of {{0}}!", playerName);
+		HashSet<MojangProfile> profiles = Realname.getProfileMatches(args[0]);
+
+		if (ListUtil.isEmpty(profiles)) {
+			this.getLog().error(sender, "Unable to locate the profile of {{0}}!", args[0]);
 			return;
 		}
 
-		UserChatData userData = UserChatData.getCache(profile);
+		UserChatData userData = UserChatData.getCache(profiles.iterator().next());
 		String separator = StringUtil.format("{0}{1}{2}", ChatColor.GRAY, ", ", ChatColor.RED);
 		String serverName = (NiftyBukkit.getBungeeHelper().isDetected() && userData.getProfile().isOnline()) ? userData.getProfile().getServer().getName() : "*";
 		this.getLog().message(sender, "Whois {{0}}", userData.getProfile().getName());

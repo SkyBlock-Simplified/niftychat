@@ -197,6 +197,10 @@ public class UserChatData extends BukkitHelper {
 		return UserRankData.getCache(this.getProfile());
 	}
 
+	public String getStrippedDisplayName() {
+		return RegexUtil.strip(this.getDisplayName(), RegexUtil.VANILLA_PATTERN).replaceAll("^\\*", "");
+	}
+
 	@Override
 	public int hashCode() {
 		return this.getProfile().hashCode();

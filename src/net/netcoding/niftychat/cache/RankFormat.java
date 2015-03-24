@@ -3,7 +3,7 @@ package net.netcoding.niftychat.cache;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 
-import net.netcoding.niftybukkit.database.factory.ResultCallback;
+import net.netcoding.niftybukkit.database.factory.AsyncResultCallback;
 import net.netcoding.niftybukkit.util.RegexUtil;
 import net.netcoding.niftybukkit.util.StringUtil;
 import net.netcoding.niftybukkit.util.concurrent.ConcurrentSet;
@@ -79,9 +79,9 @@ public class RankFormat {
 		try {
 			CACHE.clear();
 
-			NiftyChat.getSQL().query(StringUtil.format("SELECT * FROM `{0}`;", Config.FORMAT_TABLE), new ResultCallback<Void>() {
+			NiftyChat.getSQL().queryAsync(StringUtil.format("SELECT * FROM `{0}`;", Config.FORMAT_TABLE), new AsyncResultCallback() {
 				@Override
-				public Void handle(ResultSet result) throws SQLException {
+				public void handle(ResultSet result) throws SQLException {
 					while (result.next()) {
 						String rank = result.getString("rank");
 						String group = result.getString("group");
@@ -96,13 +96,9 @@ public class RankFormat {
 
 						new RankFormat(rank, group, format, prefix, suffix, message);
 					}
-
-					return null;
 				}
 			});
-		} catch (Exception ex) {
-			ex.printStackTrace();
-		}
+		} catch (Exception ex) { }
 	}
 
 	public static void removeCache(String rank) {

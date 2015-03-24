@@ -8,7 +8,7 @@ import java.util.Map;
 import java.util.UUID;
 
 import net.netcoding.niftybukkit.NiftyBukkit;
-import net.netcoding.niftybukkit.database.factory.ResultCallback;
+import net.netcoding.niftybukkit.database.factory.AsyncResultCallback;
 import net.netcoding.niftybukkit.database.notifications.DatabaseListener;
 import net.netcoding.niftybukkit.database.notifications.DatabaseNotification;
 import net.netcoding.niftybukkit.database.notifications.TriggerEvent;
@@ -27,9 +27,9 @@ public class Notifications implements DatabaseListener {
 
 		if (table.equals(Config.USER_TABLE)) {
 			if (event.equals(TriggerEvent.UPDATE)) {
-				databaseNotification.getUpdatedRow(new ResultCallback<Void>() {
+				databaseNotification.getUpdatedRow(new AsyncResultCallback() {
 					@Override
-					public Void handle(ResultSet result) throws SQLException {
+					public void handle(ResultSet result) throws SQLException {
 						if (result.next()) {
 							UUID uuid = UUID.fromString(result.getString("uuid"));
 							UserChatData userData = UserChatData.getCache(NiftyBukkit.getMojangRepository().searchByUniqueId(uuid));
@@ -39,8 +39,6 @@ public class Notifications implements DatabaseListener {
 								userData.updateTabListName();
 							}
 						}
-
-						return null;
 					}
 				});
 			}
@@ -49,21 +47,19 @@ public class Notifications implements DatabaseListener {
 				Map<String, Object> data = databaseNotification.getDeletedData();
 				RankFormat.removeCache((String)data.get("rank"));
 			} else if (event.equals(TriggerEvent.INSERT)) {
-				databaseNotification.getUpdatedRow(new ResultCallback<Void>() {
+				databaseNotification.getUpdatedRow(new AsyncResultCallback() {
 					@Override
-					public Void handle(ResultSet result) throws SQLException {
+					public void handle(ResultSet result) throws SQLException {
 						if (result.next()) {
 							String rank = result.getString("rank");
 							new RankFormat(rank, result.getString("group"), result.getString("format"));
 						}
-
-						return null;
 					}
 				});
 			} else if (event.equals(TriggerEvent.UPDATE)) {
-				databaseNotification.getUpdatedRow(new ResultCallback<Void>() {
+				databaseNotification.getUpdatedRow(new AsyncResultCallback() {
 					@Override
-					public Void handle(ResultSet result) throws SQLException {
+					public void handle(ResultSet result) throws SQLException {
 						if (result.next()) {
 							String rank = result.getString("rank");
 							RankFormat rankData = RankFormat.getCache(rank);
@@ -80,8 +76,6 @@ public class Notifications implements DatabaseListener {
 								}
 							}
 						}
-
-						return null;
 					}
 				});
 			}
@@ -100,9 +94,9 @@ public class Notifications implements DatabaseListener {
 			}
 
 			if (!event.equals(TriggerEvent.DELETE)) {
-				databaseNotification.getUpdatedRow(new ResultCallback<Void>() {
+				databaseNotification.getUpdatedRow(new AsyncResultCallback() {
 					@Override
-					public Void handle(ResultSet result) throws SQLException {
+					public void handle(ResultSet result) throws SQLException {
 						if (result.next()) {
 							UUID uuid = UUID.fromString(result.getString("uuid"));
 							UserChatData userData = UserChatData.getCache(NiftyBukkit.getMojangRepository().searchByUniqueId(uuid));
@@ -133,8 +127,6 @@ public class Notifications implements DatabaseListener {
 								userData.applyFlagData(flag);
 							}
 						}
-
-						return null;
 					}
 				});
 			}

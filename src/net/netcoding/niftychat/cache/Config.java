@@ -10,13 +10,13 @@ import org.bukkit.plugin.java.JavaPlugin;
 
 public class Config extends SQLConfig<MySQL> {
 
-	public static final transient String CHAT_CHANNEL = "NiftyChat";
-	private static final transient String TABLE_PREFIX = CHAT_CHANNEL.toLowerCase() + "_";
-	public static final transient String USER_TABLE = TABLE_PREFIX + "users";
-	public static final transient String CENSOR_TABLE = TABLE_PREFIX + "censors";
-	public static final transient String FORMAT_TABLE = TABLE_PREFIX + "formats";
-	public static final transient String USER_FLAGS_TABLE = TABLE_PREFIX + "flags_users";
-	public static final transient String SERVER_FLAGS_TABLE = TABLE_PREFIX + "flags_servers";
+	public static final String CHAT_CHANNEL = "NiftyChat";
+	private static final String TABLE_PREFIX = CHAT_CHANNEL.toLowerCase() + "_";
+	public static final String USER_TABLE = TABLE_PREFIX + "users";
+	public static final String CENSOR_TABLE = TABLE_PREFIX + "censors";
+	public static final String FORMAT_TABLE = TABLE_PREFIX + "formats";
+	public static final String USER_FLAGS_TABLE = TABLE_PREFIX + "flags_users";
+	public static final String SERVER_FLAGS_TABLE = TABLE_PREFIX + "flags_servers";
 
 	public Config(JavaPlugin plugin) throws Exception {
 		super(plugin, "config");

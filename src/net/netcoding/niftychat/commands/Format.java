@@ -3,7 +3,7 @@ package net.netcoding.niftychat.commands;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 
-import net.netcoding.niftybukkit.database.factory.ResultCallback;
+import net.netcoding.niftybukkit.database.factory.callbacks.ResultCallback;
 import net.netcoding.niftybukkit.minecraft.BukkitCommand;
 import net.netcoding.niftybukkit.util.RegexUtil;
 import net.netcoding.niftybukkit.util.StringUtil;

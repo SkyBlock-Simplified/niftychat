@@ -4,7 +4,7 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.regex.Pattern;
 
-import net.netcoding.niftybukkit.database.factory.AsyncResultCallback;
+import net.netcoding.niftybukkit.database.factory.callbacks.VoidResultCallback;
 import net.netcoding.niftybukkit.util.StringUtil;
 import net.netcoding.niftybukkit.util.concurrent.ConcurrentSet;
 import net.netcoding.niftychat.NiftyChat;
@@ -57,7 +57,7 @@ public class CensorData {
 		try {
 			CACHE.clear();
 
-			NiftyChat.getSQL().queryAsync(StringUtil.format("SELECT * FROM `{0}`;", Config.CENSOR_TABLE), new AsyncResultCallback() {
+			NiftyChat.getSQL().queryAsync(StringUtil.format("SELECT * FROM `{0}`;", Config.CENSOR_TABLE), new VoidResultCallback() {
 				@Override
 				public void handle(ResultSet result) throws SQLException {
 					while (result.next()) {

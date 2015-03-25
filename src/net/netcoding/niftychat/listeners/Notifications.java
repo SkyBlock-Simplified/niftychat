@@ -8,7 +8,7 @@ import java.util.Map;
 import java.util.UUID;
 
 import net.netcoding.niftybukkit.NiftyBukkit;
-import net.netcoding.niftybukkit.database.factory.AsyncResultCallback;
+import net.netcoding.niftybukkit.database.factory.callbacks.VoidResultCallback;
 import net.netcoding.niftybukkit.database.notifications.DatabaseListener;
 import net.netcoding.niftybukkit.database.notifications.DatabaseNotification;
 import net.netcoding.niftybukkit.database.notifications.TriggerEvent;
@@ -27,7 +27,7 @@ public class Notifications implements DatabaseListener {
 
 		if (table.equals(Config.USER_TABLE)) {
 			if (event.equals(TriggerEvent.UPDATE)) {
-				databaseNotification.getUpdatedRow(new AsyncResultCallback() {
+				databaseNotification.getUpdatedRow(new VoidResultCallback() {
 					@Override
 					public void handle(ResultSet result) throws SQLException {
 						if (result.next()) {
@@ -47,7 +47,7 @@ public class Notifications implements DatabaseListener {
 				Map<String, Object> data = databaseNotification.getDeletedData();
 				RankFormat.removeCache((String)data.get("rank"));
 			} else if (event.equals(TriggerEvent.INSERT)) {
-				databaseNotification.getUpdatedRow(new AsyncResultCallback() {
+				databaseNotification.getUpdatedRow(new VoidResultCallback() {
 					@Override
 					public void handle(ResultSet result) throws SQLException {
 						if (result.next()) {
@@ -57,7 +57,7 @@ public class Notifications implements DatabaseListener {
 					}
 				});
 			} else if (event.equals(TriggerEvent.UPDATE)) {
-				databaseNotification.getUpdatedRow(new AsyncResultCallback() {
+				databaseNotification.getUpdatedRow(new VoidResultCallback() {
 					@Override
 					public void handle(ResultSet result) throws SQLException {
 						if (result.next()) {
@@ -94,7 +94,7 @@ public class Notifications implements DatabaseListener {
 			}
 
 			if (!event.equals(TriggerEvent.DELETE)) {
-				databaseNotification.getUpdatedRow(new AsyncResultCallback() {
+				databaseNotification.getUpdatedRow(new VoidResultCallback() {
 					@Override
 					public void handle(ResultSet result) throws SQLException {
 						if (result.next()) {

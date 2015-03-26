@@ -35,7 +35,7 @@ public class Login extends BukkitListener {
 		final UserChatData userData = new UserChatData(this.getPlugin(), event.getProfile());
 
 		try {
-			NiftyChat.getSQL().updateAsync(StringUtil.format("INSERT IGNORE INTO `{0}` (`uuid`) VALUES (?);", Config.USER_TABLE), userData.getProfile().getUniqueId());
+			NiftyChat.getSQL().updateAsync(StringUtil.format("INSERT IGNORE INTO {0} (uuid) VALUES (?);", Config.USER_TABLE), userData.getProfile().getUniqueId());
 			userData.updateDisplayName();
 			userData.updateTabListName();
 

@@ -7,18 +7,29 @@ import net.netcoding.niftybukkit.util.StringUtil;
 public class UserFlagData {
 
 	private long expires = 0;
-
 	private final String flag;
-
 	private final String server;
-
 	private long submitted = System.currentTimeMillis();
-
 	private boolean value = false;
 
 	public UserFlagData(String flag, String server) {
 		this.flag = flag;
 		this.server = StringUtil.isEmpty(server) ? "*" : server;
+	}
+
+	@Override
+	public boolean equals(Object obj) {
+		if (obj == null) return false;
+		if (!(obj instanceof UserChatData)) return false;
+		if (this == obj) return true;
+		UserFlagData flagData = (UserFlagData)obj;
+
+		if (this.getFlag().equalsIgnoreCase(flagData.getFlag())) {
+			if (this.getServerName().equalsIgnoreCase(flagData.getServerName()))
+				return true;
+		}
+
+		return false;
 	}
 
 	public String getFlag() {
@@ -63,6 +74,11 @@ public class UserFlagData {
 
 	public void setSubmitted(long submitted) {
 		this.submitted = submitted;
+	}
+
+	@Override
+	public int hashCode() {
+		return this.getServerName().hashCode();
 	}
 
 }

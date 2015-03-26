@@ -76,29 +76,27 @@ public class RankFormat {
 	}
 
 	public static void reload() {
-		try {
-			CACHE.clear();
+		CACHE.clear();
 
-			NiftyChat.getSQL().queryAsync(StringUtil.format("SELECT * FROM `{0}`;", Config.FORMAT_TABLE), new VoidResultCallback() {
-				@Override
-				public void handle(ResultSet result) throws SQLException {
-					while (result.next()) {
-						String rank = result.getString("rank");
-						String group = result.getString("group");
-						String prefix = result.getString("prefix");
-						if (StringUtil.isEmpty(prefix)) prefix = null;
-						String suffix = result.getString("suffix");
-						if (StringUtil.isEmpty(suffix)) suffix = null;
-						String message = result.getString("message");
-						if (StringUtil.isEmpty(message)) message = null;
-						String format = result.getString("format");
-						if (result.wasNull()) format = null;
+		NiftyChat.getSQL().queryAsync(StringUtil.format("SELECT * FROM {0};", Config.FORMAT_TABLE), new VoidResultCallback() {
+			@Override
+			public void handle(ResultSet result) throws SQLException {
+				while (result.next()) {
+					String rank = result.getString("rank");
+					String group = result.getString("_group");
+					String prefix = result.getString("_prefix");
+					if (StringUtil.isEmpty(prefix)) prefix = null;
+					String suffix = result.getString("_suffix");
+					if (StringUtil.isEmpty(suffix)) suffix = null;
+					String message = result.getString("message");
+					if (StringUtil.isEmpty(message)) message = null;
+					String format = result.getString("format");
+					if (result.wasNull()) format = null;
 
-						new RankFormat(rank, group, format, prefix, suffix, message);
-					}
+					new RankFormat(rank, group, format, prefix, suffix, message);
 				}
-			});
-		} catch (Exception ex) { }
+			}
+		});
 	}
 
 	public static void removeCache(String rank) {

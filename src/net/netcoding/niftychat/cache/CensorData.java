@@ -54,21 +54,19 @@ public class CensorData {
 	}
 
 	public static void reload() {
-		try {
-			CACHE.clear();
+		CACHE.clear();
 
-			NiftyChat.getSQL().queryAsync(StringUtil.format("SELECT * FROM `{0}`;", Config.CENSOR_TABLE), new VoidResultCallback() {
-				@Override
-				public void handle(ResultSet result) throws SQLException {
-					while (result.next()) {
-						String badword = result.getString("badword");
-						String replace = result.getString("replace");
-						replace = (result.wasNull() ? null : replace);
-						new CensorData(badword, replace);
-					}
+		NiftyChat.getSQL().queryAsync(StringUtil.format("SELECT * FROM {0};", Config.CENSOR_TABLE), new VoidResultCallback() {
+			@Override
+			public void handle(ResultSet result) throws SQLException {
+				while (result.next()) {
+					String badword = result.getString("badword");
+					String replace = result.getString("_replace");
+					replace = (result.wasNull() ? null : replace);
+					new CensorData(badword, replace);
 				}
-			});
-		} catch (Exception ex) { }
+			}
+		});
 	}
 
 	public static void removeCache(String badword) {

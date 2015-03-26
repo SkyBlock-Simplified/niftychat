@@ -99,13 +99,22 @@ public class NiftyChat extends BukkitPlugin {
 
 	private boolean setupTables() {
 		try {
-			getSQL().createTableAsync(Config.FORMAT_TABLE, "`rank` VARCHAR(50) NOT NULL PRIMARY KEY, `group` VARCHAR(255), `prefix` VARCHAR(255), `suffix` VARCHAR(255), `message` VARCHAR(50), `format` VARCHAR(255)");
-			getSQL().createTableAsync(Config.CENSOR_TABLE, "`badword` VARCHAR(255) NOT NULL PRIMARY KEY, `replace` VARCHAR(255)");
-			getSQL().createTableAsync(Config.USER_TABLE, "`uuid` VARCHAR(37) NOT NULL PRIMARY KEY, `nick` VARCHAR(255), `ufnick` VARCHAR(16) UNIQUE");
-			getSQL().createTableAsync(Config.USER_FLAGS_TABLE, StringUtil.format("`uuid` VARCHAR(37) NOT NULL, `flag` VARCHAR(50) NOT NULL, `value` BIT(1) NOT NULL, `server` VARCHAR(100) NOT NULL, `_submitted` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP, `_expires` TIMESTAMP NULL, PRIMARY KEY (`uuid`, `flag`, `server`), FOREIGN KEY (`uuid`) REFERENCES `{0}`(`uuid`) ON DELETE CASCADE", Config.USER_TABLE));
-			getSQL().createTableAsync(Config.SERVER_FLAGS_TABLE, "`server` VARCHAR(100) NOT NULL, `flag` VARCHAR(50) NOT NULL, `value` BIT(1) NOT NULL, PRIMARY KEY (`server`, `flag`)");
-			getSQL().updateAsync(StringUtil.format("INSERT IGNORE INTO `{0}` (`rank`, `prefix`, `message`, `format`) VALUES (?, ?, ?, ?);", Config.FORMAT_TABLE), "default", "&7", "&7", "{displayname} &8>&r {msg}");
-			getSQL().updateAsync(StringUtil.format("INSERT IGNORE INTO `{0}` (`rank`, `message`, `format`) VALUES (?, ?, ?);", Config.FORMAT_TABLE), "message", "&7", "{sender} &8->&r {receiver} &8>&r {pmsg}");
+			getSQL().createTableAsync(Config.FORMAT_TABLE, "rank VARCHAR(50) NOT NULL PRIMARY KEY, groupname VARCHAR(255), prefix VARCHAR(255), suffix VARCHAR(255), message VARCHAR(50), format VARCHAR(255)");
+			getSQL().createTableAsync(Config.CENSOR_TABLE, "badword VARCHAR(255) NOT NULL PRIMARY KEY, replacement VARCHAR(255)");
+			getSQL().createTableAsync(Config.USER_TABLE, "uuid VARCHAR(37) NOT NULL PRIMARY KEY, nick VARCHAR(255), ufnick VARCHAR(16) UNIQUE");
+			getSQL().createTableAsync(Config.USER_FLAGS_TABLE, StringUtil.format("uuid VARCHAR(37) NOT NULL, flag VARCHAR(50) NOT NULL, _value BIT(1) NOT NULL, server VARCHAR(100) NOT NULL, _submitted TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP, _expires TIMESTAMP NULL, PRIMARY KEY (uuid, flag, server), FOREIGN KEY (uuid) REFERENCES {0}(uuid) ON DELETE CASCADE", Config.USER_TABLE));
+			getSQL().createTableAsync(Config.SERVER_FLAGS_TABLE, "server VARCHAR(100) NOT NULL, flag VARCHAR(50) NOT NULL, value BIT(1) NOT NULL, PRIMARY KEY (server, flag)");
+			getSQL().updateAsync(StringUtil.format("INSERT IGNORE INTO {0} (rank, prefix, message, format) VALUES (?, ?, ?, ?);", Config.FORMAT_TABLE), "default", "&7", "&7", "{displayname} &8>&r {msg}");
+			getSQL().updateAsync(StringUtil.format("INSERT IGNORE INTO {0} (rank, message, format) VALUES (?, ?, ?);", Config.FORMAT_TABLE), "message", "&7", "{sender} &8->&r {receiver} &8>&r {pmsg}");
+
+			if (getSQL().checkColumnExists(Config.CENSOR_TABLE, "replace")) {
+				getSQL().updateAsync(StringUtil.format("ALTER TABLE {0} RENAME COLUMN `replace` _replace;", Config.CENSOR_TABLE));
+				getSQL().updateAsync(StringUtil.format("ALTER TABLE {0} RENAME COLUMN `value` _value;", Config.USER_FLAGS_TABLE));
+				getSQL().updateAsync(StringUtil.format("ALTER TABLE {0} RENAME COLUMN `group` _group;", Config.FORMAT_TABLE));
+				getSQL().updateAsync(StringUtil.format("ALTER TABLE {0} RENAME COLUMN `prefix` _prefix;", Config.FORMAT_TABLE));
+				getSQL().updateAsync(StringUtil.format("ALTER TABLE {0} RENAME COLUMN `suffix` _suffix;", Config.FORMAT_TABLE));
+			}
+
 			return true;
 		} catch (Exception ex) {
 			this.getLog().console(ex);

@@ -63,9 +63,9 @@ public class Notifications implements DatabaseListener {
 						if (result.next()) {
 							String rank = result.getString("rank");
 							RankFormat rankData = RankFormat.getCache(rank);
-							rankData.setGroup(result.getString("group"));
-							rankData.setPrefix(result.getString("prefix"));
-							rankData.setSuffix(result.getString("suffix"));
+							rankData.setGroup(result.getString("_group"));
+							rankData.setPrefix(result.getString("_prefix"));
+							rankData.setSuffix(result.getString("_suffix"));
 							rankData.setMessage(result.getString("message"));
 							rankData.setFormat(result.getString("format"));
 
@@ -123,7 +123,7 @@ public class Notifications implements DatabaseListener {
 								if (flagMatch == null) userData.addFlagData(flagMatch = new UserFlagData(flag, server));
 								flagMatch.setExpires(_expires);
 								flagMatch.setSubmitted(_submitted);
-								flagMatch.setValue(result.getBoolean("value"));
+								flagMatch.setValue(result.getBoolean("_value"));
 								userData.applyFlagData(flag);
 							}
 						}

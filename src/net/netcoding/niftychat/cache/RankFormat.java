@@ -12,7 +12,7 @@ import net.netcoding.niftychat.NiftyChat;
 public class RankFormat {
 
 	private static final transient ConcurrentSet<RankFormat> CACHE = new ConcurrentSet<>();
-	private String rank;
+	private final String rank;
 	private String group;
 	private String format;
 	private String prefix;

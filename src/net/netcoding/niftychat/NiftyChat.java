@@ -1,6 +1,6 @@
 package net.netcoding.niftychat;
 
-import net.netcoding.niftybukkit.database.MySQL;
+import net.netcoding.niftybukkit.database.factory.SQLWrapper;
 import net.netcoding.niftybukkit.minecraft.BukkitPlugin;
 import net.netcoding.niftybukkit.util.StringUtil;
 import net.netcoding.niftychat.cache.CensorData;
@@ -93,7 +93,7 @@ public class NiftyChat extends BukkitPlugin {
 			pluginConfig.getSQL().removeListeners();
 	}
 
-	public final static MySQL getSQL() {
+	public final static SQLWrapper getSQL() {
 		return pluginConfig.getSQL();
 	}
 

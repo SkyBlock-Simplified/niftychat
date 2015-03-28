@@ -52,7 +52,7 @@ public class Notifications implements DatabaseListener {
 					public void handle(ResultSet result) throws SQLException {
 						if (result.next()) {
 							String rank = result.getString("rank");
-							new RankFormat(rank, result.getString("group"), result.getString("format"));
+							new RankFormat(rank, result.getString("_group"), result.getString("_format"));
 						}
 					}
 				});
@@ -66,8 +66,8 @@ public class Notifications implements DatabaseListener {
 							rankData.setGroup(result.getString("_group"));
 							rankData.setPrefix(result.getString("_prefix"));
 							rankData.setSuffix(result.getString("_suffix"));
-							rankData.setMessage(result.getString("message"));
-							rankData.setFormat(result.getString("format"));
+							rankData.setMessage(result.getString("_message"));
+							rankData.setFormat(result.getString("_format"));
 
 							for (UserChatData userData : UserChatData.getCache()) {
 								if (userData.getRankData().getPrimaryRank().equalsIgnoreCase(rank)) {

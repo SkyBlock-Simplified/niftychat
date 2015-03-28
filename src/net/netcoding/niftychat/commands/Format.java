@@ -77,10 +77,7 @@ public class Format extends BukkitCommand {
 					String result = NiftyChat.getSQL().query(StringUtil.format("SELECT _{0} FROM {1} WHERE rank = ?;", action, Config.FORMAT_TABLE), new ResultCallback<String>() {
 						@Override
 						public String handle(ResultSet result) throws SQLException {
-							if (result.next())
-								return result.getString(action);
-
-							return _null;
+							return result.next() ? result.getString(StringUtil.format("_{0}", action)) : _null;
 						}
 					}, rank);
 

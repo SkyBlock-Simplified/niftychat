@@ -32,7 +32,7 @@ public class Format extends BukkitCommand {
 
 	@Override
 	protected void onCommand(final CommandSender sender, String alias, final String[] args) throws Exception {
-		final String action = StringUtil.format("{0}{1}", (args[0].matches("^prefix|suffix|group$") ? "_" : ""), args[0]);
+		final String action = args[0];
 		final String rank = args[1];
 		final String _null = RegexUtil.SECTOR_SYMBOL + "onull";
 		String format = null;
@@ -49,7 +49,7 @@ public class Format extends BukkitCommand {
 
 					if (action.equalsIgnoreCase("create")) {
 						try {
-							NiftyChat.getSQL().update(StringUtil.format("INSERT INTO {0} (rank, _group, format) VALUES (?, ?, ?);", Config.FORMAT_TABLE), rank, group, format);
+							NiftyChat.getSQL().update(StringUtil.format("INSERT INTO {0} (rank, _group, _format) VALUES (?, ?, ?);", Config.FORMAT_TABLE), rank, group, format);
 						} catch (MySQLIntegrityConstraintViolationException ex) {
 							this.getLog().error(sender, "The format entry for {{0}} already exists!", rank);
 						}
@@ -74,7 +74,7 @@ public class Format extends BukkitCommand {
 
 			if (args.length == 2) {
 				if (this.hasPermissions(sender, "format", "view")) {
-					String result = NiftyChat.getSQL().query(StringUtil.format("SELECT {0} FROM {1} WHERE rank = ?;", action, Config.FORMAT_TABLE), new ResultCallback<String>() {
+					String result = NiftyChat.getSQL().query(StringUtil.format("SELECT _{0} FROM {1} WHERE rank = ?;", action, Config.FORMAT_TABLE), new ResultCallback<String>() {
 						@Override
 						public String handle(ResultSet result) throws SQLException {
 							if (result.next())
@@ -90,7 +90,7 @@ public class Format extends BukkitCommand {
 				if (this.hasPermissions(sender, "format", "edit")) {
 					format = StringUtil.implode(" ", args, 2);
 
-					if (NiftyChat.getSQL().update(StringUtil.format("UPDATE {0} SET {1} = ? WHERE rank = ?;", Config.FORMAT_TABLE, action), format, rank))
+					if (NiftyChat.getSQL().update(StringUtil.format("UPDATE {0} SET _{1} = ? WHERE rank = ?;", Config.FORMAT_TABLE, action), format, rank))
 						this.getLog().message(sender, "The {0} for {{1}} has been set to {{2}}.", action, rank, (StringUtil.isEmpty(format) ? _null : format));
 					else
 						this.getLog().error(sender, "Unable to set {{0}} for {{1}}!", action, rank);

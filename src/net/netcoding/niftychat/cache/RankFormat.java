@@ -88,9 +88,9 @@ public class RankFormat {
 					if (StringUtil.isEmpty(prefix)) prefix = null;
 					String suffix = result.getString("_suffix");
 					if (StringUtil.isEmpty(suffix)) suffix = null;
-					String message = result.getString("message");
+					String message = result.getString("_message");
 					if (StringUtil.isEmpty(message)) message = null;
-					String format = result.getString("format");
+					String format = result.getString("_format");
 					if (result.wasNull()) format = null;
 
 					new RankFormat(rank, group, format, prefix, suffix, message);

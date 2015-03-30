@@ -48,18 +48,18 @@ public class Whois extends BukkitCommand {
 
 		UserChatData userData = UserChatData.getCache(profiles.iterator().next());
 		String separator = StringUtil.format("{0}{1}{2}", ChatColor.GRAY, ", ", ChatColor.RED);
-		String serverName = (NiftyBukkit.getBungeeHelper().isDetected() && userData.getProfile().isOnline()) ? userData.getProfile().getServer().getName() : "*";
+		String serverName = (NiftyBukkit.getBungeeHelper().isDetected() && userData.isOnline()) ? userData.getProfile().getServer().getName() : "*";
 		this.getLog().message(sender, "Whois {{0}}", userData.getProfile().getName());
 		this.getLog().message(sender, "Display Name: {0}", userData.getDisplayName());
 		this.getLog().message(sender, "Ranks: {{0}}", StringUtil.implode(separator, userData.getRankData().getRanks()));
 
-		if (NiftyBukkit.getBungeeHelper().isDetected() && userData.getProfile().isOnline()) {
+		if (NiftyBukkit.getBungeeHelper().isDetected() && userData.isOnlineAnywhere()) {
 			if (!userData.getFlagData(Vanish.FLAG).getValue() || this.hasPermissions(sender, "vanish", "see"))
 				this.getLog().message(sender, "Server: {{0}}", serverName);
 		}
 
 		if (alias.matches("^.+?admin$") && this.hasPermissions(sender, "whois", "admin")) {
-			if (userData.getProfile().isOnline()) {
+			if (userData.isOnlineAnywhere()) {
 				if (!userData.getFlagData(Vanish.FLAG).getValue() || this.hasPermissions(sender, "vanish", "see"))
 					this.getLog().message(sender, "IP Address: {{0}}", userData.getProfile().getAddress().getHostName());
 			}
@@ -120,7 +120,7 @@ public class Whois extends BukkitCommand {
 				}
 			}
 		} else {
-			if (userData.getOfflinePlayer().isOnline()) {
+			if (userData.isOnline()) {
 				if (!userData.getFlagData(Vanish.FLAG).getValue() || this.hasPermissions(sender, "vanish", "see")) {
 					Player player = userData.getOfflinePlayer().getPlayer();
 					this.getLog().message(sender, "Operator: {{0}}", (userData.getOfflinePlayer().isOp() ? (ChatColor.GREEN + "Yes") : "No"));

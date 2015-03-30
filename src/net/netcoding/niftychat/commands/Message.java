@@ -43,7 +43,7 @@ public class Message extends BukkitCommand {
 		UserChatData recipientData = UserChatData.getCache(NiftyBukkit.getMojangRepository().searchByUsername(recipientName)); // Recipient
 
 		if (recipientData.equals(senderData)) { // Sending
-			boolean receiverOnline = receiverData.isOnline();
+			boolean receiverOnline = receiverData.isOnlineAnywhere();
 
 			if (!receiverOnline) {
 				helper.getLog().error(senderData.getOfflinePlayer().getPlayer(), "Unable to locate {{0}}!", receiverData.getProfile().getName());

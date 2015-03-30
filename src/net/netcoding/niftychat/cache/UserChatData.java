@@ -10,8 +10,8 @@ import java.util.List;
 
 import net.netcoding.niftybukkit.NiftyBukkit;
 import net.netcoding.niftybukkit.database.factory.callbacks.ResultCallback;
-import net.netcoding.niftybukkit.minecraft.BukkitHelper;
 import net.netcoding.niftybukkit.minecraft.BungeeServer;
+import net.netcoding.niftybukkit.mojang.MojangCache;
 import net.netcoding.niftybukkit.mojang.MojangProfile;
 import net.netcoding.niftybukkit.util.ListUtil;
 import net.netcoding.niftybukkit.util.RegexUtil;
@@ -25,10 +25,9 @@ import net.netcoding.niftyranks.cache.UserRankData;
 import org.bukkit.OfflinePlayer;
 import org.bukkit.plugin.java.JavaPlugin;
 
-public class UserChatData extends BukkitHelper {
+public class UserChatData extends MojangCache {
 
 	private static final transient ConcurrentSet<UserChatData> CACHE = new ConcurrentSet<>();
-	private MojangProfile profile;
 	private String lastMessage;
 	private MojangProfile lastMessenger;
 	private boolean hasMoved = false;
@@ -39,8 +38,7 @@ public class UserChatData extends BukkitHelper {
 	}
 
 	private UserChatData(JavaPlugin plugin, MojangProfile profile, boolean addToCache) {
-		super(plugin);
-		this.profile = profile;
+		super(plugin, profile);
 		if (addToCache) CACHE.add(this);
 	}
 
@@ -74,18 +72,9 @@ public class UserChatData extends BukkitHelper {
 		}
 	}
 
-	@Override
-	public boolean equals(Object obj) {
-		if (obj == null) return false;
-		if (!(obj instanceof UserChatData)) return false;
-		if (this == obj) return true;
-		UserChatData userData = (UserChatData)obj;
-		return this.getProfile().equals(userData.getProfile());
-	}
-
 	public static ConcurrentSet<UserChatData> getCache() {
 		for (UserChatData data : CACHE) {
-			if (!data.getOfflinePlayer().isOnline())
+			if (!data.isOnline())
 				CACHE.remove(data);
 		}
 
@@ -93,9 +82,9 @@ public class UserChatData extends BukkitHelper {
 	}
 
 	public static UserChatData getCache(MojangProfile profile) {
-		for (UserChatData data : getCache()) {
+		for (MojangCache data : getCache()) {
 			if (profile.equals(data.getProfile()))
-				return data;
+				return (UserChatData)data;
 		}
 
 		return new UserChatData(NiftyChat.getPlugin(NiftyChat.class), profile, false);
@@ -106,7 +95,7 @@ public class UserChatData extends BukkitHelper {
 	}
 
 	private String getDisplayName(boolean fetch) {
-		if (!fetch && this.getOfflinePlayer().isOnline())
+		if (!fetch && this.isOnline())
 			return this.getOfflinePlayer().getPlayer().getDisplayName();
 
 		try {
@@ -189,21 +178,12 @@ public class UserChatData extends BukkitHelper {
 		return this.getPlugin().getServer().getOfflinePlayer(this.getProfile().getUniqueId());
 	}
 
-	public MojangProfile getProfile() {
-		return this.profile;
-	}
-
 	public UserRankData getRankData() {
 		return UserRankData.getCache(this.getProfile());
 	}
 
 	public String getStrippedDisplayName() {
 		return RegexUtil.strip(this.getDisplayName(), RegexUtil.VANILLA_PATTERN).replaceAll("^\\*", "");
-	}
-
-	@Override
-	public int hashCode() {
-		return this.getProfile().hashCode();
 	}
 
 	public boolean hasMoved() {
@@ -219,10 +199,6 @@ public class UserChatData extends BukkitHelper {
 		if (StringUtil.notEmpty(this.lastMessage) && this.lastMessage.equalsIgnoreCase(message)) return true;
 		this.lastMessage = message;
 		return false;
-	}
-
-	public boolean isOnline() {
-		return this.getProfile().isOnline();
 	}
 
 	public void reloadFlagData() {

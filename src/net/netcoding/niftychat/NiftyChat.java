@@ -90,7 +90,7 @@ public class NiftyChat extends BukkitPlugin {
 	@Override
 	public void onDisable() {
 		if (getSQL() != null)
-			pluginConfig.getSQL().removeListeners();
+			getSQL().removeListeners();
 	}
 
 	public final static SQLWrapper getSQL() {

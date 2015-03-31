@@ -48,7 +48,7 @@ public class Whois extends BukkitCommand {
 
 		UserChatData userData = UserChatData.getCache(profiles.iterator().next());
 		String separator = StringUtil.format("{0}{1}{2}", ChatColor.GRAY, ", ", ChatColor.RED);
-		String serverName = (NiftyBukkit.getBungeeHelper().isDetected() && userData.isOnline()) ? userData.getProfile().getServer().getName() : "*";
+		String serverName = (NiftyBukkit.getBungeeHelper().isDetected() && userData.isOnlineLocally()) ? userData.getProfile().getServer().getName() : "*";
 		this.getLog().message(sender, "Whois {{0}}", userData.getProfile().getName());
 		this.getLog().message(sender, "Display Name: {0}", userData.getDisplayName());
 		this.getLog().message(sender, "Ranks: {{0}}", StringUtil.implode(separator, userData.getRankData().getRanks()));
@@ -120,7 +120,7 @@ public class Whois extends BukkitCommand {
 				}
 			}
 		} else {
-			if (userData.isOnline()) {
+			if (userData.isOnlineLocally()) {
 				if (!userData.getFlagData(Vanish.FLAG).getValue() || this.hasPermissions(sender, "vanish", "see")) {
 					Player player = userData.getOfflinePlayer().getPlayer();
 					this.getLog().message(sender, "Operator: {{0}}", (userData.getOfflinePlayer().isOp() ? (ChatColor.GREEN + "Yes") : "No"));

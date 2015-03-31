@@ -70,7 +70,7 @@ public class SocialSpy extends BukkitCommand {
 		if (!sender.getName().equalsIgnoreCase(profile.getName()))
 			this.getLog().message(sender, sendMsg, profile.getName(), (!server.equals("*") ? "" : "globally "), (!isSpying ? "" : "un"), serverMsg);
 
-		if (!NiftyBukkit.getBungeeHelper().isDetected() && userData.isOnline())
+		if (!NiftyBukkit.getBungeeHelper().isDetected() && userData.isOnlineLocally())
 			this.getLog().message(userData.getOfflinePlayer().getPlayer(), receiveMsg, "", (!isSpying ? "" : "un"), "");
 		else {
 			if (isConsole(sender) && NiftyBukkit.getBungeeHelper().getServer().getPlayerCount() == 0) return;

@@ -22,7 +22,6 @@ import net.netcoding.niftychat.NiftyChat;
 import net.netcoding.niftychat.commands.Vanish;
 import net.netcoding.niftyranks.cache.UserRankData;
 
-import org.bukkit.OfflinePlayer;
 import org.bukkit.plugin.java.JavaPlugin;
 
 public class UserChatData extends MojangCache {
@@ -74,7 +73,7 @@ public class UserChatData extends MojangCache {
 
 	public static ConcurrentSet<UserChatData> getCache() {
 		for (UserChatData data : CACHE) {
-			if (!data.isOnline())
+			if (!data.isOnlineLocally())
 				CACHE.remove(data);
 		}
 
@@ -95,7 +94,7 @@ public class UserChatData extends MojangCache {
 	}
 
 	private String getDisplayName(boolean fetch) {
-		if (!fetch && this.isOnline())
+		if (!fetch && this.isOnlineLocally())
 			return this.getOfflinePlayer().getPlayer().getDisplayName();
 
 		try {
@@ -172,10 +171,6 @@ public class UserChatData extends MojangCache {
 
 	public MojangProfile getLastMessenger() {
 		return this.lastMessenger;
-	}
-
-	public OfflinePlayer getOfflinePlayer() {
-		return this.getPlugin().getServer().getOfflinePlayer(this.getProfile().getUniqueId());
 	}
 
 	public UserRankData getRankData() {

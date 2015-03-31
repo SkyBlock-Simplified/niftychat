@@ -10,6 +10,7 @@ commands:
   censor:
     description: Manage chat censoring
     usage: /<command> <add|edit|remove|list> <badword> [replace]
+    aliases: filter
   format:
     description: Manage chat formatting
     usage: /<command> <group|format|prefix|suffix|message> <rank> [value]

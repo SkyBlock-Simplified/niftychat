@@ -97,7 +97,7 @@ public class Message extends BukkitCommand {
 		if (reply) {
 			MojangProfile lastMessenger = senderData.getLastMessenger();
 
-			if (lastMessenger != null) {
+			if (lastMessenger != null && lastMessenger.isOnline()) {
 				playerName = lastMessenger.getName();
 			} else {
 				this.getLog().error(sender, "You have no one to reply to!");

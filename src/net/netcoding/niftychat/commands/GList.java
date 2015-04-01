@@ -68,7 +68,7 @@ public class GList extends BukkitCommand {
 					String displayName = isVanished ? StringUtil.format("{{0}}{1}", "*", userData.getDisplayName()) : userData.getDisplayName();
 
 					if (isVanished && isPlayer(sender)) {
-						if (senderData.equals(userData) || this.hasPermissions(sender, "vanish", "see"))
+						if (userData.equals(senderData) || this.hasPermissions(sender, "vanish", "see"))
 							nameList.add(displayName);
 						else
 							totalPlayers--;
@@ -97,7 +97,7 @@ public class GList extends BukkitCommand {
 							String displayName = isVanished ? StringUtil.format("{{0}}{1}", "*", userData.getDisplayName()) : userData.getDisplayName();
 
 							if (isVanished && isPlayer(sender)) {
-								if (senderData.equals(userData) || this.hasPermissions(sender, "vanish", "see"))
+								if (userData.equals(senderData) || this.hasPermissions(sender, "vanish", "see"))
 									nameList.add(displayName);
 								else {
 									serverPlayers--;

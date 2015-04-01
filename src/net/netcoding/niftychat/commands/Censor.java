@@ -1,12 +1,14 @@
 package net.netcoding.niftychat.commands;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.util.Iterator;
 import java.util.regex.Pattern;
 import java.util.regex.PatternSyntaxException;
 
 import net.netcoding.niftybukkit.minecraft.BukkitCommand;
+import net.netcoding.niftybukkit.util.ListUtil;
+import net.netcoding.niftybukkit.util.NumberUtil;
 import net.netcoding.niftybukkit.util.StringUtil;
+import net.netcoding.niftybukkit.util.concurrent.ConcurrentSet;
 import net.netcoding.niftychat.NiftyChat;
 import net.netcoding.niftychat.cache.CensorData;
 import net.netcoding.niftychat.cache.Config;
@@ -27,18 +29,23 @@ public class Censor extends BukkitCommand {
 
 		if (action.equalsIgnoreCase("list")) {
 			if (this.hasPermissions(sender, "censor", "list")) {
-				List<String> censorList = new ArrayList<String>();
+				ConcurrentSet<CensorData> censorCache = CensorData.getCache();
 
-				if (CensorData.getCache().size() > 0) {
-					for (CensorData censor : CensorData.getCache()) {
-						String badword = censor.getBadword();
-						String match = ChatColor.RED + badword + ChatColor.GRAY;
-						String replace = censor.getReplace();
-						replace = ChatColor.RED + replace + ChatColor.GRAY;
-						censorList.add(StringUtil.format("{0} => {1}", match, replace));
+				if (censorCache.size() > 0) {
+					int page = ListUtil.isEmpty(args) ? 0 : NumberUtil.isInt(args[1]) ? censorCache.size() > 5 ? Integer.parseInt(args[1]) : 0 : 0;
+					if (page == 0) page = 1;
+					Iterator<CensorData> totalIterator = censorCache.iterator();
+
+					if (censorCache.size() > 5 && page > 1) {
+						for (int i = 0; i < (5 * page); i++)
+							totalIterator.next();
 					}
 
-					this.getLog().message(sender, "[{{0}}]\n\n{1}", "Censor List", StringUtil.implode(", ", censorList));
+					this.getLog().message(sender, "[{{0}}]", "Censor List");
+					for (int i = 0; i < (censorCache.size() < 5 ? censorCache.size() : 5); i++) {
+						CensorData censor = totalIterator.next();
+						this.getLog().message(sender, "{{0}} => {1}", ((censor.isEnabled() ? ChatColor.GREEN : "") + censor.getBadword()), censor.getReplace());
+					}
 				} else
 					this.getLog().error(sender, "There are no words in the censor list");
 			}

@@ -16,6 +16,7 @@ public class CensorData {
 	private String badword;
 	private Pattern pattern;
 	private String replace;
+	private boolean enabled = true;
 
 	public CensorData(String badword) {
 		this(badword, DEFAULT_REPLACE);
@@ -23,7 +24,7 @@ public class CensorData {
 
 	public CensorData(String badword, String replace) {
 		this.badword = badword;
-		this.pattern = Pattern.compile(String.format("(?i)\\b(%1$s)\\b", badword.replaceAll("%", "[\\\\S-]*")));
+		this.pattern = Pattern.compile(StringUtil.format("(?i)\\b({0})\\b", badword.replaceAll("%", "[\\\\S-]*")));
 		this.replace = (replace == null ? DEFAULT_REPLACE : replace);
 		CACHE.add(this);
 	}
@@ -53,6 +54,10 @@ public class CensorData {
 		return this.replace;
 	}
 
+	public boolean isEnabled() {
+		return this.enabled;
+	}
+
 	public static void reload() {
 		CACHE.clear();
 
@@ -74,6 +79,10 @@ public class CensorData {
 			if (censor.getBadword().equalsIgnoreCase(badword))
 				CACHE.remove(censor);
 		}
+	}
+
+	public void setEnabled(boolean value) {
+		this.enabled = value;
 	}
 
 	public void setReplace(String replace) {

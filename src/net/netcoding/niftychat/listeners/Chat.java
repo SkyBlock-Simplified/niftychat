@@ -90,12 +90,21 @@ public class Chat extends BukkitListener {
 				Pattern pattern = censor.getPattern();
 				int current = 0;
 
-				while (pattern.matcher(message).find()) {
-					message = RegexUtil.replace(message, pattern, censor.getReplace());
+				if (censor.isEnabled()) {
+					while (pattern.matcher(message).find()) {
+						try {
+							message = RegexUtil.replace(message, pattern, censor.getReplace());
+						} catch (Exception ex) {
+							helper.getLog().console("Error detected in censor! Please check the censor {0} => {1} for message {2}", pattern.toString(), censor.getReplace(), beforeCensor);
+							censor.setEnabled(false);
+							break;
+						}
 
-					if (++current >= 10) {
-						helper.getLog().console("Possible infinite loop detected in censor! Please check the censor {0} => {1} for message {2}", pattern.toString(), censor.getReplace(), beforeCensor);
-						break;
+						if (++current >= 10) {
+							helper.getLog().console("Possible infinite loop detected in censor! Please check the censor {0} => {1} for message {2}", pattern.toString(), censor.getReplace(), beforeCensor);
+							censor.setEnabled(false);
+							break;
+						}
 					}
 				}
 			}

@@ -42,7 +42,7 @@ public class Censor extends BukkitCommand {
 					}
 
 					this.getLog().message(sender, "[{{0}} (Page {{1}}/{{2}})]", "Censor List", page, Math.floor(censorCache.size() / 5.0));
-					for (int i = 0; i < (censorCache.size() < 5 ? censorCache.size() : 5); i++) {
+					for (int i = 0; i < 5 && totalIterator.hasNext(); i++) {
 						CensorData censor = totalIterator.next();
 						this.getLog().message(sender, "{{0}} => {1}", ((censor.isEnabled() ? ChatColor.GREEN : "") + censor.getBadword()), censor.getReplace());
 					}

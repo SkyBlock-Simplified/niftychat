@@ -93,7 +93,7 @@ public class Chat extends BukkitListener {
 				while (pattern.matcher(message).find()) {
 					message = RegexUtil.replace(message, pattern, censor.getReplace());
 
-					if (++current >= 15) {
+					if (++current >= 10) {
 						helper.getLog().console("Possible infinite loop detected in censor! Please check the censor {0} => {1} for message {2}", pattern.toString(), censor.getReplace(), beforeCensor);
 						break;
 					}

@@ -33,6 +33,7 @@ public class Censor extends BukkitCommand {
 				if (censorCache.size() > 0) {
 					int page = args.length > 1 ? NumberUtil.isInt(args[1]) ? censorCache.size() > 5 ? Integer.parseInt(args[1]) : 0 : 0 : 0;
 					if (page == 0) page = 1;
+					if (page * 5 > censorCache.size()) page = (int)Math.floor(censorCache.size() / 5.0);
 					Iterator<CensorData> totalIterator = censorCache.iterator();
 
 					if (censorCache.size() > 5 && page > 1) {
@@ -40,7 +41,7 @@ public class Censor extends BukkitCommand {
 							totalIterator.next();
 					}
 
-					this.getLog().message(sender, "[{{0}} (Page {{1}}/{{2}})]", "Censor List", page, Math.ceil(censorCache.size() / 5.0));
+					this.getLog().message(sender, "[{{0}} (Page {{1}}/{{2}})]", "Censor List", page, Math.floor(censorCache.size() / 5.0));
 					for (int i = 0; i < (censorCache.size() < 5 ? censorCache.size() : 5); i++) {
 						CensorData censor = totalIterator.next();
 						this.getLog().message(sender, "{{0}} => {1}", ((censor.isEnabled() ? ChatColor.GREEN : "") + censor.getBadword()), censor.getReplace());

@@ -5,7 +5,6 @@ import java.util.regex.Pattern;
 import java.util.regex.PatternSyntaxException;
 
 import net.netcoding.niftybukkit.minecraft.BukkitCommand;
-import net.netcoding.niftybukkit.util.ListUtil;
 import net.netcoding.niftybukkit.util.NumberUtil;
 import net.netcoding.niftybukkit.util.StringUtil;
 import net.netcoding.niftybukkit.util.concurrent.ConcurrentSet;
@@ -32,7 +31,7 @@ public class Censor extends BukkitCommand {
 				ConcurrentSet<CensorData> censorCache = CensorData.getCache();
 
 				if (censorCache.size() > 0) {
-					int page = ListUtil.isEmpty(args) ? 0 : NumberUtil.isInt(args[1]) ? censorCache.size() > 5 ? Integer.parseInt(args[1]) : 0 : 0;
+					int page = args.length > 1 ? NumberUtil.isInt(args[1]) ? censorCache.size() > 5 ? Integer.parseInt(args[1]) : 0 : 0 : 0;
 					if (page == 0) page = 1;
 					Iterator<CensorData> totalIterator = censorCache.iterator();
 
@@ -41,7 +40,7 @@ public class Censor extends BukkitCommand {
 							totalIterator.next();
 					}
 
-					this.getLog().message(sender, "[{{0}}]", "Censor List");
+					this.getLog().message(sender, "[{{0}} (Page {{1}}/{{2}})]", "Censor List", page, Math.ceil(censorCache.size() / 5.0));
 					for (int i = 0; i < (censorCache.size() < 5 ? censorCache.size() : 5); i++) {
 						CensorData censor = totalIterator.next();
 						this.getLog().message(sender, "{{0}} => {1}", ((censor.isEnabled() ? ChatColor.GREEN : "") + censor.getBadword()), censor.getReplace());

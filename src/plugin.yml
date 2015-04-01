@@ -64,6 +64,7 @@ permissions:
         children:
           niftychat.chat:
             description: Allows you to chat
+            default: true
           niftychat.chat.bypass.*:
             description: Allows you to bypass all chat filtering
             children:

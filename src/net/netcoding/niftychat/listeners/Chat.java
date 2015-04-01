@@ -83,6 +83,15 @@ public class Chat extends BukkitListener {
 				message = RegexUtil.URL_PATTERN.matcher(message).replaceAll("$1 $2");
 		}
 
+		if (!helper.hasPermissions(player, action, "bypass", "caps")) {
+			String[] words = message.split("\\s");
+
+			for (int i = 0; i < words.length; i++)
+				if (words[i].length() > 3) words[i] = words[i].toLowerCase();
+
+			message = StringUtil.implode(" ", words);
+		}
+
 		if (!helper.hasPermissions(player, action, "bypass", "censor")) {
 			String beforeCensor = message;
 
@@ -110,15 +119,6 @@ public class Chat extends BukkitListener {
 			}
 		}
 
-		if (!helper.hasPermissions(player, action, "bypass", "caps")) {
-			String[] words = message.split("\\s");
-
-			for (int i = 0; i < words.length; i++)
-				if (words[i].length() > 3) words[i] = words[i].toLowerCase();
-
-			message = StringUtil.implode(" ", words);
-		}
-
 		return message;
 	}
 
@@ -127,7 +127,7 @@ public class Chat extends BukkitListener {
 		Player player = event.getPlayer();
 		String message = event.getMessage();
 
-		if (check(this, player, message)) {
+		if (check(this, player, message) && this.hasPermissions(player, "chat")) {
 			message = format(this, player, "chat", message);
 			message = filter(this, player, "chat", message);
 		} else

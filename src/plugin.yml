@@ -16,7 +16,7 @@ commands:
     usage: /<command> <group|format|prefix|suffix|message> <rank> [value]
   list:
     description: Show all, specific or current servers with player counts and names
-    usage: /<command>
+    usage: /<command> [server]
     aliases: [glist, online, gonline]
   message:
     description: Send a message to another player

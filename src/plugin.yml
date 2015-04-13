@@ -7,6 +7,10 @@ main: net.netcoding.niftychat.NiftyChat
 depend: [NiftyBukkit, NiftyRanks]
 
 commands:
+  broadcast:
+    description: Sends a message to all online players
+    usage: /<command> <message>
+    aliases: [say, br, networkbroadcast, networkbr, nbroadcast, nbroadcast, nbr, nb]
   censor:
     description: Manage chat censoring
     usage: /<command> <add|edit|remove|list> <badword> [replace]
@@ -18,6 +22,10 @@ commands:
     description: Show all, specific or current servers with player counts and names
     usage: /<command> [server]
     aliases: [glist, online, gonline]
+  me:
+    description: Sends a minified chat message
+    usage: /command> <message>
+    aliases: [mi, mememe]
   message:
     description: Send a message to another player
     usage: /<command> <player> <message>
@@ -50,6 +58,13 @@ permissions:
   niftychat.*:
     description: Gives access to all plugin features and commands
     children:
+      niftychat.broadcast.*:
+        description: Allows you to access all broadcast features
+        children:
+          niftychat.broadcast:
+            description: Allows you to broadcast a message
+          niftychat.broadcast.network:
+            description: Allows you to broadcast a message across the network
       niftychat.censor.*:
         description: Allows you to access all censor features
         children:
@@ -97,6 +112,34 @@ permissions:
             description: Allows you to create and delete rank formats
           niftychat.format.view:
             description: Allows you to view rank format, prefix and suffix
+      niftychat.me.*:
+        description: Allows you to access all minified chat features
+        children:
+          niftychat.me:
+            description: Allows you to send minified message
+          niftychat.me.bypass.*:
+            description: Allows you to bypass all minified message filtering
+            children:
+              niftychat.me.bypass.advertise:
+                description: Allows you to put IP addresses and websites with ports in minified chat
+              niftychat.me.bypass.caps:
+                description: Allows you to use CAPS in minified chat
+              niftychat.me.bypass.censor:
+                description: Allows you to bypass the badword censor in minified chat
+              niftychat.me.bypass.move:
+                description: Allows you to minified chat without moving on first join
+              niftychat.me.bypass.repeat:
+                description: Allows you to submit the same message in minified chat
+              niftychat.me.bypass.url:
+                description: Allows you to put websites without ports in minified chat
+          niftychat.me.color:
+            description: Allows you to use colors in minified chat
+          niftychat.me.format:
+            description: Allows you to use formatting in minified chat
+          niftychat.me.global:
+            description: Allows you to send minified messages to players across servers
+          niftychat.me.magic:
+            description: Allows you to use magic in minified chat
       niftychat.message.*:
         description: Allows you to access all message features
         children:

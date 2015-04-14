@@ -6,9 +6,11 @@ import net.netcoding.niftybukkit.util.StringUtil;
 import net.netcoding.niftychat.cache.CensorData;
 import net.netcoding.niftychat.cache.Config;
 import net.netcoding.niftychat.cache.RankFormat;
+import net.netcoding.niftychat.commands.Broadcast;
 import net.netcoding.niftychat.commands.Censor;
 import net.netcoding.niftychat.commands.Format;
 import net.netcoding.niftychat.commands.GList;
+import net.netcoding.niftychat.commands.Me;
 import net.netcoding.niftychat.commands.Message;
 import net.netcoding.niftychat.commands.Mute;
 import net.netcoding.niftychat.commands.Nick;
@@ -63,9 +65,11 @@ public class NiftyChat extends BukkitPlugin {
 		}
 
 		this.getLog().console("Registering Commands");
+		new Broadcast(this);
 		new Censor(this);
 		new Format(this);
 		new GList(this);
+		new Me(this);
 		new Message(this);
 		new Mute(this);
 		new Nick(this);

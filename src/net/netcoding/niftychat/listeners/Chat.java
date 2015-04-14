@@ -138,7 +138,6 @@ public class Chat extends BukkitListener {
 
 	@EventHandler(priority = EventPriority.LOW)
 	public void onPlayerChat(AsyncPlayerChatEvent event) {
-		if (event.isCancelled()) return;
 		Player player = event.getPlayer();
 		MojangProfile profile = NiftyBukkit.getMojangRepository().searchByPlayer(player);
 		UserChatData userData = UserChatData.getCache(profile);

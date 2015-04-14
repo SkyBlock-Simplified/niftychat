@@ -20,7 +20,7 @@ public class Me extends BukkitCommand {
 
 	@Override
 	protected void onCommand(CommandSender sender, String alias, String[] args) throws Exception {
-		String name = StringUtil.format("{0}[{{1}}{0}]", ChatColor.DARK_GRAY, "Console");
+		String name = StringUtil.format("{0}[{{1}}{0}]{2}", ChatColor.DARK_GRAY, "Console", ChatColor.GRAY);
 		String message = StringUtil.implode(" ", args);
 
 		if (isPlayer(sender)) {
@@ -34,7 +34,7 @@ public class Me extends BukkitCommand {
 				return;
 		}
 
-		message = StringUtil.format("{0} &7{1}", name, message);
+		message = StringUtil.format("{0} {1}", name, message);
 		this.getLog().message(this.getPlugin().getServer().getConsoleSender(), message);
 
 		for (MojangProfile profile : NiftyBukkit.getBungeeHelper().getPlayerList())

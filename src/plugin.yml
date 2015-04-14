@@ -24,7 +24,7 @@ commands:
     aliases: [glist, online, gonline]
   me:
     description: Sends a minified chat message
-    usage: /command> <message>
+    usage: /<command> <message>
     aliases: [mi, mememe]
   message:
     description: Send a message to another player

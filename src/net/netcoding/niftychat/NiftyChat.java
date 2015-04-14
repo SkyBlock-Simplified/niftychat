@@ -108,8 +108,8 @@ public class NiftyChat extends BukkitPlugin {
 			getSQL().createTable(Config.USER_TABLE, "uuid VARCHAR(37) NOT NULL PRIMARY KEY, nick VARCHAR(255), ufnick VARCHAR(16) UNIQUE");
 			getSQL().createTable(Config.USER_FLAGS_TABLE, StringUtil.format("uuid VARCHAR(37) NOT NULL, flag VARCHAR(50) NOT NULL, _value BIT(1) NOT NULL, server VARCHAR(100) NOT NULL, _submitted TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP, _expires TIMESTAMP NULL, PRIMARY KEY (uuid, flag, server), FOREIGN KEY (uuid) REFERENCES {0}(uuid) ON DELETE CASCADE", Config.USER_TABLE));
 			getSQL().createTable(Config.SERVER_FLAGS_TABLE, "server VARCHAR(100) NOT NULL, flag VARCHAR(50) NOT NULL, _value BIT(1) NOT NULL, PRIMARY KEY (server, flag)");
-			getSQL().updateAsync(StringUtil.format("INSERT IGNORE INTO {0} (rank, _prefix, message, format) VALUES (?, ?, ?, ?);", Config.FORMAT_TABLE), "default", "&7", "&7", "{displayname} &8>&r {msg}");
-			getSQL().updateAsync(StringUtil.format("INSERT IGNORE INTO {0} (rank, message, format) VALUES (?, ?, ?);", Config.FORMAT_TABLE), "message", "&7", "{sender} &8->&r {receiver} &8>&r {pmsg}");
+			getSQL().updateAsync(StringUtil.format("INSERT IGNORE INTO {0} (rank, _prefix, _message, _format) VALUES (?, ?, ?, ?);", Config.FORMAT_TABLE), "default", "&7", "&7", "{displayname} &8>&r {msg}");
+			getSQL().updateAsync(StringUtil.format("INSERT IGNORE INTO {0} (rank, _message, _format) VALUES (?, ?, ?);", Config.FORMAT_TABLE), "message", "&7", "{sender} &8->&r {receiver} &8>&r {pmsg}");
 
 			if (getSQL().checkColumnExists(Config.CENSOR_TABLE, "replace")) {
 				getSQL().updateAsync(StringUtil.format("ALTER TABLE {0} CHANGE `replace` _replace VARCHAR(255);", Config.CENSOR_TABLE));

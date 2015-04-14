@@ -7,7 +7,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 
-import net.netcoding.niftybukkit.NiftyBukkit;
 import net.netcoding.niftybukkit.database.factory.callbacks.VoidResultCallback;
 import net.netcoding.niftybukkit.database.notifications.DatabaseListener;
 import net.netcoding.niftybukkit.database.notifications.DatabaseNotification;
@@ -32,11 +31,13 @@ public class Notifications implements DatabaseListener {
 					public void handle(ResultSet result) throws SQLException {
 						if (result.next()) {
 							UUID uuid = UUID.fromString(result.getString("uuid"));
-							UserChatData userData = UserChatData.getCache(NiftyBukkit.getMojangRepository().searchByUniqueId(uuid));
 
-							if (userData.getOfflinePlayer().isOnline()) {
-								userData.updateDisplayName();
-								userData.updateTabListName();
+							for (UserChatData userData : UserChatData.getCache()) {
+								if (userData.getProfile().getUniqueId().equals(uuid)) {
+									userData.updateDisplayName();
+									userData.updateTabListName();
+									break;
+								}
 							}
 						}
 					}
@@ -85,11 +86,12 @@ public class Notifications implements DatabaseListener {
 			if (!event.equals(TriggerEvent.INSERT)) {
 				Map<String, Object> data = databaseNotification.getDeletedData();
 				UUID uuid = UUID.fromString((String)data.get("uuid"));
-				UserChatData userData = UserChatData.getCache(NiftyBukkit.getMojangRepository().searchByUniqueId(uuid));
 
-				if (userData.getOfflinePlayer().isOnline()) {
-					userData.reloadFlagData();
-					userData.applyFlagData((String)data.get("flag"));
+				for (UserChatData userData : UserChatData.getCache()) {
+					if (userData.getProfile().getUniqueId().equals(uuid)) {
+						userData.reloadFlagData();
+						userData.applyFlagData((String)data.get("flag"));
+					}
 				}
 			}
 
@@ -99,32 +101,34 @@ public class Notifications implements DatabaseListener {
 					public void handle(ResultSet result) throws SQLException {
 						if (result.next()) {
 							UUID uuid = UUID.fromString(result.getString("uuid"));
-							UserChatData userData = UserChatData.getCache(NiftyBukkit.getMojangRepository().searchByUniqueId(uuid));
 
-							if (userData.getOfflinePlayer().isOnline()) {
-								String flag = result.getString("flag");
-								List<UserFlagData> flagDatas = userData.getAllFlagData(flag);
-								String server = result.getString("server");
-								long _submitted = result.getTimestamp("_submitted").getTime();
-								Timestamp expires = result.getTimestamp("_expires");
-								long _expires = result.wasNull() ? 0 : expires.getTime();
-								UserFlagData flagMatch = null;
+							for (UserChatData userData : UserChatData.getCache()) {
+								if (userData.getProfile().getUniqueId().equals(uuid)) {
+									String flag = result.getString("flag");
+									List<UserFlagData> flagDatas = userData.getAllFlagData(flag);
+									String server = result.getString("server");
+									long _submitted = result.getTimestamp("_submitted").getTime();
+									Timestamp expires = result.getTimestamp("_expires");
+									long _expires = result.wasNull() ? 0 : expires.getTime();
+									UserFlagData flagMatch = null;
 
-								for (UserFlagData flagData : flagDatas) {
-									if (flagData.isGlobal() && server.equals("*")) {
-										flagMatch = flagData;
-										break;
-									} else if (!flagData.isGlobal() && flagData.getServerName().equals(server)) {
-										flagMatch = flagData;
-										break;
+									for (UserFlagData flagData : flagDatas) {
+										if (flagData.isGlobal() && server.equals("*")) {
+											flagMatch = flagData;
+											break;
+										} else if (!flagData.isGlobal() && flagData.getServerName().equals(server)) {
+											flagMatch = flagData;
+											break;
+										}
 									}
-								}
 
-								if (flagMatch == null) userData.addFlagData(flagMatch = new UserFlagData(flag, server));
-								flagMatch.setExpires(_expires);
-								flagMatch.setSubmitted(_submitted);
-								flagMatch.setValue(result.getBoolean("_value"));
-								userData.applyFlagData(flag);
+									if (flagMatch == null) userData.addFlagData(flagMatch = new UserFlagData(flag, server));
+									flagMatch.setExpires(_expires);
+									flagMatch.setSubmitted(_submitted);
+									flagMatch.setValue(result.getBoolean("_value"));
+									userData.applyFlagData(flag);
+									break;
+								}
 							}
 						}
 					}

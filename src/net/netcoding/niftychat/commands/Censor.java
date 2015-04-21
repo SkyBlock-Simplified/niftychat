@@ -31,10 +31,10 @@ public class Censor extends BukkitCommand {
 				ConcurrentSet<CensorData> censorCache = CensorData.getCache();
 
 				if (censorCache.size() > 0) {
-					int total = (int)Math.ceil(censorCache.size() / 5.0);
+					int total = (int)Math.floor(censorCache.size() / 5.0);
 					int page = args.length > 1 ? NumberUtil.isInt(args[1]) ? censorCache.size() > 5 ? Integer.parseInt(args[1]) : 0 : 0 : 0;
 					if (page == 0) page = 1;
-					if (page * 5 >= censorCache.size()) page = total - 1;
+					if (page * 5 > censorCache.size()) page = total - 1;
 					Iterator<CensorData> totalIterator = censorCache.iterator();
 
 					if (censorCache.size() > 5 && page > 1) {

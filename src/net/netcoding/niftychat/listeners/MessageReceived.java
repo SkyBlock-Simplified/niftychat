@@ -8,7 +8,6 @@ import net.netcoding.niftychat.cache.Config;
 import net.netcoding.niftychat.cache.UserChatData;
 import net.netcoding.niftychat.commands.Message;
 
-import org.bukkit.entity.Player;
 import org.bukkit.plugin.java.JavaPlugin;
 
 import com.google.common.io.ByteArrayDataInput;
@@ -20,7 +19,7 @@ public class MessageReceived extends BukkitHelper implements BungeeListener {
 	}
 
 	@Override
-	public void onMessageReceived(String channel, Player player, byte[] message) throws Exception {
+	public void onMessageReceived(String channel, byte[] message) throws Exception {
 		ByteArrayDataInput input = DataUtil.newDataInput(message);
 		String subChannel = input.readUTF();
 		if (!subChannel.equals(Config.CHAT_CHANNEL)) return;

@@ -2,6 +2,7 @@ package net.netcoding.niftychat.commands;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.sql.SQLIntegrityConstraintViolationException;
 
 import net.netcoding.niftybukkit.minecraft.BukkitCommand;
 import net.netcoding.niftychat.NiftyChat;
@@ -13,8 +14,6 @@ import net.netcoding.niftyranks.cache.UserRankData;
 
 import org.bukkit.command.CommandSender;
 import org.bukkit.plugin.java.JavaPlugin;
-
-import com.mysql.jdbc.exceptions.jdbc4.MySQLIntegrityConstraintViolationException;
 
 public class Format extends BukkitCommand {
 
@@ -50,7 +49,7 @@ public class Format extends BukkitCommand {
 					if (action.equalsIgnoreCase("create")) {
 						try {
 							NiftyChat.getSQL().update(StringUtil.format("INSERT INTO {0} (rank, _group, _format) VALUES (?, ?, ?);", Config.FORMAT_TABLE), rank, group, format);
-						} catch (MySQLIntegrityConstraintViolationException ex) {
+						} catch (SQLIntegrityConstraintViolationException ex) {
 							this.getLog().error(sender, "The format entry for {{0}} already exists!", rank);
 						}
 					} else {

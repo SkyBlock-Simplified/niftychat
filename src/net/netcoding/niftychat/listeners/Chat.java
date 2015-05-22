@@ -5,13 +5,13 @@ import java.util.regex.Pattern;
 import net.netcoding.niftybukkit.NiftyBukkit;
 import net.netcoding.niftybukkit.minecraft.BukkitHelper;
 import net.netcoding.niftybukkit.minecraft.BukkitListener;
-import net.netcoding.niftybukkit.mojang.MojangProfile;
-import net.netcoding.niftybukkit.util.RegexUtil;
-import net.netcoding.niftybukkit.util.StringUtil;
+import net.netcoding.niftybukkit.mojang.BukkitMojangProfile;
 import net.netcoding.niftychat.cache.CensorData;
 import net.netcoding.niftychat.cache.RankFormat;
 import net.netcoding.niftychat.cache.UserChatData;
 import net.netcoding.niftychat.commands.Mute;
+import net.netcoding.niftycore.util.RegexUtil;
+import net.netcoding.niftycore.util.StringUtil;
 
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
@@ -27,7 +27,7 @@ public class Chat extends BukkitListener {
 	}
 
 	public static boolean check(BukkitHelper helper, Player player, String message) {
-		MojangProfile profile = NiftyBukkit.getMojangRepository().searchByPlayer(player);
+		BukkitMojangProfile profile = NiftyBukkit.getMojangRepository().searchByPlayer(player);
 		UserChatData userData = UserChatData.getCache(profile);
 		String stripMessage = RegexUtil.strip(message, RegexUtil.REPLACE_ALL_PATTERN);
 
@@ -139,7 +139,7 @@ public class Chat extends BukkitListener {
 	@EventHandler(priority = EventPriority.LOW)
 	public void onPlayerChat(AsyncPlayerChatEvent event) {
 		Player player = event.getPlayer();
-		MojangProfile profile = NiftyBukkit.getMojangRepository().searchByPlayer(player);
+		BukkitMojangProfile profile = NiftyBukkit.getMojangRepository().searchByPlayer(player);
 		UserChatData userData = UserChatData.getCache(profile);
 
 		String rank = userData.getRankData().getPrimaryRank();

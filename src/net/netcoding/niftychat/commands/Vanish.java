@@ -2,11 +2,11 @@ package net.netcoding.niftychat.commands;
 
 import net.netcoding.niftybukkit.NiftyBukkit;
 import net.netcoding.niftybukkit.minecraft.BukkitCommand;
-import net.netcoding.niftybukkit.mojang.MojangProfile;
-import net.netcoding.niftybukkit.mojang.exceptions.ProfileNotFoundException;
-import net.netcoding.niftybukkit.util.StringUtil;
+import net.netcoding.niftybukkit.mojang.BukkitMojangProfile;
 import net.netcoding.niftychat.cache.Config;
 import net.netcoding.niftychat.cache.UserChatData;
+import net.netcoding.niftycore.mojang.exceptions.ProfileNotFoundException;
+import net.netcoding.niftycore.util.StringUtil;
 
 import org.bukkit.ChatColor;
 import org.bukkit.command.CommandSender;
@@ -24,7 +24,7 @@ public class Vanish extends BukkitCommand {
 
 	@Override
 	protected void onCommand(CommandSender sender, String alias, String[] args) throws Exception {
-		MojangProfile profile;
+		BukkitMojangProfile profile;
 		String server = Config.getServerNameFromArgs(args, (args.length > 0));
 		String playerName = args.length == 0 ? sender.getName() : args[0];
 		playerName = NiftyBukkit.getBungeeHelper().isDetected() ? !NiftyBukkit.getBungeeHelper().getServerName().equals(server) ? args.length == 1 ? sender.getName() : playerName : playerName : playerName;

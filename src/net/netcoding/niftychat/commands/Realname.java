@@ -8,16 +8,16 @@ import java.util.List;
 import java.util.UUID;
 
 import net.netcoding.niftybukkit.NiftyBukkit;
-import net.netcoding.niftybukkit.database.factory.callbacks.ResultCallback;
 import net.netcoding.niftybukkit.minecraft.BukkitCommand;
-import net.netcoding.niftybukkit.minecraft.BungeeServer;
-import net.netcoding.niftybukkit.mojang.MojangProfile;
-import net.netcoding.niftybukkit.mojang.exceptions.ProfileNotFoundException;
-import net.netcoding.niftybukkit.util.ListUtil;
-import net.netcoding.niftybukkit.util.StringUtil;
+import net.netcoding.niftybukkit.minecraft.messages.BungeeServer;
+import net.netcoding.niftybukkit.mojang.BukkitMojangProfile;
 import net.netcoding.niftychat.NiftyChat;
 import net.netcoding.niftychat.cache.Config;
 import net.netcoding.niftychat.cache.UserChatData;
+import net.netcoding.niftycore.database.factory.callbacks.ResultCallback;
+import net.netcoding.niftycore.mojang.exceptions.ProfileNotFoundException;
+import net.netcoding.niftycore.util.ListUtil;
+import net.netcoding.niftycore.util.StringUtil;
 
 import org.bukkit.command.CommandSender;
 import org.bukkit.plugin.java.JavaPlugin;
@@ -29,8 +29,8 @@ public class Realname extends BukkitCommand {
 		this.setPlayerTabComplete();
 	}
 
-	public static HashSet<MojangProfile> getProfileMatches(String lookup) throws Exception {
-		MojangProfile profile;
+	public static HashSet<BukkitMojangProfile> getProfileMatches(String lookup) throws Exception {
+		BukkitMojangProfile profile;
 		String profileLookup = "";
 
 		try {
@@ -38,17 +38,14 @@ public class Realname extends BukkitCommand {
 			profileLookup = profile.getUniqueId().toString();
 		} catch (ProfileNotFoundException pnfe) { }
 
-		final HashSet<MojangProfile> profiles = NiftyChat.getSQL().query(StringUtil.format("SELECT uuid FROM {0} WHERE LOWER(ufnick) = ? OR LOWER(ufnick) LIKE ? OR uuid = ? ORDER BY ufnick;", Config.USER_TABLE), new ResultCallback<HashSet<MojangProfile>>() {
+		final HashSet<BukkitMojangProfile> profiles = NiftyChat.getSQL().query(StringUtil.format("SELECT uuid FROM {0} WHERE LOWER(ufnick) = ? OR LOWER(ufnick) LIKE ? OR uuid = ? ORDER BY ufnick;", Config.USER_TABLE), new ResultCallback<HashSet<BukkitMojangProfile>>() {
 			@Override
-			public HashSet<MojangProfile> handle(ResultSet result) throws SQLException {
-				HashSet<MojangProfile> data = new HashSet<>();
+			public HashSet<BukkitMojangProfile> handle(ResultSet result) throws SQLException {
+				HashSet<BukkitMojangProfile> data = new HashSet<>();
 
 				while (result.next()) {
-					MojangProfile profile;
-
 					try {
-						profile = NiftyBukkit.getMojangRepository().searchByUniqueId(UUID.fromString(result.getString("uuid")));
-						data.add(profile);
+						data.add(NiftyBukkit.getMojangRepository().searchByUniqueId(UUID.fromString(result.getString("uuid"))));
 					} catch (ProfileNotFoundException pnfe) { }
 				}
 
@@ -66,10 +63,10 @@ public class Realname extends BukkitCommand {
 			return;
 		}
 
-		HashSet<MojangProfile> profiles = getProfileMatches(args[0]);
+		HashSet<BukkitMojangProfile> profiles = getProfileMatches(args[0]);
 
 		if (ListUtil.notEmpty(profiles)) {
-			for (MojangProfile profile : profiles) {
+			for (BukkitMojangProfile profile : profiles) {
 				UserChatData userData = UserChatData.getCache(profile);
 
 				if (!profile.getName().equals(userData.getStrippedDisplayName()))
@@ -88,7 +85,7 @@ public class Realname extends BukkitCommand {
 
 		if (NiftyBukkit.getBungeeHelper().isDetected()) {
 			for (BungeeServer server : NiftyBukkit.getBungeeHelper().getServers()) {
-				for (MojangProfile profile : server.getPlayerList()) {
+				for (BukkitMojangProfile profile : server.getPlayerList()) {
 					UserChatData userData = UserChatData.getCache(profile);
 					String displayName = userData.getStrippedDisplayName();
 

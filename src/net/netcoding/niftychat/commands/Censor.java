@@ -5,12 +5,12 @@ import java.util.regex.Pattern;
 import java.util.regex.PatternSyntaxException;
 
 import net.netcoding.niftybukkit.minecraft.BukkitCommand;
-import net.netcoding.niftybukkit.util.NumberUtil;
-import net.netcoding.niftybukkit.util.StringUtil;
-import net.netcoding.niftybukkit.util.concurrent.ConcurrentSet;
 import net.netcoding.niftychat.NiftyChat;
 import net.netcoding.niftychat.cache.CensorData;
 import net.netcoding.niftychat.cache.Config;
+import net.netcoding.niftycore.util.NumberUtil;
+import net.netcoding.niftycore.util.StringUtil;
+import net.netcoding.niftycore.util.concurrent.ConcurrentSet;
 
 import org.bukkit.ChatColor;
 import org.bukkit.command.CommandSender;

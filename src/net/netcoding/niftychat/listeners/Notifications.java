@@ -7,15 +7,15 @@ import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 
-import net.netcoding.niftybukkit.database.factory.callbacks.VoidResultCallback;
-import net.netcoding.niftybukkit.database.notifications.DatabaseListener;
-import net.netcoding.niftybukkit.database.notifications.DatabaseNotification;
-import net.netcoding.niftybukkit.database.notifications.TriggerEvent;
 import net.netcoding.niftychat.cache.CensorData;
 import net.netcoding.niftychat.cache.Config;
 import net.netcoding.niftychat.cache.RankFormat;
 import net.netcoding.niftychat.cache.UserChatData;
 import net.netcoding.niftychat.cache.UserFlagData;
+import net.netcoding.niftycore.database.factory.callbacks.VoidResultCallback;
+import net.netcoding.niftycore.database.notifications.DatabaseListener;
+import net.netcoding.niftycore.database.notifications.DatabaseNotification;
+import net.netcoding.niftycore.database.notifications.TriggerEvent;
 
 public class Notifications implements DatabaseListener {
 

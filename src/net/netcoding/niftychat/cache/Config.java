@@ -1,10 +1,10 @@
 package net.netcoding.niftychat.cache;
 
 import net.netcoding.niftybukkit.NiftyBukkit;
-import net.netcoding.niftybukkit.database.MySQL;
-import net.netcoding.niftybukkit.yaml.ConfigSection;
-import net.netcoding.niftybukkit.yaml.SQLConfig;
-import net.netcoding.niftybukkit.yaml.exceptions.InvalidConfigurationException;
+import net.netcoding.niftycore.database.MySQL;
+import net.netcoding.niftycore.yaml.ConfigSection;
+import net.netcoding.niftycore.yaml.SQLConfig;
+import net.netcoding.niftycore.yaml.exceptions.InvalidConfigurationException;
 
 import org.bukkit.plugin.java.JavaPlugin;
 
@@ -19,7 +19,7 @@ public class Config extends SQLConfig<MySQL> {
 	public static final String SERVER_FLAGS_TABLE = TABLE_PREFIX + "flags_servers";
 
 	public Config(JavaPlugin plugin) throws Exception {
-		super(plugin, "config");
+		super(plugin.getDataFolder(), "config");
 	}
 
 	public static boolean isForcedCommand(String alias) {

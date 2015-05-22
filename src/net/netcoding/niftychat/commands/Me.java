@@ -2,9 +2,10 @@ package net.netcoding.niftychat.commands;
 
 import net.netcoding.niftybukkit.NiftyBukkit;
 import net.netcoding.niftybukkit.minecraft.BukkitCommand;
-import net.netcoding.niftybukkit.mojang.MojangProfile;
-import net.netcoding.niftybukkit.util.StringUtil;
+import net.netcoding.niftybukkit.mojang.BukkitMojangProfile;
 import net.netcoding.niftychat.listeners.Chat;
+import net.netcoding.niftycore.mojang.MojangProfile;
+import net.netcoding.niftycore.util.StringUtil;
 
 import org.bukkit.ChatColor;
 import org.bukkit.command.CommandSender;
@@ -38,7 +39,7 @@ public class Me extends BukkitCommand {
 		this.getLog().message(this.getPlugin().getServer().getConsoleSender(), message);
 
 		for (MojangProfile profile : NiftyBukkit.getBungeeHelper().getPlayerList())
-			this.getLog().message(profile.getOfflinePlayer().getPlayer(), message);
+			this.getLog().message(((BukkitMojangProfile)profile).getOfflinePlayer().getPlayer(), message);
 	}
 
 }

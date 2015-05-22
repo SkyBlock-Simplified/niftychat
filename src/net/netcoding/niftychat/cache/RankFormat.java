@@ -3,11 +3,11 @@ package net.netcoding.niftychat.cache;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 
-import net.netcoding.niftybukkit.database.factory.callbacks.VoidResultCallback;
-import net.netcoding.niftybukkit.util.RegexUtil;
-import net.netcoding.niftybukkit.util.StringUtil;
-import net.netcoding.niftybukkit.util.concurrent.ConcurrentSet;
 import net.netcoding.niftychat.NiftyChat;
+import net.netcoding.niftycore.database.factory.callbacks.VoidResultCallback;
+import net.netcoding.niftycore.util.RegexUtil;
+import net.netcoding.niftycore.util.StringUtil;
+import net.netcoding.niftycore.util.concurrent.ConcurrentSet;
 
 public class RankFormat {
 
@@ -75,7 +75,7 @@ public class RankFormat {
 		return this.suffix;
 	}
 
-	public static void reload() {
+	public static void reload() throws SQLException {
 		CACHE.clear();
 
 		NiftyChat.getSQL().queryAsync(StringUtil.format("SELECT * FROM {0};", Config.FORMAT_TABLE), new VoidResultCallback() {

@@ -5,12 +5,12 @@ import java.util.List;
 
 import net.netcoding.niftybukkit.NiftyBukkit;
 import net.netcoding.niftybukkit.minecraft.BukkitCommand;
-import net.netcoding.niftybukkit.minecraft.BungeeServer;
-import net.netcoding.niftybukkit.mojang.MojangProfile;
-import net.netcoding.niftybukkit.util.ListUtil;
-import net.netcoding.niftybukkit.util.RegexUtil;
-import net.netcoding.niftybukkit.util.StringUtil;
+import net.netcoding.niftybukkit.minecraft.messages.BungeeServer;
+import net.netcoding.niftybukkit.mojang.BukkitMojangProfile;
 import net.netcoding.niftychat.cache.UserChatData;
+import net.netcoding.niftycore.util.ListUtil;
+import net.netcoding.niftycore.util.RegexUtil;
+import net.netcoding.niftycore.util.StringUtil;
 
 import org.bukkit.ChatColor;
 import org.bukkit.command.CommandSender;
@@ -22,8 +22,6 @@ public class GList extends BukkitCommand {
 	public GList(JavaPlugin plugin) {
 		super(plugin, "list");
 		this.setMinimumArgsLength(0);
-		this.editUsage(0, "glist", "[server]");
-		this.editUsage(0, "gonline", "[server]");
 	}
 
 	@Override
@@ -41,6 +39,18 @@ public class GList extends BukkitCommand {
 				if (selected != null) {
 					totalPlayers = selected.getPlayerCount();
 					maxPlayers = selected.getMaxPlayers();
+
+					if (this.hasPermissions(sender, "debug") && args.length > 1) {
+						this.getLog().message(sender, "[DEBUG]");
+						this.getLog().message(sender, " Online: {{0}}", selected.isOnline() ? "Yes" : "No");
+						this.getLog().message(sender, " Count: {{0}}", totalPlayers);
+						this.getLog().message(sender, " Max: {{0}}", maxPlayers);
+						this.getLog().message(sender, " Motd: {{0}}", selected.getMotd());
+						this.getLog().message(sender, " Version: {{0}}", selected.getVersion().getName());
+						this.getLog().message(sender, " Protocol: {{0}}", selected.getVersion().getProtocol());
+						this.getLog().message(sender, "[/DEBUG]");
+						this.getLog().message(sender, "");
+					}
 				}
 			} else
 				selected = NiftyBukkit.getBungeeHelper().getServer();
@@ -48,7 +58,7 @@ public class GList extends BukkitCommand {
 
 		if (!NiftyBukkit.getBungeeHelper().isDetected() || alias.matches("^list|online$") || !selected.equals(NiftyBukkit.getBungeeHelper().getServer())) {
 			List<String> nameList = new ArrayList<>();
-			List<MojangProfile> profiles = new ArrayList<>();
+			List<BukkitMojangProfile> profiles = new ArrayList<>();
 			String serverName = NiftyBukkit.getBungeeHelper().isDetected() ? selected.getName() : "*";
 
 			if (!NiftyBukkit.getBungeeHelper().isDetected()) {
@@ -62,7 +72,7 @@ public class GList extends BukkitCommand {
 			}
 
 			if (profiles.size() > 0) {
-				for (MojangProfile profile : profiles) {
+				for (BukkitMojangProfile profile : profiles) {
 					UserChatData userData = UserChatData.getCache(profile);
 					boolean isVanished = userData.getFlagData(Vanish.FLAG, serverName).getValue();
 					String displayName = isVanished ? StringUtil.format("{{0}}{1}", "*", userData.getDisplayName()) : userData.getDisplayName();
@@ -91,7 +101,7 @@ public class GList extends BukkitCommand {
 					if (server.getPlayerCount() > 0) {
 						List<String> nameList = new ArrayList<>();
 
-						for (MojangProfile profile : server.getPlayerList()) {
+						for (BukkitMojangProfile profile : server.getPlayerList()) {
 							UserChatData userData = UserChatData.getCache(profile);
 							boolean isVanished = userData.getFlagData(Vanish.FLAG, server.getName()).getValue();
 							String displayName = isVanished ? StringUtil.format("{{0}}{1}", "*", userData.getDisplayName()) : userData.getDisplayName();

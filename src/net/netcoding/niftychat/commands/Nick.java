@@ -5,15 +5,15 @@ import java.sql.SQLException;
 import java.util.regex.Pattern;
 
 import net.netcoding.niftybukkit.NiftyBukkit;
-import net.netcoding.niftybukkit.database.factory.callbacks.ResultCallback;
 import net.netcoding.niftybukkit.minecraft.BukkitCommand;
-import net.netcoding.niftybukkit.mojang.MojangProfile;
-import net.netcoding.niftybukkit.mojang.exceptions.ProfileNotFoundException;
-import net.netcoding.niftybukkit.util.RegexUtil;
-import net.netcoding.niftybukkit.util.StringUtil;
+import net.netcoding.niftybukkit.mojang.BukkitMojangProfile;
 import net.netcoding.niftychat.NiftyChat;
 import net.netcoding.niftychat.cache.Config;
 import net.netcoding.niftychat.cache.UserChatData;
+import net.netcoding.niftycore.database.factory.callbacks.ResultCallback;
+import net.netcoding.niftycore.mojang.exceptions.ProfileNotFoundException;
+import net.netcoding.niftycore.util.RegexUtil;
+import net.netcoding.niftycore.util.StringUtil;
 
 import org.bukkit.ChatColor;
 import org.bukkit.command.CommandSender;
@@ -47,7 +47,7 @@ public class Nick extends BukkitCommand {
 		boolean clear = _nick.matches("^off|clear$");
 		boolean revoke = _nick.matches("^revoke|disable$");
 		boolean grant = _nick.matches("^grant|allow|enable$");
-		MojangProfile profile = null;
+		BukkitMojangProfile profile = null;
 
 		if (isConsole(playerName)) {
 			this.getLog().error(sender, "You cannot nickname the console!");

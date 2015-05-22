@@ -6,13 +6,13 @@ import java.util.Date;
 import net.netcoding.niftybukkit.NiftyBukkit;
 import net.netcoding.niftybukkit.minecraft.BukkitCommand;
 import net.netcoding.niftybukkit.minecraft.BukkitLogger;
-import net.netcoding.niftybukkit.mojang.MojangProfile;
-import net.netcoding.niftybukkit.mojang.exceptions.ProfileNotFoundException;
-import net.netcoding.niftybukkit.util.StringUtil;
-import net.netcoding.niftybukkit.util.TimeUtil;
+import net.netcoding.niftybukkit.mojang.BukkitMojangProfile;
 import net.netcoding.niftychat.cache.Config;
 import net.netcoding.niftychat.cache.UserChatData;
 import net.netcoding.niftychat.cache.UserFlagData;
+import net.netcoding.niftycore.mojang.exceptions.ProfileNotFoundException;
+import net.netcoding.niftycore.util.StringUtil;
+import net.netcoding.niftycore.util.TimeUtil;
 
 import org.bukkit.ChatColor;
 import org.bukkit.command.CommandSender;
@@ -39,7 +39,7 @@ public class Mute extends BukkitCommand {
 	@Override
 	protected void onCommand(CommandSender sender, String alias, String[] args) throws Exception {
 		String playerName = args[0];
-		MojangProfile profile;
+		BukkitMojangProfile profile;
 		long expires = args.length >= 2 ? System.currentTimeMillis() + TimeUtil.getDateTime(args[1]) : 0;
 		String server = Config.getServerNameFromArgs(args, ((args.length == 2 && expires == 0) || args.length == 3));
 

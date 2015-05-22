@@ -1,14 +1,14 @@
 package net.netcoding.niftychat.listeners;
 
 import net.netcoding.niftybukkit.minecraft.BukkitListener;
-import net.netcoding.niftybukkit.minecraft.BungeeHelper;
 import net.netcoding.niftybukkit.minecraft.events.BungeeLoadedEvent;
 import net.netcoding.niftybukkit.minecraft.events.PlayerPostLoginEvent;
-import net.netcoding.niftybukkit.util.StringUtil;
+import net.netcoding.niftybukkit.minecraft.messages.BungeeHelper;
 import net.netcoding.niftychat.NiftyChat;
 import net.netcoding.niftychat.cache.Config;
 import net.netcoding.niftychat.cache.UserChatData;
 import net.netcoding.niftychat.commands.Vanish;
+import net.netcoding.niftycore.util.StringUtil;
 
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.player.PlayerJoinEvent;

@@ -3,12 +3,12 @@ package net.netcoding.niftychat.commands;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 
-import net.netcoding.niftybukkit.database.factory.callbacks.ResultCallback;
 import net.netcoding.niftybukkit.minecraft.BukkitCommand;
-import net.netcoding.niftybukkit.util.RegexUtil;
-import net.netcoding.niftybukkit.util.StringUtil;
 import net.netcoding.niftychat.NiftyChat;
 import net.netcoding.niftychat.cache.Config;
+import net.netcoding.niftycore.database.factory.callbacks.ResultCallback;
+import net.netcoding.niftycore.util.RegexUtil;
+import net.netcoding.niftycore.util.StringUtil;
 import net.netcoding.niftyranks.cache.UserRankData;
 
 import org.bukkit.command.CommandSender;

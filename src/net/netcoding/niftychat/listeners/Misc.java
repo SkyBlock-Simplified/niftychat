@@ -6,11 +6,11 @@ import java.util.List;
 import net.netcoding.niftybukkit.NiftyBukkit;
 import net.netcoding.niftybukkit.minecraft.BukkitListener;
 import net.netcoding.niftybukkit.minecraft.events.PlayerNameChangeEvent;
-import net.netcoding.niftybukkit.mojang.MojangProfile;
-import net.netcoding.niftybukkit.mojang.exceptions.ProfileNotFoundException;
+import net.netcoding.niftybukkit.mojang.BukkitMojangProfile;
 import net.netcoding.niftychat.cache.UserChatData;
 import net.netcoding.niftychat.commands.Mute;
 import net.netcoding.niftychat.commands.Vanish;
+import net.netcoding.niftycore.mojang.exceptions.ProfileNotFoundException;
 import net.netcoding.niftyranks.events.RankChangeEvent;
 
 import org.bukkit.Material;
@@ -33,16 +33,19 @@ public class Misc extends BukkitListener {
 		Material type = event.getBlock().getType();
 
 		if (Material.SIGN_POST.equals(type) || Material.WALL_SIGN.equals(type)) {
-			MojangProfile profile = NiftyBukkit.getMojangRepository().searchByPlayer(event.getPlayer());
+			BukkitMojangProfile profile = NiftyBukkit.getMojangRepository().searchByPlayer(event.getPlayer());
 			UserChatData userData = UserChatData.getCache(profile);
 			event.setCancelled(userData.getFlagData(Mute.FLAG).getValue());
+
+			if (event.isCancelled())
+				this.getLog().console("{0} was seen as muted, sign create blocked!", profile.getName());
 		}
 	}
 
 	@EventHandler
 	public void onPlayerInteract(PlayerInteractEvent event) {
 		if (event.getItem() != null && BOOKS.contains(event.getItem().getType())) {
-			MojangProfile profile = NiftyBukkit.getMojangRepository().searchByPlayer(event.getPlayer());
+			BukkitMojangProfile profile = NiftyBukkit.getMojangRepository().searchByPlayer(event.getPlayer());
 			UserChatData userData = UserChatData.getCache(profile);
 			event.setCancelled(userData.getFlagData(Mute.FLAG).getValue());
 		}
@@ -51,9 +54,11 @@ public class Misc extends BukkitListener {
 	@EventHandler
 	public void onPlayerMove(PlayerMoveEvent event) {
 		try {
-			MojangProfile profile = NiftyBukkit.getMojangRepository().searchByPlayer(event.getPlayer());
+			BukkitMojangProfile profile = NiftyBukkit.getMojangRepository().searchByPlayer(event.getPlayer());
 			UserChatData userData = UserChatData.getCache(profile);
-			if (userData.getOfflinePlayer().isOnline()) userData.setMoved();
+
+			if (userData.isOnlineLocally())
+				userData.setMoved();
 		} catch (ProfileNotFoundException pfne) { }
 	}
 
@@ -61,7 +66,7 @@ public class Misc extends BukkitListener {
 	public void onPlayerNameChange(PlayerNameChangeEvent event) {
 		UserChatData userData = UserChatData.getCache(event.getProfile());
 
-		if (userData.getOfflinePlayer().isOnline()) {
+		if (userData.isOnlineLocally()) {
 			userData.updateDisplayName();
 			userData.updateTabListName();
 			userData.applyFlagData(Vanish.FLAG);
@@ -72,7 +77,7 @@ public class Misc extends BukkitListener {
 	public void onRankChangeEvent(RankChangeEvent event) {
 		UserChatData userData = UserChatData.getCache(event.getProfile());
 
-		if (userData.getOfflinePlayer().isOnline()) {
+		if (userData.isOnlineLocally()) {
 			userData.updateDisplayName();
 			userData.updateTabListName();
 			userData.applyFlagData(Vanish.FLAG);

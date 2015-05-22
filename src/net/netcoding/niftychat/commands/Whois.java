@@ -8,13 +8,13 @@ import java.util.List;
 
 import net.netcoding.niftybukkit.NiftyBukkit;
 import net.netcoding.niftybukkit.minecraft.BukkitCommand;
-import net.netcoding.niftybukkit.mojang.MojangProfile;
-import net.netcoding.niftybukkit.util.ListUtil;
-import net.netcoding.niftybukkit.util.NumberUtil;
-import net.netcoding.niftybukkit.util.StringUtil;
-import net.netcoding.niftybukkit.util.concurrent.ConcurrentList;
+import net.netcoding.niftybukkit.mojang.BukkitMojangProfile;
 import net.netcoding.niftychat.cache.UserChatData;
 import net.netcoding.niftychat.cache.UserFlagData;
+import net.netcoding.niftycore.util.ListUtil;
+import net.netcoding.niftycore.util.NumberUtil;
+import net.netcoding.niftycore.util.StringUtil;
+import net.netcoding.niftycore.util.concurrent.ConcurrentList;
 
 import org.bukkit.ChatColor;
 import org.bukkit.command.CommandSender;
@@ -39,7 +39,7 @@ public class Whois extends BukkitCommand {
 			return;
 		}
 
-		HashSet<MojangProfile> profiles = Realname.getProfileMatches(args[0]);
+		HashSet<BukkitMojangProfile> profiles = Realname.getProfileMatches(args[0]);
 
 		if (ListUtil.isEmpty(profiles)) {
 			this.getLog().error(sender, "Unable to locate the profile of {{0}}!", args[0]);

@@ -1,8 +1,8 @@
 package net.netcoding.niftychat.cache;
 
 import net.netcoding.niftybukkit.NiftyBukkit;
-import net.netcoding.niftybukkit.minecraft.BungeeServer;
-import net.netcoding.niftybukkit.util.StringUtil;
+import net.netcoding.niftybukkit.minecraft.messages.BungeeServer;
+import net.netcoding.niftycore.util.StringUtil;
 
 public class UserFlagData {
 

@@ -9,34 +9,35 @@ import java.util.HashSet;
 import java.util.List;
 
 import net.netcoding.niftybukkit.NiftyBukkit;
-import net.netcoding.niftybukkit.database.factory.callbacks.ResultCallback;
-import net.netcoding.niftybukkit.minecraft.BungeeServer;
-import net.netcoding.niftybukkit.mojang.MojangCache;
-import net.netcoding.niftybukkit.mojang.MojangProfile;
-import net.netcoding.niftybukkit.util.ListUtil;
-import net.netcoding.niftybukkit.util.RegexUtil;
-import net.netcoding.niftybukkit.util.StringUtil;
-import net.netcoding.niftybukkit.util.TimeUtil;
-import net.netcoding.niftybukkit.util.concurrent.ConcurrentSet;
+import net.netcoding.niftybukkit.minecraft.messages.BungeeServer;
+import net.netcoding.niftybukkit.mojang.BukkitMojangCache;
+import net.netcoding.niftybukkit.mojang.BukkitMojangProfile;
 import net.netcoding.niftychat.NiftyChat;
 import net.netcoding.niftychat.commands.Vanish;
+import net.netcoding.niftycore.database.factory.callbacks.ResultCallback;
+import net.netcoding.niftycore.mojang.MojangProfile;
+import net.netcoding.niftycore.util.ListUtil;
+import net.netcoding.niftycore.util.RegexUtil;
+import net.netcoding.niftycore.util.StringUtil;
+import net.netcoding.niftycore.util.TimeUtil;
+import net.netcoding.niftycore.util.concurrent.ConcurrentSet;
 import net.netcoding.niftyranks.cache.UserRankData;
 
 import org.bukkit.plugin.java.JavaPlugin;
 
-public class UserChatData extends MojangCache {
+public class UserChatData extends BukkitMojangCache {
 
 	private static final transient ConcurrentSet<UserChatData> CACHE = new ConcurrentSet<>();
 	private String lastMessage;
-	private MojangProfile lastMessenger;
+	private BukkitMojangProfile lastMessenger;
 	private boolean hasMoved = false;
 	private HashSet<UserFlagData> flagData = new HashSet<>();
 
-	public UserChatData(JavaPlugin plugin, MojangProfile profile) {
+	public UserChatData(JavaPlugin plugin, BukkitMojangProfile profile) {
 		this(plugin, profile, true);
 	}
 
-	private UserChatData(JavaPlugin plugin, MojangProfile profile, boolean addToCache) {
+	private UserChatData(JavaPlugin plugin, BukkitMojangProfile profile, boolean addToCache) {
 		super(plugin, profile);
 		if (addToCache) CACHE.add(this);
 	}
@@ -80,10 +81,10 @@ public class UserChatData extends MojangCache {
 		return CACHE;
 	}
 
-	public static UserChatData getCache(MojangProfile profile) {
-		for (MojangCache data : getCache()) {
+	public static UserChatData getCache(BukkitMojangProfile profile) {
+		for (UserChatData data : getCache()) {
 			if (profile.equals(data.getProfile()))
-				return (UserChatData)data;
+				return data;
 		}
 
 		return new UserChatData(NiftyChat.getPlugin(NiftyChat.class), profile, false);
@@ -104,7 +105,7 @@ public class UserChatData extends MojangCache {
 		}
 	}
 
-	private static String _getDisplayName(final MojangProfile profile) throws SQLException {
+	private static String _getDisplayName(final BukkitMojangProfile profile) throws SQLException {
 		return NiftyChat.getSQL().query(StringUtil.format("SELECT * FROM {0} WHERE uuid = ?;", Config.USER_TABLE), new ResultCallback<String>() {
 			@Override
 			public String handle(ResultSet result) throws SQLException {
@@ -229,7 +230,7 @@ public class UserChatData extends MojangCache {
 		return NiftyChat.getSQL().update(StringUtil.format("DELETE FROM {0} WHERE uuid = ? AND flag = ? AND (server = ? OR \"\" = ?);", Config.USER_FLAGS_TABLE), this.getProfile().getUniqueId(), flag, server, server);
 	}
 
-	public void setLastMessenger(MojangProfile profile) {
+	public void setLastMessenger(BukkitMojangProfile profile) {
 		this.lastMessenger = profile;
 	}
 

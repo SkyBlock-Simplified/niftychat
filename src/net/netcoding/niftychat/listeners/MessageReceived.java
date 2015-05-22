@@ -2,11 +2,11 @@ package net.netcoding.niftychat.listeners;
 
 import net.netcoding.niftybukkit.NiftyBukkit;
 import net.netcoding.niftybukkit.minecraft.BukkitHelper;
-import net.netcoding.niftybukkit.minecraft.BungeeListener;
-import net.netcoding.niftybukkit.util.DataUtil;
+import net.netcoding.niftybukkit.minecraft.messages.BungeeListener;
 import net.netcoding.niftychat.cache.Config;
 import net.netcoding.niftychat.cache.UserChatData;
 import net.netcoding.niftychat.commands.Message;
+import net.netcoding.niftycore.util.DataUtil;
 
 import org.bukkit.plugin.java.JavaPlugin;
 

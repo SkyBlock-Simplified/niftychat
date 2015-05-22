@@ -1,8 +1,6 @@
 package net.netcoding.niftychat;
 
-import net.netcoding.niftybukkit.database.factory.SQLWrapper;
 import net.netcoding.niftybukkit.minecraft.BukkitPlugin;
-import net.netcoding.niftybukkit.util.StringUtil;
 import net.netcoding.niftychat.cache.CensorData;
 import net.netcoding.niftychat.cache.Config;
 import net.netcoding.niftychat.cache.RankFormat;
@@ -23,6 +21,8 @@ import net.netcoding.niftychat.listeners.Disconnect;
 import net.netcoding.niftychat.listeners.Login;
 import net.netcoding.niftychat.listeners.Misc;
 import net.netcoding.niftychat.listeners.Notifications;
+import net.netcoding.niftycore.database.factory.SQLWrapper;
+import net.netcoding.niftycore.util.StringUtil;
 
 public class NiftyChat extends BukkitPlugin {
 
@@ -84,11 +84,20 @@ public class NiftyChat extends BukkitPlugin {
 		new Login(this);
 		new Misc(this);
 
-		this.getLog().console("Loading Censor List");
-		CensorData.reload();
+		try {
+			this.getLog().console("Loading Censor List");
+			CensorData.reload();
+		} catch (Exception ex) {
+			this.getLog().console("Unable to load censor list!", ex);
+		}
 
-		this.getLog().console("Loading Rank Formats");
-		RankFormat.reload();
+		try {
+			this.getLog().console("Loading Rank Formats");
+			RankFormat.reload();
+		} catch (Exception ex) {
+			this.getLog().console("Unable to load rank formats!", ex);
+		}
+
 	}
 
 	@Override

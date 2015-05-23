@@ -18,11 +18,6 @@
 		</dependency>
 		<dependency>
 			<groupId>net.netcoding</groupId>
-			<artifactId>niftycore</artifactId>
-			<scope>provided</scope>
-		</dependency>
-		<dependency>
-			<groupId>net.netcoding</groupId>
 			<artifactId>niftybukkit</artifactId>
 			<scope>provided</scope>
 		</dependency>

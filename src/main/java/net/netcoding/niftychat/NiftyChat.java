@@ -30,8 +30,8 @@ public class NiftyChat extends BukkitPlugin {
 
 	@Override
 	public void onEnable() {
-		this.getLog().console("Loading SQL Config");
 		try {
+			this.getLog().console("Loading SQL Config");
 			(pluginConfig = new Config(this)).init();
 
 			if (pluginConfig.getSQL() == null) {

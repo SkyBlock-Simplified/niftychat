@@ -26,15 +26,15 @@ import net.netcoding.niftycore.util.StringUtil;
 
 public class NiftyChat extends BukkitPlugin {
 
-	private static transient Config pluginConfig;
+	private static transient Config PLUGIN_CONFIG;
 
 	@Override
 	public void onEnable() {
 		try {
 			this.getLog().console("Loading SQL Config");
-			(pluginConfig = new Config(this)).init();
+			(PLUGIN_CONFIG = new Config(this)).init();
 
-			if (pluginConfig.getSQL() == null) {
+			if (PLUGIN_CONFIG.getSQL() == null) {
 				this.getLog().console("Incomplete MySQL Configuration!");
 				this.setEnabled(false);
 				return;
@@ -107,7 +107,7 @@ public class NiftyChat extends BukkitPlugin {
 	}
 
 	public final static SQLWrapper getSQL() {
-		return pluginConfig.getSQL();
+		return PLUGIN_CONFIG.getSQL();
 	}
 
 	private boolean setupTables() {

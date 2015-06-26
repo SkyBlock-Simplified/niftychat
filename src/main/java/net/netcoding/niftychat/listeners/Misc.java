@@ -1,8 +1,5 @@
 package net.netcoding.niftychat.listeners;
 
-import java.util.Arrays;
-import java.util.List;
-
 import net.netcoding.niftybukkit.NiftyBukkit;
 import net.netcoding.niftybukkit.minecraft.BukkitListener;
 import net.netcoding.niftybukkit.minecraft.events.PlayerNameChangeEvent;
@@ -12,13 +9,15 @@ import net.netcoding.niftychat.commands.Mute;
 import net.netcoding.niftychat.commands.Vanish;
 import net.netcoding.niftycore.mojang.exceptions.ProfileNotFoundException;
 import net.netcoding.niftyranks.events.RankChangeEvent;
-
 import org.bukkit.Material;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.block.BlockPlaceEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.event.player.PlayerMoveEvent;
 import org.bukkit.plugin.java.JavaPlugin;
+
+import java.util.Arrays;
+import java.util.List;
 
 public class Misc extends BukkitListener {
 
@@ -35,7 +34,9 @@ public class Misc extends BukkitListener {
 		if (Material.SIGN_POST.equals(type) || Material.WALL_SIGN.equals(type)) {
 			BukkitMojangProfile profile = NiftyBukkit.getMojangRepository().searchByPlayer(event.getPlayer());
 			UserChatData userData = UserChatData.getCache(profile);
-			event.setCancelled(userData.getFlagData(Mute.FLAG).getValue());
+
+			if (userData.getFlagData(Mute.FLAG).getValue())
+				event.setCancelled(true);
 
 			if (event.isCancelled())
 				this.getLog().console("{0} was seen as muted, sign create blocked!", profile.getName());
@@ -47,7 +48,9 @@ public class Misc extends BukkitListener {
 		if (event.getItem() != null && BOOKS.contains(event.getItem().getType())) {
 			BukkitMojangProfile profile = NiftyBukkit.getMojangRepository().searchByPlayer(event.getPlayer());
 			UserChatData userData = UserChatData.getCache(profile);
-			event.setCancelled(userData.getFlagData(Mute.FLAG).getValue());
+
+			if (userData.getFlagData(Mute.FLAG).getValue())
+				event.setCancelled(true);
 		}
 	}
 

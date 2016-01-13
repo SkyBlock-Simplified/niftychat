@@ -1,8 +1,5 @@
 package net.netcoding.niftychat.commands;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import net.netcoding.niftybukkit.NiftyBukkit;
 import net.netcoding.niftybukkit.minecraft.BukkitCommand;
 import net.netcoding.niftybukkit.minecraft.messages.BungeeServer;
@@ -11,11 +8,13 @@ import net.netcoding.niftychat.cache.UserChatData;
 import net.netcoding.niftycore.util.ListUtil;
 import net.netcoding.niftycore.util.RegexUtil;
 import net.netcoding.niftycore.util.StringUtil;
-
 import org.bukkit.ChatColor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.java.JavaPlugin;
+
+import java.util.ArrayList;
+import java.util.List;
 
 public class GList extends BukkitCommand {
 
@@ -40,15 +39,15 @@ public class GList extends BukkitCommand {
 					totalPlayers = selected.getPlayerCount();
 					maxPlayers = selected.getMaxPlayers();
 
-					if (this.hasPermissions(sender, "debug") && args.length > 1) {
-						this.getLog().message(sender, "[DEBUG]");
-						this.getLog().message(sender, " Online: {{0}}", selected.isOnline() ? "Yes" : "No");
-						this.getLog().message(sender, " Count: {{0}}", totalPlayers);
-						this.getLog().message(sender, " Max: {{0}}", maxPlayers);
-						this.getLog().message(sender, " Motd: {{0}}", selected.getMotd());
-						this.getLog().message(sender, " Version: {{0}}", selected.getVersion().getName());
-						this.getLog().message(sender, " Protocol: {{0}}", selected.getVersion().getProtocol());
-						this.getLog().message(sender, "[/DEBUG]");
+					if (this.hasPermissions(sender, "list", "debug") && args.length > 1 && "^debug|1|y(es)?$".matches(args[1])) {
+						this.getLog().message(sender, "-- DEBUG --");
+						this.getLog().message(sender, "  Online: {{0}}", selected.isOnline() ? "Yes" : "No");
+						this.getLog().message(sender, "  Count: {{0}}", totalPlayers);
+						this.getLog().message(sender, "  Max: {{0}}", maxPlayers);
+						this.getLog().message(sender, "  Motd: {{0}}", selected.getMotd());
+						this.getLog().message(sender, "  Version: {{0}}", selected.getVersion().getName());
+						this.getLog().message(sender, "  Protocol: {{0}}", selected.getVersion().getProtocol());
+						this.getLog().message(sender, "-- DEBUG --");
 						this.getLog().message(sender, "");
 					}
 				}
@@ -129,4 +128,18 @@ public class GList extends BukkitCommand {
 		this.getLog().message(sender, RegexUtil.replaceColor(StringUtil.implode("\n", output), RegexUtil.REPLACE_ALL_PATTERN));
 	}
 
+	@Override
+	protected List<String> onTabComplete(CommandSender sender, String label, String[] args) throws Exception {
+		final String arg = args[0].toLowerCase();
+		List<String> names = new ArrayList<>();
+
+		if (NiftyBukkit.getBungeeHelper().isDetected()) {
+			for (BungeeServer server : NiftyBukkit.getBungeeHelper().getServers()) {
+				if (server.getName().toLowerCase().startsWith(arg) || server.getName().toLowerCase().contains(arg))
+					names.add(server.getName());
+			}
+		}
+
+		return names;
+	}
 }

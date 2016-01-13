@@ -20,7 +20,7 @@ commands:
     usage: /<command> <group|format|prefix|suffix|message> <rank> [value]
   list:
     description: Show all, specific or current servers with player counts and names
-    usage: /<command> [server]
+    usage: /<command> [server] [debug]
     aliases: [glist, online, gonline]
   me:
     description: Sends a minified chat message
@@ -112,6 +112,13 @@ permissions:
             description: Allows you to create and delete rank formats
           niftychat.format.view:
             description: Allows you to view rank format, prefix and suffix
+      niftychat.list.*:
+        description: Allows you to access all list features
+        children:
+          niftychat.list:
+            description: Allows you to list online users
+          niftychat.list.debug:
+            description: Allows you to output debug information when you specify a server
       niftychat.me.*:
         description: Allows you to access all minified chat features
         children:

@@ -39,7 +39,7 @@ public class GList extends BukkitCommand {
 					totalPlayers = selected.getPlayerCount();
 					maxPlayers = selected.getMaxPlayers();
 
-					if (this.hasPermissions(sender, "list", "debug") && args.length > 1 && "^debug|1|y(es)?$".matches(args[1])) {
+					if (this.hasPermissions(sender, "list", "debug") && args.length > 1 && args[1].matches("^(debug|1|y(es)?)$")) {
 						this.getLog().message(sender, "-- DEBUG --");
 						this.getLog().message(sender, "  Online: {{0}}", selected.isOnline() ? "Yes" : "No");
 						this.getLog().message(sender, "  Count: {{0}}", totalPlayers);

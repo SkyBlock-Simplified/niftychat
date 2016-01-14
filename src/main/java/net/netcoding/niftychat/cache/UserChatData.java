@@ -1,13 +1,5 @@
 package net.netcoding.niftychat.cache;
 
-import java.sql.ResultSet;
-import java.sql.SQLException;
-import java.sql.Timestamp;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.HashSet;
-import java.util.List;
-
 import net.netcoding.niftybukkit.NiftyBukkit;
 import net.netcoding.niftybukkit.minecraft.messages.BungeeServer;
 import net.netcoding.niftybukkit.mojang.BukkitMojangCache;
@@ -22,8 +14,15 @@ import net.netcoding.niftycore.util.StringUtil;
 import net.netcoding.niftycore.util.TimeUtil;
 import net.netcoding.niftycore.util.concurrent.ConcurrentSet;
 import net.netcoding.niftyranks.cache.UserRankData;
-
 import org.bukkit.plugin.java.JavaPlugin;
+
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.sql.Timestamp;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.HashSet;
+import java.util.List;
 
 public class UserChatData extends BukkitMojangCache {
 
@@ -219,6 +218,15 @@ public class UserChatData extends BukkitMojangCache {
 			}, this.getProfile().getUniqueId()));
 		} catch (SQLException ex) {
 			this.getLog().console(ex);
+		}
+	}
+
+	public static void removeCache(BukkitMojangProfile profile) {
+		for (UserChatData data : CACHE) {
+			if (data.getProfile().equals(profile)) {
+				CACHE.remove(data);
+				break;
+			}
 		}
 	}
 

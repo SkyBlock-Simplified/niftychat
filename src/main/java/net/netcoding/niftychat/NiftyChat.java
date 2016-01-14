@@ -17,8 +17,7 @@ import net.netcoding.niftychat.commands.SocialSpy;
 import net.netcoding.niftychat.commands.Vanish;
 import net.netcoding.niftychat.commands.Whois;
 import net.netcoding.niftychat.listeners.Chat;
-import net.netcoding.niftychat.listeners.Disconnect;
-import net.netcoding.niftychat.listeners.Login;
+import net.netcoding.niftychat.listeners.Connections;
 import net.netcoding.niftychat.listeners.Misc;
 import net.netcoding.niftychat.listeners.Notifications;
 import net.netcoding.niftycore.database.factory.SQLWrapper;
@@ -80,8 +79,7 @@ public class NiftyChat extends BukkitPlugin {
 
 		this.getLog().console("Registering Listeners");
 		new Chat(this);
-		new Disconnect(this);
-		new Login(this);
+		new Connections(this);
 		new Misc(this);
 
 		try {

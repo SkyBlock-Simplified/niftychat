@@ -1,7 +1,5 @@
 package net.netcoding.niftychat.listeners;
 
-import java.util.regex.Pattern;
-
 import net.netcoding.niftybukkit.NiftyBukkit;
 import net.netcoding.niftybukkit.minecraft.BukkitHelper;
 import net.netcoding.niftybukkit.minecraft.BukkitListener;
@@ -12,13 +10,14 @@ import net.netcoding.niftychat.cache.UserChatData;
 import net.netcoding.niftychat.commands.Mute;
 import net.netcoding.niftycore.util.RegexUtil;
 import net.netcoding.niftycore.util.StringUtil;
-
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.player.AsyncPlayerChatEvent;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.bukkit.scoreboard.Team;
+
+import java.util.regex.Pattern;
 
 public class Chat extends BukkitListener {
 
@@ -157,6 +156,14 @@ public class Chat extends BukkitListener {
 		synchronized (this) {
 			event.setFormat(StringUtil.format(format, group, world, world.substring(0, 1).toUpperCase(), teamName, teamPrefix, teamSuffix));
 		}
+
+		/*Reflection packetChat = new Reflection("PacketPlayOutChat", MinecraftPackage.MINECRAFT_SERVER);
+		Reflection chatSerializer = BukkitReflection.getComatibleReflection("IChatBaseComponent", "ChatSerializer");
+		JsonObject json = new JsonObject();
+		json.addProperty("text", RegexUtil.replaceColor("chat text", RegexUtil.REPLACE_ALL_PATTERN));
+		Object chatJson = chatSerializer.invokeMethod("a", null, json.toString());
+		Object packetChatObj = packetChat.newInstance(chatJson, true);
+		profile.sendPacket(packetChatObj);*/
 	}
 
 }

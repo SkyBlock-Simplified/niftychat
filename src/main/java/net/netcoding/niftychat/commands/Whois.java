@@ -1,11 +1,5 @@
 package net.netcoding.niftychat.commands;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Date;
-import java.util.HashSet;
-import java.util.List;
-
 import net.netcoding.niftybukkit.NiftyBukkit;
 import net.netcoding.niftybukkit.minecraft.BukkitCommand;
 import net.netcoding.niftybukkit.mojang.BukkitMojangProfile;
@@ -15,12 +9,17 @@ import net.netcoding.niftycore.util.ListUtil;
 import net.netcoding.niftycore.util.NumberUtil;
 import net.netcoding.niftycore.util.StringUtil;
 import net.netcoding.niftycore.util.concurrent.ConcurrentList;
-
 import org.bukkit.ChatColor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Damageable;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.java.JavaPlugin;
+
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Date;
+import java.util.HashSet;
+import java.util.List;
 
 public class Whois extends BukkitCommand {
 
@@ -61,7 +60,7 @@ public class Whois extends BukkitCommand {
 		if (alias.matches("^.+?admin$") && this.hasPermissions(sender, "whois", "admin")) {
 			if (userData.isOnlineAnywhere()) {
 				if (!userData.getFlagData(Vanish.FLAG).getValue() || this.hasPermissions(sender, "vanish", "see"))
-					this.getLog().message(sender, "IP Address: {{0}}", userData.getProfile().getAddress().getHostName());
+					this.getLog().message(sender, "Address: {{0}}:{{1}}", userData.getProfile().getAddress().getAddress().getHostAddress(), userData.getProfile().getAddress().getPort());
 			}
 
 			this.getLog().message(sender, "Nickname Access: {{0}}", (!userData.getFlagData("nick-revoke").getValue() ? (ChatColor.GREEN + "Yes") : "No"));

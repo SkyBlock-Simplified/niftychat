@@ -104,7 +104,7 @@ public class NiftyChat extends BukkitPlugin {
 			getSQL().removeListeners();
 	}
 
-	public final static SQLWrapper getSQL() {
+	public static SQLWrapper getSQL() {
 		return PLUGIN_CONFIG.getSQL();
 	}
 

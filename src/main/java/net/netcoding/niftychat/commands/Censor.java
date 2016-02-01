@@ -12,6 +12,8 @@ import org.bukkit.ChatColor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.plugin.java.JavaPlugin;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.regex.Pattern;
 import java.util.regex.PatternSyntaxException;
 
@@ -19,6 +21,8 @@ public class Censor extends BukkitCommand {
 
 	public Censor(JavaPlugin plugin) {
 		super(plugin, "censor");
+		this.editUsage(1, "add", "<regex> [replace]");
+		this.editUsage(1, "edit", "<regex> [replace]");
 		this.editUsage(1, "remove", "<regex>");
 		this.editUsage(1, "list", "");
 		this.editUsage(1, "test", "<regex> <word> [replace]");
@@ -114,7 +118,7 @@ public class Censor extends BukkitCommand {
 					try {
 						message = RegexUtil.replace(message, pattern, replace);
 					} catch (Exception ex) {
-						this.getLog().console(sender, "Error detected in censor! Please check the censor {0} => {1} for message {2}", pattern.toString(), replace, original);
+						this.getLog().error(sender, "Error detected in censor! Please check the censor {0} => {1} for message {2}", pattern.toString(), replace, original);
 						break;
 					}
 
@@ -132,4 +136,17 @@ public class Censor extends BukkitCommand {
 			this.showUsage(sender);
 	}
 
+	@Override
+	protected List<String> onTabComplete(CommandSender sender, String label, String[] args) throws Exception {
+		ConcurrentList<CensorData> censorCache = CensorData.getCache();
+		final String arg = args[1].toLowerCase();
+		List<String> badwords = new ArrayList<>();
+
+		for (CensorData data : censorCache) {
+			if (data.getBadword().startsWith(arg) || data.getBadword().contains(arg))
+				badwords.add(data.getBadword());
+		}
+
+		return badwords;
+	}
 }

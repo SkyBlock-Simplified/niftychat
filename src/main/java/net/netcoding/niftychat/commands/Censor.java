@@ -33,11 +33,6 @@ public class Censor extends BukkitCommand {
 		String action = args[0].toLowerCase();
 
 		if (action.equalsIgnoreCase("list")) {
-			if (!this.hasPermissions(sender, "censor", "list")) {
-				this.getLog().error(sender, "You do not have permission to list the censor!");
-				return;
-			}
-
 			if (CensorData.getCache().size() > 0) {
 				ConcurrentList<CensorData> censorCache = CensorData.getCache();
 				int rounded = NumberUtil.roundUp(censorCache.size(), 5);

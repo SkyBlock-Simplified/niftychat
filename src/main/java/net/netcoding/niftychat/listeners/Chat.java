@@ -92,7 +92,7 @@ public class Chat extends BukkitListener {
 		}
 
 		if (!helper.hasPermissions(player, action, "bypass", "censor")) {
-			String beforeCensor = message;
+			String original = message;
 
 			for (CensorData censor : CensorData.getCache()) {
 				Pattern pattern = censor.getPattern();
@@ -103,13 +103,13 @@ public class Chat extends BukkitListener {
 						try {
 							message = RegexUtil.replace(message, pattern, censor.getReplace());
 						} catch (Exception ex) {
-							helper.getLog().console("Error detected in censor! Please check the censor {0} => {1} for message {2}", pattern.toString(), censor.getReplace(), beforeCensor);
+							helper.getLog().console("Error detected in censor! Please check the censor {0} => {1} for message {2}", pattern.toString(), censor.getReplace(), original);
 							censor.setEnabled(false);
 							break;
 						}
 
 						if (++current >= 10) {
-							helper.getLog().console("Possible infinite loop detected in censor! Please check the censor {0} => {1} for message {2}", pattern.toString(), censor.getReplace(), beforeCensor);
+							helper.getLog().console("Possible infinite loop detected in censor! Please check the censor {0} => {1} for message {2}", pattern.toString(), censor.getReplace(), original);
 							censor.setEnabled(false);
 							break;
 						}

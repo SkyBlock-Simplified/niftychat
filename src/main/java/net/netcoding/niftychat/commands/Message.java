@@ -4,18 +4,22 @@ import net.netcoding.niftybukkit.NiftyBukkit;
 import net.netcoding.niftybukkit.minecraft.BukkitCommand;
 import net.netcoding.niftybukkit.minecraft.BukkitHelper;
 import net.netcoding.niftybukkit.minecraft.messages.BungeeServer;
+import net.netcoding.niftybukkit.mojang.BukkitMojangProfile;
 import net.netcoding.niftychat.cache.Config;
 import net.netcoding.niftychat.cache.RankFormat;
 import net.netcoding.niftychat.cache.UserChatData;
 import net.netcoding.niftychat.listeners.Chat;
 import net.netcoding.niftycore.mojang.MojangProfile;
-import net.netcoding.niftycore.mojang.exceptions.ProfileNotFoundException;
+import net.netcoding.niftycore.util.ListUtil;
 import net.netcoding.niftycore.util.RegexUtil;
 import net.netcoding.niftycore.util.StringUtil;
-
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.java.JavaPlugin;
+
+import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.List;
 
 public class Message extends BukkitCommand {
 
@@ -116,12 +120,15 @@ public class Message extends BukkitCommand {
 			return;
 		}
 
-		try {
-			profile = NiftyBukkit.getMojangRepository().searchByUsername(playerName);
-		} catch (ProfileNotFoundException pnfe) {
+
+		HashSet<BukkitMojangProfile> profiles = Realname.getProfileMatches(playerName);
+
+		if (ListUtil.isEmpty(profiles)) {
 			this.getLog().error(sender, "Unable to locate the profile of {{0}}!", playerName);
 			return;
 		}
+
+		profile = profiles.iterator().next();
 
 		if (sender.getName().equals(profile.getName())) {
 			this.getLog().error(sender, "You cannot message yourself!");
@@ -144,6 +151,26 @@ public class Message extends BukkitCommand {
 			if (send(this, sender.getName(), profile.getName(), sender.getName(), message))
 				NiftyBukkit.getBungeeHelper().forward(senderData.getProfile(), server.getName(), Config.CHAT_CHANNEL, "Message", sender.getName(), profile.getName(), message);
 		}
+	}
+
+	@Override
+	protected List<String> onTabComplete(final CommandSender sender, String alias, String[] args) throws Exception {
+		final String arg = args[0].toLowerCase();
+		List<String> names = new ArrayList<>();
+
+		if (NiftyBukkit.getBungeeHelper().isDetected()) {
+			for (BungeeServer server : NiftyBukkit.getBungeeHelper().getServers()) {
+				for (BukkitMojangProfile profile : server.getPlayerList()) {
+					UserChatData userData = UserChatData.getCache(profile);
+					String displayName = userData.getStrippedDisplayName();
+
+					if (displayName.toLowerCase().startsWith(arg) || displayName.toLowerCase().contains(arg))
+						names.add(displayName);
+				}
+			}
+		}
+
+		return names;
 	}
 
 }

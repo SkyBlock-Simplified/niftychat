@@ -2,6 +2,7 @@ package net.netcoding.niftychat.commands;
 
 import net.netcoding.niftybukkit.NiftyBukkit;
 import net.netcoding.niftybukkit.minecraft.BukkitCommand;
+import net.netcoding.niftybukkit.minecraft.messages.BungeeServer;
 import net.netcoding.niftybukkit.mojang.BukkitMojangProfile;
 import net.netcoding.niftychat.cache.UserChatData;
 import net.netcoding.niftychat.cache.UserFlagData;
@@ -135,6 +136,26 @@ public class Whois extends BukkitCommand {
 				}
 			}
 		}
+	}
+
+	@Override
+	protected List<String> onTabComplete(final CommandSender sender, String alias, String[] args) throws Exception {
+		final String arg = args[0].toLowerCase();
+		List<String> names = new ArrayList<>();
+
+		if (NiftyBukkit.getBungeeHelper().isDetected()) {
+			for (BungeeServer server : NiftyBukkit.getBungeeHelper().getServers()) {
+				for (BukkitMojangProfile profile : server.getPlayerList()) {
+					UserChatData userData = UserChatData.getCache(profile);
+					String displayName = userData.getStrippedDisplayName();
+
+					if (displayName.toLowerCase().startsWith(arg) || displayName.toLowerCase().contains(arg))
+						names.add(displayName);
+				}
+			}
+		}
+
+		return names;
 	}
 
 }

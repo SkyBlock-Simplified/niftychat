@@ -69,8 +69,6 @@ permissions:
         description: Allows you to access all censor features
         children:
           niftychat.censor:
-            description: Allows you to modify the censor
-          niftychat.censor.list:
             description: Allows you to list censored words
           niftychat.censor.manage:
             description: Allows you to add, edit and remove and test censored words

@@ -1,12 +1,5 @@
 package net.netcoding.niftychat.commands;
 
-import java.sql.ResultSet;
-import java.sql.SQLException;
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.List;
-import java.util.UUID;
-
 import net.netcoding.niftybukkit.NiftyBukkit;
 import net.netcoding.niftybukkit.minecraft.BukkitCommand;
 import net.netcoding.niftybukkit.minecraft.messages.BungeeServer;
@@ -18,9 +11,15 @@ import net.netcoding.niftycore.database.factory.callbacks.ResultCallback;
 import net.netcoding.niftycore.mojang.exceptions.ProfileNotFoundException;
 import net.netcoding.niftycore.util.ListUtil;
 import net.netcoding.niftycore.util.StringUtil;
-
 import org.bukkit.command.CommandSender;
 import org.bukkit.plugin.java.JavaPlugin;
+
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.List;
+import java.util.UUID;
 
 public class Realname extends BukkitCommand {
 
@@ -36,9 +35,9 @@ public class Realname extends BukkitCommand {
 		try {
 			profile = NiftyBukkit.getMojangRepository().searchByUsername(lookup);
 			profileLookup = profile.getUniqueId().toString();
-		} catch (ProfileNotFoundException pnfe) { }
+		} catch (ProfileNotFoundException ignore) { }
 
-		final HashSet<BukkitMojangProfile> profiles = NiftyChat.getSQL().query(StringUtil.format("SELECT uuid FROM {0} WHERE LOWER(ufnick) = ? OR LOWER(ufnick) LIKE ? OR uuid = ? ORDER BY ufnick;", Config.USER_TABLE), new ResultCallback<HashSet<BukkitMojangProfile>>() {
+		return NiftyChat.getSQL().query(StringUtil.format("SELECT uuid FROM {0} WHERE LOWER(ufnick) = ? OR LOWER(ufnick) LIKE ? OR uuid = ? ORDER BY ufnick;", Config.USER_TABLE), new ResultCallback<HashSet<BukkitMojangProfile>>() {
 			@Override
 			public HashSet<BukkitMojangProfile> handle(ResultSet result) throws SQLException {
 				HashSet<BukkitMojangProfile> data = new HashSet<>();
@@ -46,14 +45,12 @@ public class Realname extends BukkitCommand {
 				while (result.next()) {
 					try {
 						data.add(NiftyBukkit.getMojangRepository().searchByUniqueId(UUID.fromString(result.getString("uuid"))));
-					} catch (ProfileNotFoundException pnfe) { }
+					} catch (ProfileNotFoundException ignore) { }
 				}
 
 				return data;
 			}
 		}, lookup, ("%" + lookup + "%"), profileLookup);
-
-		return profiles;
 	}
 
 	@Override
@@ -79,7 +76,7 @@ public class Realname extends BukkitCommand {
 	}
 
 	@Override
-	public List<String> onTabComplete(final CommandSender sender, String alias, String[] args) throws Exception {
+	protected List<String> onTabComplete(final CommandSender sender, String alias, String[] args) throws Exception {
 		final String arg = args[0].toLowerCase();
 		List<String> names = new ArrayList<>();
 

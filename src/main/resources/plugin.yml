@@ -13,7 +13,7 @@ commands:
     aliases: [say, br, networkbroadcast, networkbr, nbroadcast, nbroadcast, nbr, nb]
   censor:
     description: Manage chat censoring
-    usage: /<command> <add|edit|remove|list> <badword> [replace]
+    usage: /<command> <add|edit|list|remove|test> <regex> [replace]
     aliases: filter
   format:
     description: Manage chat formatting
@@ -73,7 +73,7 @@ permissions:
           niftychat.censor.list:
             description: Allows you to list censored words
           niftychat.censor.manage:
-            description: Allows you to add, edit and remove censored words
+            description: Allows you to add, edit and remove and test censored words
       niftychat.chat.*:
         description: Allows you to bypass all chat restrictions
         children:

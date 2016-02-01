@@ -12,7 +12,6 @@ import net.netcoding.niftycore.util.StringUtil;
 import net.netcoding.niftycore.util.concurrent.ConcurrentList;
 import org.bukkit.ChatColor;
 import org.bukkit.command.CommandSender;
-import org.bukkit.entity.Damageable;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.java.JavaPlugin;
 
@@ -48,7 +47,7 @@ public class Whois extends BukkitCommand {
 
 		UserChatData userData = UserChatData.getCache(profiles.iterator().next());
 		String separator = StringUtil.format("{0}{1}{2}", ChatColor.GRAY, ", ", ChatColor.RED);
-		String serverName = (NiftyBukkit.getBungeeHelper().isDetected() && userData.isOnlineLocally()) ? userData.getProfile().getServer().getName() : "*";
+		String serverName = NiftyBukkit.getBungeeHelper().isDetected() ? userData.getProfile().getServer().getName() : "*";
 		this.getLog().message(sender, "Whois {{0}}", userData.getProfile().getName());
 		this.getLog().message(sender, "Display Name: {0}", userData.getDisplayName());
 		this.getLog().message(sender, "Ranks: {{0}}", StringUtil.implode(separator, userData.getRankData().getRanks()));
@@ -126,7 +125,7 @@ public class Whois extends BukkitCommand {
 					this.getLog().message(sender, "Operator: {{0}}", (userData.getOfflinePlayer().isOp() ? (ChatColor.GREEN + "Yes") : "No"));
 					this.getLog().message(sender, "Location: {{0}}, {{1}}, {{2}}, {{3}}", player.getLocation().getWorld().getName(), player.getLocation().getX(), player.getLocation().getY(), player.getLocation().getZ());
 					this.getLog().message(sender, "Game Mode: {{0}}", player.getGameMode().toString().toLowerCase());
-					this.getLog().message(sender, "Health: {{0}}/{{1}}", ((Damageable)player).getHealth(), ((Damageable)player).getMaxHealth());
+					this.getLog().message(sender, "Health: {{0}}/{{1}}", player.getHealth(), player.getMaxHealth());
 					this.getLog().message(sender, "Hunger: {{0}}/{{1}} ({{2}} Saturation)", player.getFoodLevel(), "20", ((player.getSaturation() > 0 ? "+" : "") + player.getSaturation()));
 					this.getLog().message(sender, "Experience: {{0}} (Level {{1}})", player.getTotalExperience(), player.getLevel());
 					//this.getLog().message(sender, "God Mode: {{0}}", "??");

@@ -1,17 +1,17 @@
 package net.netcoding.niftychat.cache;
 
+import net.netcoding.niftychat.NiftyChat;
+import net.netcoding.niftycore.database.factory.callbacks.VoidResultCallback;
+import net.netcoding.niftycore.util.StringUtil;
+import net.netcoding.niftycore.util.concurrent.ConcurrentList;
+
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.regex.Pattern;
 
-import net.netcoding.niftychat.NiftyChat;
-import net.netcoding.niftycore.database.factory.callbacks.VoidResultCallback;
-import net.netcoding.niftycore.util.StringUtil;
-import net.netcoding.niftycore.util.concurrent.ConcurrentSet;
-
 public class CensorData {
 
-	private static final transient ConcurrentSet<CensorData> CACHE = new ConcurrentSet<>();
+	private static final transient ConcurrentList<CensorData> CACHE = new ConcurrentList<>();
 	public static final transient String DEFAULT_REPLACE = "***";
 	private String badword;
 	private Pattern pattern;
@@ -33,7 +33,7 @@ public class CensorData {
 		return this.badword;
 	}
 
-	public static ConcurrentSet<CensorData> getCache() {
+	public static ConcurrentList<CensorData> getCache() {
 		return CACHE;
 	}
 

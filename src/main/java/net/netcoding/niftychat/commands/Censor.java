@@ -25,7 +25,7 @@ public class Censor extends BukkitCommand {
 		this.editUsage(1, "edit", "<regex> [replace]");
 		this.editUsage(1, "remove", "<regex>");
 		this.editUsage(1, "list", "");
-		this.editUsage(1, "test", "<regex> <word> [replace]");
+		this.editUsage(1, "test", "<regex> <message> <replace>");
 	}
 
 	@Override
@@ -40,7 +40,7 @@ public class Censor extends BukkitCommand {
 
 			if (CensorData.getCache().size() > 0) {
 				ConcurrentList<CensorData> censorCache = CensorData.getCache();
-				int rounded = NumberUtil.round(censorCache.size(), 5);
+				int rounded = NumberUtil.roundUp(censorCache.size(), 5);
 				int pages = rounded / 5;
 				int page = args.length > 1 ? NumberUtil.isInt(args[1]) ? censorCache.size() > 5 ? Integer.parseInt(args[1]) : 0 : 0 : 0;
 

@@ -1,17 +1,18 @@
 package net.netcoding.niftychat.cache;
 
-import java.sql.ResultSet;
-import java.sql.SQLException;
-
 import net.netcoding.niftychat.NiftyChat;
 import net.netcoding.niftycore.database.factory.callbacks.VoidResultCallback;
 import net.netcoding.niftycore.util.RegexUtil;
 import net.netcoding.niftycore.util.StringUtil;
 import net.netcoding.niftycore.util.concurrent.ConcurrentSet;
 
+import java.sql.ResultSet;
+import java.sql.SQLException;
+
 public class RankFormat {
 
 	private static final transient ConcurrentSet<RankFormat> CACHE = new ConcurrentSet<>();
+	private static final transient RankFormat DEFAULT = new RankFormat("default", "&7default", "&7", "&7", "", "{displayname} &8>&r {msg}", false);
 	private final String rank;
 	private String group;
 	private String format;
@@ -24,13 +25,19 @@ public class RankFormat {
 	}
 
 	public RankFormat(String rank, String group, String format, String prefix, String suffix, String message) {
+		this(rank, group, format, prefix, suffix, message, true);
+	}
+
+	private RankFormat(String rank, String group, String format, String prefix, String suffix, String message, boolean addToCache) {
 		this.rank = rank;
 		this.setGroup(group);
-		this.setMessage(message);
+		this.setFormat(format);
 		this.setPrefix(prefix);
 		this.setSuffix(suffix);
-		this.setFormat(format);
-		CACHE.add(this);
+		this.setMessage(message);
+
+		if (addToCache)
+			CACHE.add(this);
 	}
 
 	public static ConcurrentSet<RankFormat> getCache() {
@@ -38,7 +45,7 @@ public class RankFormat {
 	}
 
 	public static RankFormat getCache(String rank) {
-		RankFormat _default = null;
+		RankFormat _default = DEFAULT;
 
 		for (RankFormat data : getCache()) {
 			if (data.getRank().equalsIgnoreCase("default"))
@@ -111,7 +118,7 @@ public class RankFormat {
 	}
 
 	public void setFormat(String value) {
-		String _default = "{displayname} &8>&r {msg}";
+		String _default = DEFAULT.getFormat();
 		if (StringUtil.isEmpty(value)) value = _default;
 
 		try {

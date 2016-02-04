@@ -138,7 +138,7 @@ public class Censor extends BukkitCommand {
 		List<String> badwords = new ArrayList<>();
 
 		for (CensorData data : censorCache) {
-			if (data.getBadword().startsWith(arg) || data.getBadword().contains(arg))
+			if (data.getBadword().startsWith(arg))
 				badwords.add(data.getBadword());
 		}
 

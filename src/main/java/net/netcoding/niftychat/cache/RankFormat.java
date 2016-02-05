@@ -48,7 +48,7 @@ public class RankFormat {
 		RankFormat _default = DEFAULT;
 
 		for (RankFormat data : getCache()) {
-			if ("default".equalsIgnoreCase(data.getRank()))
+			if (data.getRank().equalsIgnoreCase(DEFAULT.getRank()))
 				_default = data;
 
 			if (data.getRank().equalsIgnoreCase(rank))

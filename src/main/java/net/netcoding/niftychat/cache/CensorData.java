@@ -13,8 +13,8 @@ public class CensorData {
 
 	private static final transient ConcurrentList<CensorData> CACHE = new ConcurrentList<>();
 	public static final transient String DEFAULT_REPLACE = "***";
-	private String badword;
-	private Pattern pattern;
+	private final String badword;
+	private final Pattern pattern;
 	private String replace;
 	private boolean enabled = true;
 

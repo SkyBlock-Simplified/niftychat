@@ -109,7 +109,7 @@ public class UserChatData extends BukkitMojangCache<BukkitMojangProfile> {
 			@Override
 			public String handle(ResultSet result) throws SQLException {
 				String displayName = profile.getName();
-				String rank = "default";
+				String rank = RankFormat.DEFAULT.getRank();
 
 				if (result.next()) {
 					rank = UserRankData.getCache(profile).getPrimaryRank();

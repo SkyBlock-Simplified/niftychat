@@ -48,7 +48,7 @@ public class RankFormat {
 		RankFormat _default = DEFAULT;
 
 		for (RankFormat data : getCache()) {
-			if (data.getRank().equalsIgnoreCase("default"))
+			if ("default".equalsIgnoreCase(data.getRank()))
 				_default = data;
 
 			if (data.getRank().equalsIgnoreCase(rank))
@@ -82,7 +82,7 @@ public class RankFormat {
 		return this.suffix;
 	}
 
-	public static void reload() throws SQLException {
+	public static void reload() {
 		CACHE.clear();
 
 		NiftyChat.getSQL().queryAsync(StringUtil.format("SELECT * FROM {0};", Config.FORMAT_TABLE), new VoidResultCallback() {

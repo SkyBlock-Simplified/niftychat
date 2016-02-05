@@ -1,12 +1,5 @@
 package net.netcoding.niftychat.listeners;
 
-import java.sql.ResultSet;
-import java.sql.SQLException;
-import java.sql.Timestamp;
-import java.util.List;
-import java.util.Map;
-import java.util.UUID;
-
 import net.netcoding.niftychat.cache.CensorData;
 import net.netcoding.niftychat.cache.Config;
 import net.netcoding.niftychat.cache.RankFormat;
@@ -17,6 +10,13 @@ import net.netcoding.niftycore.database.notifications.DatabaseListener;
 import net.netcoding.niftycore.database.notifications.DatabaseNotification;
 import net.netcoding.niftycore.database.notifications.TriggerEvent;
 
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.sql.Timestamp;
+import java.util.List;
+import java.util.Map;
+import java.util.UUID;
+
 public class Notifications implements DatabaseListener {
 
 	@Override
@@ -25,7 +25,7 @@ public class Notifications implements DatabaseListener {
 		String table = databaseNotification.getTable();
 
 		if (table.equals(Config.USER_TABLE)) {
-			if (event.equals(TriggerEvent.UPDATE)) {
+			if (event == TriggerEvent.UPDATE) {
 				databaseNotification.getUpdatedRow(new VoidResultCallback() {
 					@Override
 					public void handle(ResultSet result) throws SQLException {
@@ -44,10 +44,10 @@ public class Notifications implements DatabaseListener {
 				});
 			}
 		} else if (table.equals(Config.FORMAT_TABLE)) {
-			if (event.equals(TriggerEvent.DELETE)) {
+			if (event == TriggerEvent.DELETE) {
 				Map<String, Object> data = databaseNotification.getDeletedData();
 				RankFormat.removeCache((String)data.get("rank"));
-			} else if (event.equals(TriggerEvent.INSERT)) {
+			} else if (event == TriggerEvent.INSERT) {
 				databaseNotification.getUpdatedRow(new VoidResultCallback() {
 					@Override
 					public void handle(ResultSet result) throws SQLException {
@@ -57,7 +57,7 @@ public class Notifications implements DatabaseListener {
 						}
 					}
 				});
-			} else if (event.equals(TriggerEvent.UPDATE)) {
+			} else if (event == TriggerEvent.UPDATE) {
 				databaseNotification.getUpdatedRow(new VoidResultCallback() {
 					@Override
 					public void handle(ResultSet result) throws SQLException {
@@ -83,7 +83,7 @@ public class Notifications implements DatabaseListener {
 		} else if (table.equals(Config.CENSOR_TABLE))
 			CensorData.reload();
 		else if (table.equals(Config.USER_FLAGS_TABLE)) {
-			if (!event.equals(TriggerEvent.INSERT)) {
+			if (event != TriggerEvent.INSERT) {
 				Map<String, Object> data = databaseNotification.getDeletedData();
 				UUID uuid = UUID.fromString((String)data.get("uuid"));
 
@@ -95,7 +95,7 @@ public class Notifications implements DatabaseListener {
 				}
 			}
 
-			if (!event.equals(TriggerEvent.DELETE)) {
+			if (event != TriggerEvent.DELETE) {
 				databaseNotification.getUpdatedRow(new VoidResultCallback() {
 					@Override
 					public void handle(ResultSet result) throws SQLException {

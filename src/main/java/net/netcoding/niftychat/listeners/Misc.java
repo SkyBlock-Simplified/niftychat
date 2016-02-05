@@ -31,7 +31,7 @@ public class Misc extends BukkitListener {
 	public void onBlockPlace(BlockPlaceEvent event) {
 		Material type = event.getBlock().getType();
 
-		if (Material.SIGN_POST.equals(type) || Material.WALL_SIGN.equals(type)) {
+		if (Material.SIGN_POST == type || Material.WALL_SIGN == type) {
 			BukkitMojangProfile profile = NiftyBukkit.getMojangRepository().searchByPlayer(event.getPlayer());
 			UserChatData userData = UserChatData.getCache(profile);
 
@@ -62,7 +62,7 @@ public class Misc extends BukkitListener {
 
 			if (userData.isOnlineLocally())
 				userData.setMoved();
-		} catch (ProfileNotFoundException pfne) { }
+		} catch (ProfileNotFoundException ignore) { }
 	}
 
 	@EventHandler

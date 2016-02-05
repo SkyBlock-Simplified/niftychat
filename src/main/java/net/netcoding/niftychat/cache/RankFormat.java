@@ -12,7 +12,7 @@ import java.sql.SQLException;
 public class RankFormat {
 
 	private static final transient ConcurrentSet<RankFormat> CACHE = new ConcurrentSet<>();
-	private static final transient RankFormat DEFAULT = new RankFormat("default", "&7default", "{displayname} &8>&r {msg}", "&7", "&7", "", false);
+	public static final transient RankFormat DEFAULT = new RankFormat("default", "&7default", "{displayname} &8>&r {msg}", "&7", "&7", "", false);
 	private final String rank;
 	private String group;
 	private String format;

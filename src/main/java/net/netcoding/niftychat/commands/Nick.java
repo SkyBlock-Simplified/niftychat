@@ -1,9 +1,5 @@
 package net.netcoding.niftychat.commands;
 
-import java.sql.ResultSet;
-import java.sql.SQLException;
-import java.util.regex.Pattern;
-
 import net.netcoding.niftybukkit.NiftyBukkit;
 import net.netcoding.niftybukkit.minecraft.BukkitCommand;
 import net.netcoding.niftybukkit.mojang.BukkitMojangProfile;
@@ -14,10 +10,13 @@ import net.netcoding.niftycore.database.factory.callbacks.ResultCallback;
 import net.netcoding.niftycore.mojang.exceptions.ProfileNotFoundException;
 import net.netcoding.niftycore.util.RegexUtil;
 import net.netcoding.niftycore.util.StringUtil;
-
 import org.bukkit.ChatColor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.plugin.java.JavaPlugin;
+
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.util.regex.Pattern;
 
 public class Nick extends BukkitCommand {
 
@@ -32,7 +31,7 @@ public class Nick extends BukkitCommand {
 	}
 
 	@Override
-	protected void onCommand(CommandSender sender, String alias, String[] args) throws Exception, Exception {
+	protected void onCommand(CommandSender sender, String alias, String[] args) throws Exception {
 		if (isConsole(sender) && args.length < 2) {
 			this.getLog().error(sender, "You must pass a player name when changing the nickname of a player from console!");
 			return;
@@ -40,14 +39,14 @@ public class Nick extends BukkitCommand {
 
 		String playerName = (args.length == 2 ? args[0] : sender.getName());
 		String nick = RegexUtil.strip((args.length == 2 ? args[1] : args[0]), RegexUtil.VANILLA_PATTERN);
-		boolean isMe = sender.getName() == playerName;
+		boolean isMe = sender.getName().equals(playerName);
 		String your = (isMe ? ChatColor.GRAY + "You" : playerName);
 		String has = (isMe ? "have" : "has");
 		String _nick = nick.toLowerCase();
 		boolean clear = _nick.matches("^off|clear$");
 		boolean revoke = _nick.matches("^revoke|disable$");
 		boolean grant = _nick.matches("^grant|allow|enable$");
-		BukkitMojangProfile profile = null;
+		BukkitMojangProfile profile;
 
 		if (isConsole(playerName)) {
 			this.getLog().error(sender, "You cannot nickname the console!");
@@ -117,21 +116,21 @@ public class Nick extends BukkitCommand {
 				}
 			}
 
-			if (RegexUtil.strip(nick, RegexUtil.REPLACE_COLOR_PATTERN) != nick) {
+			if (!RegexUtil.strip(nick, RegexUtil.REPLACE_COLOR_PATTERN).equals(nick)) {
 				if (!this.hasPermissions(sender, "nick", "color")) {
 					this.getLog().error(sender, "You do not have access to use color in nicknames!");
 					return;
 				}
 			}
 
-			if (RegexUtil.strip(nick, RegexUtil.REPLACE_MAGIC_PATTERN) != nick) {
+			if (!RegexUtil.strip(nick, RegexUtil.REPLACE_MAGIC_PATTERN).equals(nick)) {
 				if (!this.hasPermissions(sender, "nick", "magic")) {
 					this.getLog().error(sender, "You do not have access to use magic nicknames!");
 					return;
 				}
 			}
 
-			if (RegexUtil.strip(nick, RegexUtil.REPLACE_FORMAT_PATTERN) != nick) {
+			if (!RegexUtil.strip(nick, RegexUtil.REPLACE_FORMAT_PATTERN).equals(nick)) {
 				if (!this.hasPermissions(sender, "nick", "format")) {
 					this.getLog().error(sender, "You do not have access to use formatting in nicknames!");
 					return;

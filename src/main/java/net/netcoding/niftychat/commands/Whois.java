@@ -9,7 +9,6 @@ import net.netcoding.niftychat.cache.UserFlagData;
 import net.netcoding.niftycore.util.ListUtil;
 import net.netcoding.niftycore.util.NumberUtil;
 import net.netcoding.niftycore.util.StringUtil;
-import net.netcoding.niftycore.util.concurrent.ConcurrentList;
 import org.bukkit.ChatColor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
@@ -47,12 +46,13 @@ public class Whois extends BukkitCommand {
 
 		UserChatData userData = UserChatData.getCache(profiles.iterator().next());
 		String separator = StringUtil.format("{0}{1}{2}", ChatColor.GRAY, ", ", ChatColor.RED);
-		String serverName = NiftyBukkit.getBungeeHelper().isDetected() ? userData.getProfile().getServer().getName() : "*";
 		this.getLog().message(sender, "Whois {{0}}", userData.getProfile().getName());
 		this.getLog().message(sender, "Display Name: {0}", userData.getDisplayName());
 		this.getLog().message(sender, "Ranks: {{0}}", StringUtil.implode(separator, userData.getRankData().getRanks()));
 
 		if (NiftyBukkit.getBungeeHelper().isDetected() && userData.isOnlineAnywhere()) {
+			String serverName = userData.getProfile().getServer().getName();
+
 			if (!userData.getFlagData(Vanish.FLAG).getValue() || this.hasPermissions(sender, "vanish", "see"))
 				this.getLog().message(sender, "Server: {{0}}", serverName);
 		}
@@ -60,29 +60,29 @@ public class Whois extends BukkitCommand {
 		if (alias.matches("^.+?admin$") && this.hasPermissions(sender, "whois", "admin")) {
 			if (userData.isOnlineAnywhere()) {
 				if (!userData.getFlagData(Vanish.FLAG).getValue() || this.hasPermissions(sender, "vanish", "see"))
-					this.getLog().message(sender, "Address: {{0}}:{{1}}", userData.getProfile().getAddress().getAddress().getHostAddress(), userData.getProfile().getAddress().getPort());
+					this.getLog().message(sender, "Address: {{0}}:{{1,number,#}}", userData.getProfile().getAddress().getAddress().getHostAddress(), userData.getProfile().getAddress().getPort());
 			}
 
-			this.getLog().message(sender, "Nickname Access: {{0}}", (!userData.getFlagData("nick-revoke").getValue() ? (ChatColor.GREEN + "Yes") : "No"));
+			this.getLog().message(sender, "Nickname Revoked: {{0}}", (userData.getFlagData("nick-revoke").getValue() ? "Yes" : ChatColor.GREEN + "No"));
 			UserFlagData globalMuteData = userData.getFlagData(Mute.FLAG, "*");
 
-			if (globalMuteData.getValue()) {
+			if (globalMuteData.getValue())
 				this.getLog().message(sender, "Muted: {{0}} (Expires {{1}})", "Globally", (globalMuteData.getExpires() > 0 ? Mute.EXPIRE_FORMAT.format(new Date(globalMuteData.getExpires())) : "Never"));
-			} else {
-				ConcurrentList<UserFlagData> muteDatas = new ConcurrentList<>(userData.getAllFlagData(Mute.FLAG));
+			else {
+				List<UserFlagData> servers = new ArrayList<>();
 
-				for (UserFlagData muteData : muteDatas) {
-					if (!muteData.getValue())
-						muteDatas.remove(muteData);
+				for (UserFlagData muteData : userData.getAllFlagData(Mute.FLAG)) {
+					if (muteData.getValue())
+						servers.add(muteData);
 				}
 
-				if (muteDatas.size() > 0) {
+				if (!servers.isEmpty()) {
 					this.getLog().message(sender, "Muted:");
 
-					for (UserFlagData muteData : userData.getAllFlagData(Mute.FLAG))
+					for (UserFlagData muteData : servers)
 						this.getLog().message(sender, "- {{0}} (Expires {{1}})", muteData.getServerName(), (muteData.getExpires() > 0 ? Mute.EXPIRE_FORMAT.format(new Date(muteData.getExpires())) : "Never"));
 				} else
-					this.getLog().message(sender, "Muted: {{0}}", "No");
+					this.getLog().message(sender, "Muted: {0}", ChatColor.GREEN + "No");
 			}
 
 			if (userData.getFlagData(SocialSpy.FLAG, "*").getValue())
@@ -98,7 +98,7 @@ public class Whois extends BukkitCommand {
 				if (!ListUtil.isEmpty(servers))
 					this.getLog().message(sender, "Spying: {{0}}", StringUtil.implode(separator, servers));
 				else
-					this.getLog().message(sender, "Spying: {{0}}", "No");
+					this.getLog().message(sender, "Spying: {0}", ChatColor.GREEN + "No");
 			}
 
 			if (this.hasPermissions(sender, "vanish", "see")) {
@@ -115,7 +115,7 @@ public class Whois extends BukkitCommand {
 					if (!ListUtil.isEmpty(servers))
 						this.getLog().message(sender, "Vanished: {{0}}", StringUtil.implode(separator, servers));
 					else
-						this.getLog().message(sender, "Vanished: {{0}}", "No");
+						this.getLog().message(sender, "Vanished: {0}", ChatColor.GREEN + "No");
 				}
 			}
 		} else {

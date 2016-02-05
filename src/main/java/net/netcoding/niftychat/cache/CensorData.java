@@ -58,7 +58,7 @@ public class CensorData {
 		return this.enabled;
 	}
 
-	public static void reload() throws SQLException {
+	public static void reload() {
 		CACHE.clear();
 
 		NiftyChat.getSQL().queryAsync(StringUtil.format("SELECT * FROM {0};", Config.CENSOR_TABLE), new VoidResultCallback() {

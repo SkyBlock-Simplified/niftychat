@@ -18,7 +18,7 @@ public class Config extends SQLConfig<MySQL> {
 	public static final String USER_FLAGS_TABLE = TABLE_PREFIX + "flags_users";
 	public static final String SERVER_FLAGS_TABLE = TABLE_PREFIX + "flags_servers";
 
-	public Config(JavaPlugin plugin) throws Exception {
+	public Config(JavaPlugin plugin) {
 		super(plugin.getDataFolder(), "config");
 	}
 

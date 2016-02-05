@@ -1,9 +1,5 @@
 package net.netcoding.niftychat.commands;
 
-import java.sql.ResultSet;
-import java.sql.SQLException;
-import java.sql.SQLIntegrityConstraintViolationException;
-
 import net.netcoding.niftybukkit.minecraft.BukkitCommand;
 import net.netcoding.niftychat.NiftyChat;
 import net.netcoding.niftychat.cache.Config;
@@ -11,9 +7,12 @@ import net.netcoding.niftycore.database.factory.callbacks.ResultCallback;
 import net.netcoding.niftycore.util.RegexUtil;
 import net.netcoding.niftycore.util.StringUtil;
 import net.netcoding.niftyranks.cache.UserRankData;
-
 import org.bukkit.command.CommandSender;
 import org.bukkit.plugin.java.JavaPlugin;
+
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.sql.SQLIntegrityConstraintViolationException;
 
 public class Format extends BukkitCommand {
 
@@ -85,6 +84,7 @@ public class Format extends BukkitCommand {
 			} else {
 				if (this.hasPermissions(sender, "format", "edit")) {
 					format = StringUtil.implode(" ", args, 2);
+					format = (format.matches("^empty|none|null|\"\"|''$") ? null : format);
 
 					if (NiftyChat.getSQL().update(StringUtil.format("UPDATE {0} SET _{1} = ? WHERE rank = ?;", Config.FORMAT_TABLE, action), format, rank))
 						this.getLog().message(sender, "The {0} for {{1}} has been set to {{2}}.", action, rank, (StringUtil.isEmpty(format) ? _null : format));

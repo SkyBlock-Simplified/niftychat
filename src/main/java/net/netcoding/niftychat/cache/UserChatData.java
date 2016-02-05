@@ -24,7 +24,7 @@ import java.util.Date;
 import java.util.HashSet;
 import java.util.List;
 
-public class UserChatData extends BukkitMojangCache {
+public class UserChatData extends BukkitMojangCache<BukkitMojangProfile> {
 
 	private static final transient ConcurrentSet<UserChatData> CACHE = new ConcurrentSet<>();
 	private String lastMessage;

@@ -27,10 +27,10 @@ import java.util.List;
 public class UserChatData extends BukkitMojangCache<BukkitMojangProfile> {
 
 	private static final transient ConcurrentSet<UserChatData> CACHE = new ConcurrentSet<>();
+	private final HashSet<UserFlagData> flagData = new HashSet<>();
 	private String lastMessage;
 	private BukkitMojangProfile lastMessenger;
 	private boolean hasMoved = false;
-	private HashSet<UserFlagData> flagData = new HashSet<>();
 
 	public UserChatData(JavaPlugin plugin, BukkitMojangProfile profile) {
 		this(plugin, profile, true);

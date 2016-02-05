@@ -117,7 +117,7 @@ public class GList extends BukkitCommand {
 						}
 
 						names += StringUtil.implode("&r, ", nameList);
-						output.add(StringUtil.format("&8{0} &7({{1}})&f: &7{2}", server.getName(), serverPlayers, names));
+						output.add(StringUtil.format("&8{0}&7 ({{1}})&f:&7 {2}", server.getName(), serverPlayers, names));
 					}
 				}
 			}

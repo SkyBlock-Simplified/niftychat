@@ -1,8 +1,5 @@
 package net.netcoding.niftychat.commands;
 
-import java.text.SimpleDateFormat;
-import java.util.Date;
-
 import net.netcoding.niftybukkit.NiftyBukkit;
 import net.netcoding.niftybukkit.minecraft.BukkitCommand;
 import net.netcoding.niftybukkit.minecraft.BukkitLogger;
@@ -13,10 +10,12 @@ import net.netcoding.niftychat.cache.UserFlagData;
 import net.netcoding.niftycore.mojang.exceptions.ProfileNotFoundException;
 import net.netcoding.niftycore.util.StringUtil;
 import net.netcoding.niftycore.util.TimeUtil;
-
 import org.bukkit.ChatColor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.plugin.java.JavaPlugin;
+
+import java.text.SimpleDateFormat;
+import java.util.Date;
 
 public class Mute extends BukkitCommand {
 
@@ -27,6 +26,11 @@ public class Mute extends BukkitCommand {
 		super(plugin, "mute");
 		this.setMaximumArgsLength(3);
 		this.setPlayerTabComplete();
+		this.editUsage(0, "globalmute", "<player> [time]");
+		this.editUsage(0, "gmute", "<player> [time]");
+		this.editUsage(0, "globalunmute", "<player>");
+		this.editUsage(0, "gunmute", "<player>");
+		this.editUsage(0, "unmute", "<player>");
 	}
 
 	public static void sendMutedError(BukkitLogger logger, CommandSender sender, UserChatData userData) {

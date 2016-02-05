@@ -20,6 +20,15 @@ public class Vanish extends BukkitCommand {
 		super(plugin, "vanish");
 		this.setMinimumArgsLength(0);
 		this.setMaximumArgsLength(2);
+		this.editUsage(0, "globalvanish", "[player] [time]");
+		this.editUsage(0, "gvanish", "[player] [time]");
+		this.editUsage(0, "glovalunvanish", "[player]");
+		this.editUsage(0, "gunvanish", "[player]");
+		this.editUsage(0, "unvanish", "[player]");
+		this.editUsage(0, "gunv", "[player]");
+		this.editUsage(0, "gv", "[player]");
+		this.editUsage(0, "unv", "[player]");
+		this.editUsage(0, "v", "[player]");
 	}
 
 	@Override

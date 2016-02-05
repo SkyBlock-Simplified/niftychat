@@ -12,7 +12,7 @@ import java.sql.SQLException;
 public class RankFormat {
 
 	private static final transient ConcurrentSet<RankFormat> CACHE = new ConcurrentSet<>();
-	private static final transient RankFormat DEFAULT = new RankFormat("default", "&7default", "&7", "&7", "", "{displayname} &8>&r {msg}", false);
+	private static final transient RankFormat DEFAULT = new RankFormat("default", "&7default", "{displayname} &8>&r {msg}", "&7", "&7", "", false);
 	private final String rank;
 	private String group;
 	private String format;
@@ -118,13 +118,13 @@ public class RankFormat {
 	}
 
 	public void setFormat(String value) {
-		String _default = DEFAULT.getFormat();
-		if (StringUtil.isEmpty(value)) value = _default;
+		if (StringUtil.isEmpty(value))
+			value = DEFAULT.getFormat();
 
 		try {
 			value = RegexUtil.replaceColor(value, RegexUtil.REPLACE_ALL_PATTERN);
 		} catch (Exception ex) {
-			value = RegexUtil.replaceColor(_default, RegexUtil.REPLACE_ALL_PATTERN);
+			value = RegexUtil.replaceColor(DEFAULT.getFormat(), RegexUtil.REPLACE_ALL_PATTERN);
 		}
 
 		// Standard

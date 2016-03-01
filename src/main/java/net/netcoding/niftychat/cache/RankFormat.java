@@ -12,7 +12,7 @@ import java.sql.SQLException;
 public class RankFormat {
 
 	private static final transient ConcurrentSet<RankFormat> CACHE = new ConcurrentSet<>();
-	public static final transient RankFormat DEFAULT = new RankFormat("default", "&7default", "{displayname} &8>&r {msg}", "&7", "&7", "", false);
+	public static final transient RankFormat DEFAULT = new RankFormat("default", "&7default", "{displayname} &8>&r {msg}", "&7", "", "&7", false);
 	private final String rank;
 	private String group;
 	private String format;
@@ -31,10 +31,10 @@ public class RankFormat {
 	private RankFormat(String rank, String group, String format, String prefix, String suffix, String message, boolean addToCache) {
 		this.rank = rank;
 		this.setGroup(group);
-		this.setFormat(format);
 		this.setPrefix(prefix);
 		this.setSuffix(suffix);
 		this.setMessage(message);
+		this.setFormat(format);
 
 		if (addToCache)
 			CACHE.add(this);
@@ -92,13 +92,13 @@ public class RankFormat {
 					String rank = result.getString("rank");
 					String group = result.getString("_group");
 					String prefix = result.getString("_prefix");
-					if (StringUtil.isEmpty(prefix)) prefix = null;
+					if (result.wasNull()) prefix = "";
 					String suffix = result.getString("_suffix");
-					if (StringUtil.isEmpty(suffix)) suffix = null;
+					if (result.wasNull()) suffix = "";
 					String message = result.getString("_message");
-					if (StringUtil.isEmpty(message)) message = null;
+					if (result.wasNull()) message = "";
 					String format = result.getString("_format");
-					if (result.wasNull()) format = null;
+					if (result.wasNull()) format = "";
 
 					new RankFormat(rank, group, format, prefix, suffix, message);
 				}

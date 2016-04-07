@@ -17,8 +17,8 @@ import org.bukkit.plugin.java.JavaPlugin;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
-import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 public class Whois extends BukkitCommand {
 
@@ -37,7 +37,7 @@ public class Whois extends BukkitCommand {
 			return;
 		}
 
-		HashSet<BukkitMojangProfile> profiles = Realname.getProfileMatches(args[0]);
+		Set<BukkitMojangProfile> profiles = Realname.getProfileMatches(args[0]);
 
 		if (ListUtil.isEmpty(profiles)) {
 			this.getLog().error(sender, "Unable to locate the profile of {{0}}!", args[0]);

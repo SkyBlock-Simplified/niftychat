@@ -18,8 +18,8 @@ import org.bukkit.entity.Player;
 import org.bukkit.plugin.java.JavaPlugin;
 
 import java.util.ArrayList;
-import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 public class Message extends BukkitCommand {
 
@@ -121,7 +121,7 @@ public class Message extends BukkitCommand {
 		}
 
 
-		HashSet<BukkitMojangProfile> profiles = Realname.getProfileMatches(playerName);
+		Set<BukkitMojangProfile> profiles = Realname.getProfileMatches(playerName);
 
 		if (ListUtil.isEmpty(profiles)) {
 			this.getLog().error(sender, "Unable to locate the profile of {{0}}!", playerName);

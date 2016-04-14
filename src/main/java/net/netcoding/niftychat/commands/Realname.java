@@ -19,6 +19,7 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 import java.util.UUID;
 
 public class Realname extends BukkitCommand {
@@ -28,7 +29,7 @@ public class Realname extends BukkitCommand {
 		this.setPlayerTabComplete();
 	}
 
-	public static HashSet<BukkitMojangProfile> getProfileMatches(String lookup) throws Exception {
+	public static Set<BukkitMojangProfile> getProfileMatches(String lookup) throws Exception {
 		BukkitMojangProfile profile;
 		String profileLookup = "";
 
@@ -37,10 +38,10 @@ public class Realname extends BukkitCommand {
 			profileLookup = profile.getUniqueId().toString();
 		} catch (ProfileNotFoundException ignore) { }
 
-		return NiftyChat.getSQL().query(StringUtil.format("SELECT uuid FROM {0} WHERE LOWER(ufnick) = ? OR LOWER(ufnick) LIKE ? OR uuid = ? ORDER BY ufnick;", Config.USER_TABLE), new ResultCallback<HashSet<BukkitMojangProfile>>() {
+		return NiftyChat.getSQL().query(StringUtil.format("SELECT uuid FROM {0} WHERE LOWER(ufnick) = ? OR LOWER(ufnick) LIKE ? OR uuid = ? ORDER BY CASE WHEN ufnick LIKE ? THEN 1 WHEN ufnick LIKE ? THEN 2 WHEN ufnick LIKE ? THEN 3 END;", Config.USER_TABLE), new ResultCallback<Set<BukkitMojangProfile>>() {
 			@Override
-			public HashSet<BukkitMojangProfile> handle(ResultSet result) throws SQLException {
-				HashSet<BukkitMojangProfile> data = new HashSet<>();
+			public Set<BukkitMojangProfile> handle(ResultSet result) throws SQLException {
+				Set<BukkitMojangProfile> data = new HashSet<>();
 
 				while (result.next()) {
 					try {
@@ -50,7 +51,7 @@ public class Realname extends BukkitCommand {
 
 				return data;
 			}
-		}, lookup, ("%" + lookup + "%"), profileLookup);
+		}, lookup, ("%" + lookup + "%"), profileLookup, (lookup + "%"), ("%" + lookup + "%"), ("%" + lookup));
 	}
 
 	@Override
@@ -60,7 +61,7 @@ public class Realname extends BukkitCommand {
 			return;
 		}
 
-		HashSet<BukkitMojangProfile> profiles = getProfileMatches(args[0]);
+		Set<BukkitMojangProfile> profiles = getProfileMatches(args[0]);
 
 		if (ListUtil.notEmpty(profiles)) {
 			for (BukkitMojangProfile profile : profiles) {

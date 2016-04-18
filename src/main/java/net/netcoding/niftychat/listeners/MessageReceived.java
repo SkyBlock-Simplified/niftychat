@@ -1,5 +1,7 @@
 package net.netcoding.niftychat.listeners;
 
+import com.google.common.io.ByteArrayDataInput;
+
 import net.netcoding.niftybukkit.NiftyBukkit;
 import net.netcoding.niftybukkit.minecraft.BukkitHelper;
 import net.netcoding.niftybukkit.minecraft.messages.BungeeListener;
@@ -9,8 +11,6 @@ import net.netcoding.niftychat.commands.Message;
 import net.netcoding.niftycore.util.DataUtil;
 
 import org.bukkit.plugin.java.JavaPlugin;
-
-import com.google.common.io.ByteArrayDataInput;
 
 public class MessageReceived extends BukkitHelper implements BungeeListener {
 

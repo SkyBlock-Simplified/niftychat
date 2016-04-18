@@ -3,6 +3,7 @@ package net.netcoding.niftychat.events;
 import net.netcoding.niftybukkit.NiftyBukkit;
 import net.netcoding.niftybukkit.mojang.BukkitMojangProfile;
 import net.netcoding.niftycore.util.StringUtil;
+import net.netcoding.niftycore.util.json.JsonMessage;
 import org.bukkit.event.Cancellable;
 import org.bukkit.event.Event;
 import org.bukkit.event.HandlerList;
@@ -17,12 +18,12 @@ public class PlayerJsonChatEvent extends Event implements Cancellable {
 	private final BukkitMojangProfile profile;
 	private boolean cancelled = false;
 	private final String originalMessage;
-	private String message;
+	private JsonMessage message;
 
 	public PlayerJsonChatEvent(BukkitMojangProfile profile, String message) {
 		this.profile = profile;
 		this.originalMessage = StringUtil.isEmpty(message) ? "" : message;
-		this.message = this.originalMessage;
+		this.message = new JsonMessage(this.originalMessage);
 	}
 
 	@Override
@@ -35,11 +36,11 @@ public class PlayerJsonChatEvent extends Event implements Cancellable {
 	}
 
 	/**
-	 * Gets the message from the sender.
+	 * Gets the json message from the sender.
 	 *
-	 * @return Message from the sender.
+	 * @return Json message from the sender.
 	 */
-	public String getMessage() { // TODO: JSON
+	public JsonMessage getMessage() { // TODO: JSON
 		return this.message;
 	}
 
@@ -88,15 +89,6 @@ public class PlayerJsonChatEvent extends Event implements Cancellable {
 	@Override
 	public void setCancelled(boolean cancelled) {
 		this.cancelled = cancelled;
-	}
-
-	/**
-	 * Modifies the message from the sender.
-	 *
-	 * @param message New message to use.
-	 */
-	public void setMessage(String message) { // TODO: JSON
-		this.message = message;
 	}
 
 }

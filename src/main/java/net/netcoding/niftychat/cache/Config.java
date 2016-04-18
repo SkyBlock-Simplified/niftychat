@@ -1,14 +1,13 @@
 package net.netcoding.niftychat.cache;
 
 import net.netcoding.niftybukkit.NiftyBukkit;
+import net.netcoding.niftybukkit.yaml.BukkitSQLConfig;
 import net.netcoding.niftycore.database.MySQL;
 import net.netcoding.niftycore.yaml.ConfigSection;
-import net.netcoding.niftycore.yaml.SQLConfig;
 import net.netcoding.niftycore.yaml.exceptions.InvalidConfigurationException;
-
 import org.bukkit.plugin.java.JavaPlugin;
 
-public class Config extends SQLConfig<MySQL> {
+public class Config extends BukkitSQLConfig<MySQL> {
 
 	public static final String CHAT_CHANNEL = "NiftyChat";
 	private static final String TABLE_PREFIX = CHAT_CHANNEL.toLowerCase() + "_";

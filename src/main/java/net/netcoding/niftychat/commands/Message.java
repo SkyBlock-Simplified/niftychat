@@ -86,7 +86,7 @@ public class Message extends BukkitCommand {
 	@Override
 	public void onCommand(CommandSender sender, String alias, String[] args) throws Exception {
 		Player player = (Player)sender;
-		MojangProfile profile;
+		BukkitMojangProfile profile;
 		boolean reply = alias.matches("^r(?:eply)?$");
 
 		if (args.length < (reply ? 1 : 2)) {

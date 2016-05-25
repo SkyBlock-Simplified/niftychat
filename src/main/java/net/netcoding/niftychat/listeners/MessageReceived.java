@@ -4,7 +4,7 @@ import com.google.common.io.ByteArrayDataInput;
 
 import net.netcoding.niftybukkit.NiftyBukkit;
 import net.netcoding.niftybukkit.minecraft.BukkitHelper;
-import net.netcoding.niftybukkit.minecraft.messages.BungeeListener;
+import net.netcoding.niftybukkit.minecraft.messages.ChannelListener;
 import net.netcoding.niftychat.cache.Config;
 import net.netcoding.niftychat.cache.UserChatData;
 import net.netcoding.niftychat.commands.Message;
@@ -12,7 +12,7 @@ import net.netcoding.niftycore.util.DataUtil;
 
 import org.bukkit.plugin.java.JavaPlugin;
 
-public class MessageReceived extends BukkitHelper implements BungeeListener {
+public class MessageReceived extends BukkitHelper implements ChannelListener {
 
 	public MessageReceived(JavaPlugin plugin) {
 		super(plugin);

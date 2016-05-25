@@ -2,7 +2,7 @@ package net.netcoding.niftychat.listeners;
 
 import net.netcoding.niftybukkit.NiftyBukkit;
 import net.netcoding.niftybukkit.minecraft.BukkitListener;
-import net.netcoding.niftybukkit.minecraft.events.PlayerNameChangeEvent;
+import net.netcoding.niftybukkit.minecraft.events.profile.ProfileNameChangeEvent;
 import net.netcoding.niftybukkit.mojang.BukkitMojangProfile;
 import net.netcoding.niftychat.cache.UserChatData;
 import net.netcoding.niftychat.commands.Mute;
@@ -66,7 +66,7 @@ public class Misc extends BukkitListener {
 	}
 
 	@EventHandler
-	public void onPlayerNameChange(PlayerNameChangeEvent event) {
+	public void onProfileNameChange(ProfileNameChangeEvent event) {
 		UserChatData userData = UserChatData.getCache(event.getProfile());
 
 		if (userData.isOnlineLocally()) {

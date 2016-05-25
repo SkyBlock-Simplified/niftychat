@@ -1,20 +1,17 @@
 package net.netcoding.niftychat.listeners;
 
+import net.netcoding.niftybukkit.NiftyBukkit;
 import net.netcoding.niftybukkit.minecraft.BukkitListener;
-import net.netcoding.niftybukkit.minecraft.events.BungeeLoadedEvent;
-import net.netcoding.niftybukkit.minecraft.events.PlayerDisconnectEvent;
-import net.netcoding.niftybukkit.minecraft.events.PlayerPostLoginEvent;
-import net.netcoding.niftybukkit.minecraft.messages.BungeeHelper;
+import net.netcoding.niftybukkit.minecraft.events.bungee.BungeeLoadedEvent;
+import net.netcoding.niftybukkit.minecraft.events.profile.ProfileJoinEvent;
+import net.netcoding.niftybukkit.minecraft.events.profile.ProfileQuitEvent;
 import net.netcoding.niftychat.NiftyChat;
 import net.netcoding.niftychat.cache.Config;
 import net.netcoding.niftychat.cache.UserChatData;
 import net.netcoding.niftychat.commands.Vanish;
 import net.netcoding.niftycore.util.StringUtil;
-
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.player.PlayerJoinEvent;
-import org.bukkit.event.player.PlayerKickEvent;
-import org.bukkit.event.player.PlayerQuitEvent;
 import org.bukkit.plugin.java.JavaPlugin;
 
 public class Connections extends BukkitListener {
@@ -25,12 +22,7 @@ public class Connections extends BukkitListener {
 
 	@EventHandler
 	public void onBungeeLoaded(BungeeLoadedEvent event) {
-		new BungeeHelper(this.getPlugin(), new MessageReceived(this.getPlugin()), true);
-	}
-
-	@EventHandler
-	public void onPlayerDisconnect(PlayerDisconnectEvent event) {
-		UserChatData.removeCache(event.getProfile());
+		NiftyBukkit.getBungeeHelper().register(this.getPlugin(), new MessageReceived(this.getPlugin()));
 	}
 
 	@EventHandler
@@ -39,17 +31,13 @@ public class Connections extends BukkitListener {
 	}
 
 	@EventHandler
-	public void onPlayerKick(PlayerKickEvent event) {
-		event.setLeaveMessage(null);
-	}
-
-	@EventHandler
-	public void onPlayerLeave(PlayerQuitEvent event) {
+	public void onProfileQuit(ProfileQuitEvent event) {
 		event.setQuitMessage(null);
+		UserChatData.removeCache(event.getProfile());
 	}
 
 	@EventHandler
-	public void onPlayerPostLogin(PlayerPostLoginEvent event) {
+	public void onProfileJoin(ProfileJoinEvent event) {
 		final UserChatData userData = new UserChatData(this.getPlugin(), event.getProfile());
 
 		try {
@@ -62,7 +50,7 @@ public class Connections extends BukkitListener {
 
 			userData.applyFlagData(Vanish.FLAG);
 		} catch (Exception ex) {
-			this.getLog().console(ex);
+			this.getLog().console(ex, userData.getProfile().toString());
 		}
 	}
 

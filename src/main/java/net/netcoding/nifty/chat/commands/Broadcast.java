@@ -34,7 +34,7 @@ public class Broadcast extends MinecraftListener {
 			}
 		} else {
 			this.getLog().message(this.getPlugin().getServer().getConsoleSource(), message);
-			Nifty.getBungeeHelper().getPlayerList().stream().forEach(profile -> this.getLog().message(profile.getOfflinePlayer().getPlayer(), message));
+			Nifty.getBungeeHelper().getPlayerList().forEach(profile -> this.getLog().message(profile.getOfflinePlayer().getPlayer(), message));
 		}
 	}
 

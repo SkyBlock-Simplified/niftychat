@@ -1,17 +1,15 @@
-package net.netcoding.niftychat.cache;
+package net.netcoding.nifty.chat.cache;
 
-import net.netcoding.niftychat.NiftyChat;
-import net.netcoding.niftycore.database.factory.callbacks.VoidResultCallback;
-import net.netcoding.niftycore.util.StringUtil;
-import net.netcoding.niftycore.util.concurrent.ConcurrentList;
+import net.netcoding.nifty.chat.NiftyChat;
+import net.netcoding.nifty.core.util.StringUtil;
+import net.netcoding.nifty.core.util.concurrent.Concurrent;
+import net.netcoding.nifty.core.util.concurrent.ConcurrentList;
 
-import java.sql.ResultSet;
-import java.sql.SQLException;
 import java.util.regex.Pattern;
 
 public class CensorData {
 
-	private static final transient ConcurrentList<CensorData> CACHE = new ConcurrentList<>();
+	private static final transient ConcurrentList<CensorData> CACHE = Concurrent.newList();
 	public static final transient String DEFAULT_REPLACE = "***";
 	private final String badword;
 	private final Pattern pattern;
@@ -61,24 +59,18 @@ public class CensorData {
 	public static void reload() {
 		CACHE.clear();
 
-		NiftyChat.getSQL().queryAsync(StringUtil.format("SELECT * FROM {0};", Config.CENSOR_TABLE), new VoidResultCallback() {
-			@Override
-			public void handle(ResultSet result) throws SQLException {
-				while (result.next()) {
-					String badword = result.getString("badword");
-					String replace = result.getString("_replace");
-					replace = (result.wasNull() ? null : replace);
-					new CensorData(badword, replace);
-				}
+		NiftyChat.getSQL().queryAsync(StringUtil.format("SELECT * FROM {0};", Config.CENSOR_TABLE), result -> {
+			while (result.next()) {
+				String badword = result.getString("badword");
+				String replace = result.getString("_replace");
+				replace = (result.wasNull() ? null : replace);
+				new CensorData(badword, replace);
 			}
 		});
 	}
 
 	public static void removeCache(String badword) {
-		for (CensorData censor : getCache()) {
-			if (censor.getBadword().equalsIgnoreCase(badword))
-				CACHE.remove(censor);
-		}
+		getCache().stream().filter(censor -> censor.getBadword().equalsIgnoreCase(badword)).forEach(CACHE::remove);
 	}
 
 	public void setEnabled(boolean value) {

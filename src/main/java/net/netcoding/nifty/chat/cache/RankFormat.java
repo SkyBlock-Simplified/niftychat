@@ -1,17 +1,14 @@
-package net.netcoding.niftychat.cache;
+package net.netcoding.nifty.chat.cache;
 
-import net.netcoding.niftychat.NiftyChat;
-import net.netcoding.niftycore.database.factory.callbacks.VoidResultCallback;
-import net.netcoding.niftycore.util.RegexUtil;
-import net.netcoding.niftycore.util.StringUtil;
-import net.netcoding.niftycore.util.concurrent.ConcurrentSet;
-
-import java.sql.ResultSet;
-import java.sql.SQLException;
+import net.netcoding.nifty.chat.NiftyChat;
+import net.netcoding.nifty.core.util.RegexUtil;
+import net.netcoding.nifty.core.util.StringUtil;
+import net.netcoding.nifty.core.util.concurrent.Concurrent;
+import net.netcoding.nifty.core.util.concurrent.ConcurrentSet;
 
 public class RankFormat {
 
-	private static final transient ConcurrentSet<RankFormat> CACHE = new ConcurrentSet<>();
+	private static final transient ConcurrentSet<RankFormat> CACHE = Concurrent.newSet();
 	public static final transient RankFormat DEFAULT = new RankFormat("default", "&7default", "{displayname} &8>&r {msg}", "&7", "", "&7", false);
 	private final String rank;
 	private String group;
@@ -85,32 +82,26 @@ public class RankFormat {
 	public static void reload() {
 		CACHE.clear();
 
-		NiftyChat.getSQL().queryAsync(StringUtil.format("SELECT * FROM {0};", Config.FORMAT_TABLE), new VoidResultCallback() {
-			@Override
-			public void handle(ResultSet result) throws SQLException {
-				while (result.next()) {
-					String rank = result.getString("rank");
-					String group = result.getString("_group");
-					String prefix = result.getString("_prefix");
-					if (result.wasNull()) prefix = "";
-					String suffix = result.getString("_suffix");
-					if (result.wasNull()) suffix = "";
-					String message = result.getString("_message");
-					if (result.wasNull()) message = "";
-					String format = result.getString("_format");
-					if (result.wasNull()) format = "";
+		NiftyChat.getSQL().queryAsync(StringUtil.format("SELECT * FROM {0};", Config.FORMAT_TABLE), result -> {
+			while (result.next()) {
+				String rank = result.getString("rank");
+				String group = result.getString("_group");
+				String prefix = result.getString("_prefix");
+				if (result.wasNull()) prefix = "";
+				String suffix = result.getString("_suffix");
+				if (result.wasNull()) suffix = "";
+				String message = result.getString("_message");
+				if (result.wasNull()) message= "";
+				String format = result.getString("_format");
+				if (result.wasNull()) format = "";
 
-					new RankFormat(rank, group, format, prefix, suffix, message);
-				}
+				new RankFormat(rank, group, format, prefix, suffix, message);
 			}
 		});
 	}
 
 	public static void removeCache(String rank) {
-		for (RankFormat data : getCache()) {
-			if (data.getRank().equals(rank))
-				CACHE.remove(data);
-		}
+		getCache().stream().filter(data -> data.getRank().equals(rank)).forEach(CACHE::remove);
 	}
 
 	public void setGroup(String value) {

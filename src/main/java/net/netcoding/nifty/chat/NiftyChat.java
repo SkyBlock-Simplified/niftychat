@@ -1,29 +1,18 @@
-package net.netcoding.niftychat;
+package net.netcoding.nifty.chat;
 
-import net.netcoding.niftybukkit.minecraft.BukkitPlugin;
-import net.netcoding.niftychat.cache.CensorData;
-import net.netcoding.niftychat.cache.Config;
-import net.netcoding.niftychat.cache.RankFormat;
-import net.netcoding.niftychat.commands.Broadcast;
-import net.netcoding.niftychat.commands.Censor;
-import net.netcoding.niftychat.commands.Format;
-import net.netcoding.niftychat.commands.GList;
-import net.netcoding.niftychat.commands.Me;
-import net.netcoding.niftychat.commands.Message;
-import net.netcoding.niftychat.commands.Mute;
-import net.netcoding.niftychat.commands.Nick;
-import net.netcoding.niftychat.commands.Realname;
-import net.netcoding.niftychat.commands.SocialSpy;
-import net.netcoding.niftychat.commands.Vanish;
-import net.netcoding.niftychat.commands.Whois;
-import net.netcoding.niftychat.listeners.Chat;
-import net.netcoding.niftychat.listeners.Connections;
-import net.netcoding.niftychat.listeners.Misc;
-import net.netcoding.niftychat.listeners.Notifications;
-import net.netcoding.niftycore.database.factory.SQLWrapper;
-import net.netcoding.niftycore.util.StringUtil;
+import net.netcoding.nifty.chat.cache.CensorData;
+import net.netcoding.nifty.chat.cache.Config;
+import net.netcoding.nifty.chat.cache.RankFormat;
+import net.netcoding.nifty.chat.commands.*;
+import net.netcoding.nifty.chat.listeners.Chat;
+import net.netcoding.nifty.chat.listeners.Connections;
+import net.netcoding.nifty.chat.listeners.Misc;
+import net.netcoding.nifty.chat.listeners.Notifications;
+import net.netcoding.nifty.common.api.plugin.MinecraftPlugin;
+import net.netcoding.nifty.core.database.factory.SQLWrapper;
+import net.netcoding.nifty.core.util.StringUtil;
 
-public class NiftyChat extends BukkitPlugin {
+public class NiftyChat extends MinecraftPlugin {
 
 	private static transient Config PLUGIN_CONFIG;
 

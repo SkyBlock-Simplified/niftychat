@@ -1,8 +1,8 @@
-package net.netcoding.niftychat.cache;
+package net.netcoding.nifty.chat.cache;
 
-import net.netcoding.niftybukkit.NiftyBukkit;
-import net.netcoding.niftybukkit.minecraft.messages.BungeeServer;
-import net.netcoding.niftycore.util.StringUtil;
+import net.netcoding.nifty.common.Nifty;
+import net.netcoding.nifty.common.api.plugin.messaging.BungeeServer;
+import net.netcoding.nifty.core.util.StringUtil;
 
 public class UserFlagData {
 
@@ -41,7 +41,7 @@ public class UserFlagData {
 	}
 
 	public BungeeServer getServer() {
-		return NiftyBukkit.getBungeeHelper().getServer(this.server);
+		return Nifty.getBungeeHelper().getServer(this.server);
 	}
 
 	public String getServerName() {

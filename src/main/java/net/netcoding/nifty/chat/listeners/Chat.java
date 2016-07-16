@@ -1,32 +1,32 @@
-package net.netcoding.niftychat.listeners;
+package net.netcoding.nifty.chat.listeners;
 
-import net.netcoding.niftybukkit.NiftyBukkit;
-import net.netcoding.niftybukkit.minecraft.BukkitHelper;
-import net.netcoding.niftybukkit.minecraft.BukkitListener;
-import net.netcoding.niftybukkit.mojang.BukkitMojangProfile;
-import net.netcoding.niftychat.cache.CensorData;
-import net.netcoding.niftychat.cache.RankFormat;
-import net.netcoding.niftychat.cache.UserChatData;
-import net.netcoding.niftychat.commands.Mute;
-import net.netcoding.niftycore.util.RegexUtil;
-import net.netcoding.niftycore.util.StringUtil;
-import org.bukkit.entity.Player;
-import org.bukkit.event.EventHandler;
-import org.bukkit.event.EventPriority;
-import org.bukkit.event.player.AsyncPlayerChatEvent;
-import org.bukkit.plugin.java.JavaPlugin;
-import org.bukkit.scoreboard.Team;
+import net.netcoding.nifty.chat.cache.CensorData;
+import net.netcoding.nifty.chat.cache.RankFormat;
+import net.netcoding.nifty.chat.commands.Mute;
+import net.netcoding.nifty.chat.events.PlayerJsonChatEvent;
+import net.netcoding.nifty.common.Nifty;
+import net.netcoding.nifty.common.api.plugin.MinecraftHelper;
+import net.netcoding.nifty.common.api.plugin.MinecraftListener;
+import net.netcoding.nifty.common.api.plugin.Event;
+import net.netcoding.nifty.common.api.plugin.MinecraftPlugin;
+import net.netcoding.nifty.common.minecraft.entity.living.human.Player;
+import net.netcoding.nifty.common.minecraft.event.player.AsyncPlayerChatEvent;
+import net.netcoding.nifty.common.mojang.MinecraftMojangProfile;
+import net.netcoding.nifty.core.util.RegexUtil;
+import net.netcoding.nifty.core.util.StringUtil;
+import net.netcoding.nifty.core.util.json.JsonMessage;
+import net.netcoding.nifty.chat.cache.UserChatData;
 
 import java.util.regex.Pattern;
 
-public class Chat extends BukkitListener {
+public class Chat extends MinecraftListener {
 
-	public Chat(JavaPlugin plugin) {
+	public Chat(MinecraftPlugin plugin) {
 		super(plugin);
 	}
 
-	public static boolean check(BukkitHelper helper, Player player, String message) {
-		BukkitMojangProfile profile = NiftyBukkit.getMojangRepository().searchByPlayer(player);
+	public static boolean check(MinecraftHelper helper, Player player, String message) {
+		MinecraftMojangProfile profile = Nifty.getMojangRepository().searchByPlayer(player);
 		UserChatData userData = UserChatData.getCache(profile);
 		String stripMessage = RegexUtil.strip(message, RegexUtil.REPLACE_ALL_PATTERN);
 
@@ -50,7 +50,7 @@ public class Chat extends BukkitListener {
 		return true;
 	}
 
-	public static String format(BukkitHelper helper, Player player, String action, String message) {
+	public static String format(MinecraftHelper helper, Player player, String action, String message) {
 		if (helper.hasPermissions(player, action, "color"))
 			message = RegexUtil.replaceColor(message, RegexUtil.REPLACE_COLOR_PATTERN);
 		else
@@ -69,7 +69,7 @@ public class Chat extends BukkitListener {
 		return message;
 	}
 
-	public static String filter(BukkitHelper helper, Player player, String action, String message) {
+	public static String filter(MinecraftHelper helper, Player player, String action, String message) {
 		if (!helper.hasPermissions(player, action, "bypass", "advertise")) {
 			message = RegexUtil.IP_FILTER_PATTERN.matcher(message).replaceAll("*.*.*.*");
 
@@ -85,8 +85,10 @@ public class Chat extends BukkitListener {
 		if (!helper.hasPermissions(player, action, "bypass", "caps")) {
 			String[] words = message.split("\\s");
 
-			for (int i = 0; i < words.length; i++)
-				if (words[i].length() > 3) words[i] = words[i].toLowerCase();
+			for (int i = 0; i < words.length; i++) {
+				if (words[i].length() > 3)
+					words[i] = words[i].toLowerCase();
+			}
 
 			message = StringUtil.implode(" ", words);
 		}
@@ -121,7 +123,32 @@ public class Chat extends BukkitListener {
 		return message;
 	}
 
-	@EventHandler(priority = EventPriority.LOWEST)
+	//@Event(priority = Event.Priority.LOWEST, ignoreCancelled = false)
+	public void onLegacyPlayerChat(AsyncPlayerChatEvent event) {
+		event.setCancelled(true); // Legacy Cancellation
+		MinecraftMojangProfile profile = Nifty.getMojangRepository().searchByPlayer(event.getPlayer());
+		PlayerJsonChatEvent jsonChat = new PlayerJsonChatEvent(profile, event.getMessage());
+		Nifty.getPluginManager().call(jsonChat);
+
+		if (!jsonChat.isCancelled()) {
+			for (MinecraftMojangProfile recipient : jsonChat.getRecipients()) {
+				try {
+					recipient.sendMessage(jsonChat.getMessage());
+				} catch (Exception ignore) {
+					// TODO: Do something?
+				}
+			}
+		}
+	}
+
+	//@Event(priority = Event.Priority.LOWEST)
+	public void onProfileJsonChat(PlayerJsonChatEvent event) {
+		MinecraftMojangProfile profile = event.getProfile();
+		JsonMessage message = event.getMessage();
+		Player player = profile.getOfflinePlayer().getPlayer();
+	}
+
+	@Event(priority = Event.Priority.LOWEST)
 	public void checkPlayerMessage(AsyncPlayerChatEvent event) {
 		Player player = event.getPlayer();
 		String message = event.getMessage();
@@ -135,10 +162,10 @@ public class Chat extends BukkitListener {
 		event.setMessage(message);
 	}
 
-	@EventHandler(priority = EventPriority.LOW)
+	@Event(priority = Event.Priority.LOW)
 	public void onPlayerChat(AsyncPlayerChatEvent event) {
 		Player player = event.getPlayer();
-		BukkitMojangProfile profile = NiftyBukkit.getMojangRepository().searchByPlayer(player);
+		MinecraftMojangProfile profile = Nifty.getMojangRepository().searchByPlayer(player);
 		UserChatData userData = UserChatData.getCache(profile);
 
 		String rank = userData.getRankData().getPrimaryRank();
@@ -147,23 +174,14 @@ public class Chat extends BukkitListener {
 		String group = rankInfo.getGroup();
 		group = (group == null ? rank : group);
 		String world = player.getWorld().getName();
-		Team team = player.getScoreboard().getPlayerTeam(profile.getOfflinePlayer());
+		//Team team = player.getScoreboard().getPlayerTeam(profile.getOfflinePlayer());
 
-		String teamName = team != null ? team.getDisplayName() : "";
-		String teamPrefix = team != null ? team.getPrefix() : "";
-		String teamSuffix = team != null ? team.getSuffix() : "";
+		//String teamName = team != null ? team.getDisplayName() : "";
+		//String teamPrefix = team != null ? team.getPrefix() : "";
+		//String teamSuffix = team != null ? team.getSuffix() : "";
+		// TODO
 
-		synchronized (this) {
-			event.setFormat(StringUtil.format(format, group, world, world.substring(0, 1).toUpperCase(), teamName, teamPrefix, teamSuffix));
-		}
-
-		/*Reflection packetChat = new Reflection("PacketPlayOutChat", MinecraftPackage.MINECRAFT_SERVER);
-		Reflection chatSerializer = BukkitReflection.getComatibleReflection("IChatBaseComponent", "ChatSerializer");
-		JsonObject json = new JsonObject();
-		json.addProperty("text", RegexUtil.replaceColor("chat text", RegexUtil.REPLACE_ALL_PATTERN));
-		Object chatJson = chatSerializer.invokeMethod("a", null, json.toString());
-		Object packetChatObj = packetChat.newInstance(chatJson, true);
-		profile.sendPacket(packetChatObj);*/
+		event.setFormat(StringUtil.format(format, group, world, world.substring(0, 1).toUpperCase()/*, teamName, teamPrefix, teamSuffix*/));
 	}
 
 }
